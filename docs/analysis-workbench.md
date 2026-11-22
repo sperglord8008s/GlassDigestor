@@ -191,12 +191,16 @@ and [release](releases/0.6.0-pre-alpha.15.md). Archive gallery/SAF/production
 ARM64/PDF-rendering acceptance remains separate and unverified.
 
 
-Development pre-alpha.16 unifies PDF viewing through the owned-input
+Published pre-alpha.16 unifies PDF viewing through the owned-input
 `PdfPagePreview` helper. Recovered and archive PDFs have first-page thumbnails;
 the full viewer rasterizes logical point geometry to bounded useful pixels,
 with Fit/Actual pixels, horizontal/vertical scrolling and retained page/view/
 position. Source identity expands without truncating captured text. Native
 file boundaries, transient rendering and structural validity remain distinct.
-Guard/widget/exact-byte and original recovery fixtures pass; the ninth actual
-Android lab case is compiled, execution pending. See
+All 195 host cases and both five-job source CI runs pass at `04e93c0`. All nine
+actual x86 API 26/35 contracts pass, including native recovery followed by
+known red/green platform PDF rendering. Downloaded source/APK/library/report
+identities and page pixels/geometry are independently verified;
+[evidence](verification/android-worker-runtime-04e93c0.json). Production ARM64,
+SAF and full gallery UI acceptance remain separate. See
 [PDF preview contracts](pdf-page-previews.md).

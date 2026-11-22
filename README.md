@@ -35,16 +35,19 @@ permissions determine which files and system information are accessible.
    retained. Hold a card for evidence and expert actions.
 3. **Open an archive to explore its contents.** The native browser identifies
    supported archives from bytes, offers virtual folders and nested Back, and
-   acquires members by exact index. Pre-alpha.15 includes **Gallery**,
+   acquires members by exact index. Use **Gallery** for
    thumbnails, direct file saves and **Export files ZIP** for archive members.
 
 Platform image/audio/video, paged UTF-8, PDF and Hex viewers are available.
+PDFs have first-page thumbnails and Fit / Actual pixels reading with two-axis
+scrolling and retained page/view position.
 Unsupported codecs, unknown extents and extraction limits are explicit.
 Recognition alone does not establish a complete file boundary or full validity.
 
 [Recovered file gallery](docs/recovered-file-gallery.md) ·
 [Archive file gallery](docs/archive-file-gallery.md) ·
 [PDF recovery](docs/pdf-file-recovery.md) ·
+[PDF page previews](docs/pdf-page-previews.md) ·
 [Input limits and large-file checks](docs/input-budgets.md)
 
 ## Explore deeper
@@ -76,19 +79,20 @@ the MPV source-build, dependency, release and signing work needed for submission
 
 ## Verification
 
-The published [pre-alpha.15 checkpoint](https://github.com/sperglord8008s/GlassDigestor/releases/tag/v0.6.0-pre-alpha.15)
-passed all five source CI jobs and **188 Android host tests**, using real native
+The published [pre-alpha.16 checkpoint](https://github.com/sperglord8008s/GlassDigestor/releases/tag/v0.6.0-pre-alpha.16)
+passed all five source CI jobs and **195 Android host tests**, using real native
 engines/parsers where documented. ARM64 compilation, lint, APK signatures,
 offline assets and static 16 KiB alignment are checked.
 
-**Eight actual Android contracts** passed on x86 API 26 and 35. Downloaded
+**Nine actual Android contracts** passed on x86 API 26 and 35. Downloaded
 reports were independently checked against source, APK/library and report
 hashes. They include isolated worker transport/cancellation, archive extraction,
 bounded media observations, compiled declarations and exact recovery of a
-9,437,636-byte PDF. [Exact verification evidence](docs/verification/android-worker-runtime-2dcfce3.json).
+9,437,636-byte PDF, plus exact recovered two-page PDF rendering with independently
+known colors and geometry. [Exact verification evidence](docs/verification/android-worker-runtime-04e93c0.json).
 
 **Pre-alpha scope:** production ARM64 handset/SAF/UI acceptance, every media
-codec, full PDF rendering, fragmented recovery and full desktop Detect It Easy
+codec, arbitrary PDF/document support, fragmented recovery and full desktop Detect It Easy
 parity remain incomplete. A permission, signature or entropy measurement does
 not establish malicious behavior or safety. The
 [parity checklist](docs/FEATURE-PARITY.md) separates implementation, host checks
