@@ -189,3 +189,14 @@ passed. The downloaded public APK and runtime report/source/library identities
 are independently verified; see [evidence](verification/android-worker-runtime-2dcfce3.json)
 and [release](releases/0.6.0-pre-alpha.15.md). Archive gallery/SAF/production
 ARM64/PDF-rendering acceptance remains separate and unverified.
+
+
+Development pre-alpha.16 unifies PDF viewing through the owned-input
+`PdfPagePreview` helper. Recovered and archive PDFs have first-page thumbnails;
+the full viewer rasterizes logical point geometry to bounded useful pixels,
+with Fit/Actual pixels, horizontal/vertical scrolling and retained page/view/
+position. Source identity expands without truncating captured text. Native
+file boundaries, transient rendering and structural validity remain distinct.
+Guard/widget/exact-byte and original recovery fixtures pass; the ninth actual
+Android lab case is compiled, execution pending. See
+[PDF preview contracts](pdf-page-previews.md).

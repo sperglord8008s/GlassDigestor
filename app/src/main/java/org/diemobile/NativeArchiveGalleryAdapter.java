@@ -199,7 +199,10 @@ final class NativeArchiveGalleryAdapter extends BaseAdapter implements AutoClose
                                 result.bitmap = media.bitmap;
                                 result.status += "\n" + media.description();
                             } else if (type.equals("PDF")) {
-                                result.status += "\nTap to open PDF pages";
+                                PdfPagePreview.Result document =
+                                        PdfPagePreview.read(input, 0, 256, () -> closed);
+                                result.bitmap = document.bitmap;
+                                result.status += "\n" + document.description();
                             } else if (ContentPreview.looksLikeText(
                                     header, header.length == input.size)) {
                                 result.text =

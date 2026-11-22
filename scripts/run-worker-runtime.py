@@ -16,6 +16,7 @@ CHECKS = {
     "exact-range-platform-media-preview",
     "real-isolated-compiled-manifest-declaration",
     "isolated-photorec-pdf-recovery",
+    "exact-recovered-platform-pdf-pages",
     "token-scoped-kill-with-blocked-report-pipe",
     "normal-client-recovers-after-worker-death",
 }

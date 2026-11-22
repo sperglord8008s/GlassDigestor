@@ -20,6 +20,7 @@ final class ContentGalleryAdapter extends BaseAdapter implements AutoCloseable {
     private final Map<Integer, Bitmap> thumbnails = new HashMap<>();
     private final Map<Integer, String> failures = new HashMap<>();
     private final Map<Integer, MediaFrame.Result> media = new HashMap<>();
+    private final Map<Integer, PdfPagePreview.Result> pdf = new HashMap<>();
     private final Set<Integer> pending = new HashSet<>();
     private volatile boolean closed;
     private final java.util.function.Consumer<ContentMap.Card> exportFile;
@@ -91,7 +92,8 @@ final class ContentGalleryAdapter extends BaseAdapter implements AutoCloseable {
                         12));
         if ((card.kind == ContentMap.Kind.IMAGE
                         || card.kind == ContentMap.Kind.AUDIO
-                        || card.kind == ContentMap.Kind.VIDEO)
+                        || card.kind == ContentMap.Kind.VIDEO
+                        || isPdf(card))
                 && card.length != null) {
             ImageView image = new ImageView(context);
             image.setContentDescription(card.label);
@@ -100,14 +102,18 @@ final class ContentGalleryAdapter extends BaseAdapter implements AutoCloseable {
             TextView status = text("Decoding thumbnail…", 11);
             tile.addView(status);
             Bitmap bitmap = thumbnails.get(index);
-            if (bitmap == null && (media.containsKey(index) || card.kind == ContentMap.Kind.AUDIO))
-                image.setVisibility(View.GONE);
+            if (bitmap == null
+                    && (media.containsKey(index)
+                            || failures.containsKey(index)
+                            || card.kind == ContentMap.Kind.AUDIO)) image.setVisibility(View.GONE);
             if (bitmap != null) {
                 image.setImageBitmap(bitmap);
                 status.setText(
                         media.containsKey(index)
                                 ? media.get(index).description()
-                                : "Platform decoded thumbnail · tap for preview/evidence");
+                                : pdf.containsKey(index)
+                                        ? pdf.get(index).description()
+                                        : "Platform decoded thumbnail · tap for preview/evidence");
             } else if (media.containsKey(index)) status.setText(media.get(index).description());
             else if (failures.containsKey(index))
                 status.setText("Thumbnail unavailable: " + failures.get(index));
@@ -138,17 +144,33 @@ final class ContentGalleryAdapter extends BaseAdapter implements AutoCloseable {
         return tile;
     }
 
+    private static boolean isPdf(ContentMap.Card card) {
+        return card.kind == ContentMap.Kind.DOCUMENT
+                && RecoveredFiles.extension(card.format).equals("pdf");
+    }
+
     private void thumbnail(int index, ContentMap.Card card) {
         worker.execute(
                 () -> {
                     if (closed) return;
                     Bitmap bitmap = null;
                     MediaFrame.Result observation = null;
+                    PdfPagePreview.Result document = null;
                     String error = "";
                     try {
                         if (card.kind == ContentMap.Kind.IMAGE)
                             bitmap = ContentPreview.image(input.file, card.range(input.size), 256);
-                        else {
+                        else if (isPdf(card)) {
+                            document =
+                                    PdfPagePreview.thumbnail(
+                                            input,
+                                            card.range(input.size),
+                                            new java.io.File(
+                                                    context.getCacheDir(), "pdf-thumbnail-inputs"),
+                                            256,
+                                            () -> closed);
+                            bitmap = document.bitmap;
+                        } else {
                             observation =
                                     MediaFrame.read(
                                             input, card.range(input.size), 256, () -> closed);
@@ -159,6 +181,7 @@ final class ContentGalleryAdapter extends BaseAdapter implements AutoCloseable {
                     }
                     Bitmap result = bitmap;
                     MediaFrame.Result captured = observation;
+                    PdfPagePreview.Result capturedPdf = document;
                     String failure = error;
                     main.post(
                             () -> {
@@ -168,6 +191,7 @@ final class ContentGalleryAdapter extends BaseAdapter implements AutoCloseable {
                                 }
                                 pending.remove(index);
                                 if (captured != null) media.put(index, captured);
+                                if (capturedPdf != null) pdf.put(index, capturedPdf);
                                 if (result != null) thumbnails.put(index, result);
                                 else if (captured == null) failures.put(index, failure);
                                 notifyDataSetChanged();
@@ -175,10 +199,12 @@ final class ContentGalleryAdapter extends BaseAdapter implements AutoCloseable {
                 });
     }
 
-    org.json.JSONObject mediaObservation(ContentMap.Card card) throws Exception {
+    org.json.JSONObject platformObservation(ContentMap.Card card) throws Exception {
         int index = cards.indexOf(card);
         MediaFrame.Result result = media.get(index);
-        return result == null ? null : result.report();
+        if (result != null) return result.report();
+        PdfPagePreview.Result document = pdf.get(index);
+        return document == null ? null : document.report();
     }
 
     @Override
@@ -186,6 +212,7 @@ final class ContentGalleryAdapter extends BaseAdapter implements AutoCloseable {
         closed = true;
         thumbnails.clear();
         media.clear();
+        pdf.clear();
         failures.clear();
         pending.clear();
         // Bitmaps already referenced by displayed ImageViews remain valid until those views are

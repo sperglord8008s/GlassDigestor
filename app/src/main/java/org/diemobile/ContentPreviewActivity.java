@@ -4,7 +4,6 @@ package org.diemobile;
 import android.app.*;
 import android.content.*;
 import android.graphics.*;
-import android.graphics.pdf.PdfRenderer;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.*;
@@ -43,7 +42,11 @@ public final class ContentPreviewActivity extends Activity {
     private SurfaceView surface;
     private boolean prepared, paused = true;
     private volatile int generation;
-    private int pdfPage, seekPosition;
+    private int pdfPage, seekPosition, pdfScrollX, pdfScrollY;
+    private boolean pdfActualPixels;
+    private PdfPagePreview.Result pdfPreview;
+    private HorizontalScrollView pdfPan;
+    private ScrollView pdfScroll;
     private Utf8Pages.Cursor textCursor = new Utf8Pages.Cursor();
     private Utf8Pages.Page textPage;
     private Long requestedTextOffset;
@@ -90,6 +93,11 @@ public final class ContentPreviewActivity extends Activity {
         if (saved != null) {
             mode = saved.getString("mode", "Automatic");
             pdfPage = Math.max(0, saved.getInt("pdfPage"));
+            pdfActualPixels = saved.getBoolean("pdfActualPixels", false);
+            pdfScrollX =
+                    Math.max(0, Math.min(PdfPagePreview.MAX_TARGET, saved.getInt("pdfScrollX")));
+            pdfScrollY =
+                    Math.max(0, Math.min(PdfPagePreview.MAX_TARGET, saved.getInt("pdfScrollY")));
             seekPosition = Math.max(0, saved.getInt("seek"));
             long size = getIntent().getLongExtra("sourceSize", -1);
             try {
@@ -148,6 +156,17 @@ public final class ContentPreviewActivity extends Activity {
         root.addView(title);
         identity = text("Checking owned preview bytes…", 12);
         identity.setTextIsSelectable(true);
+        identity.setMaxLines(2);
+        identity.setEllipsize(TextUtils.TruncateAt.END);
+        identity.setTag("content-source-identity");
+        identity.setTooltipText("Tap for complete source identity and origin summary");
+        identity.setOnClickListener(
+                view ->
+                        new AlertDialog.Builder(this)
+                                .setTitle("Source identity / origin summary")
+                                .setMessage(identity.getText())
+                                .setPositiveButton("Close", null)
+                                .show());
         root.addView(identity);
         originButton = button("Origin / captured evidence", this::showOrigin);
         originButton.setTag("content-origin");
@@ -494,6 +513,11 @@ public final class ContentPreviewActivity extends Activity {
 
     private void render() {
         if (input == null) return;
+        if (pdfPreview != null && pdfPreview.pageIndex != pdfPage) pdfScrollX = pdfScrollY = 0;
+        else capturePdfScroll();
+        pdfPreview = null;
+        pdfPan = null;
+        pdfScroll = null;
         releasePlayer();
         int ticket = ++generation;
         long wantedText = requestedTextOffset == null ? textCursor.offset : requestedTextOffset;
@@ -501,6 +525,7 @@ public final class ContentPreviewActivity extends Activity {
         requestedTextOffset = null;
         requestedTextTail = requestedTextBack = false;
         long wantedHex = hexOffset;
+        int wantedPdfPage = pdfPage;
         if (mode.equals("UTF-8 text") && textPage != null) {
             showTextBody(textPage.text, false);
             textControls(textPage);
@@ -648,7 +673,7 @@ public final class ContentPreviewActivity extends Activity {
                                                         + input.size
                                                         + positionNotice);
                                     });
-                        } else if (chosen.equals("PDF")) pdf(ticket);
+                        } else if (chosen.equals("PDF")) pdf(ticket, wantedPdfPage);
                         else
                             runOnUiThread(
                                     () -> {
@@ -781,26 +806,15 @@ public final class ContentPreviewActivity extends Activity {
                 .show();
     }
 
-    private void pdf(int ticket) throws Exception {
-        Bitmap bitmap;
-        int count, selected;
-        try (ParcelFileDescriptor file =
-                        ParcelFileDescriptor.open(input.file, ParcelFileDescriptor.MODE_READ_ONLY);
-                PdfRenderer renderer = new PdfRenderer(file)) {
-            count = renderer.getPageCount();
-            if (count == 0) throw new IOException("PDF has no renderable page");
-            selected = Math.min(pdfPage, count - 1);
-            try (PdfRenderer.Page page = renderer.openPage(selected)) {
-                double scale = Math.min(1, 1536.0 / Math.max(page.getWidth(), page.getHeight()));
-                bitmap =
-                        Bitmap.createBitmap(
-                                Math.max(1, (int) Math.round(page.getWidth() * scale)),
-                                Math.max(1, (int) Math.round(page.getHeight() * scale)),
-                                Bitmap.Config.ARGB_8888);
-                bitmap.eraseColor(Color.WHITE);
-                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
-            }
-        }
+    private void pdf(int ticket, int wantedPage) throws Exception {
+        PdfPagePreview.Result observation =
+                PdfPagePreview.read(
+                        input,
+                        wantedPage,
+                        PdfPagePreview.MAX_TARGET,
+                        () -> cancellation.get() || ticket != generation);
+        Bitmap bitmap = observation.bitmap;
+        int count = observation.pageCount, selected = observation.pageIndex;
         runOnUiThread(
                 () -> {
                     if (isDestroyed() || ticket != generation) {
@@ -808,36 +822,106 @@ public final class ContentPreviewActivity extends Activity {
                         return;
                     }
                     pdfPage = selected;
-                    ImageView image = new ImageView(this);
-                    image.setTag("content-pdf");
-                    image.setImageBitmap(bitmap);
-                    image.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                    content.addView(image, new LinearLayout.LayoutParams(-1, -1));
-                    Button previous =
-                            button(
-                                    "Previous page",
-                                    () -> {
-                                        pdfPage--;
-                                        render();
-                                    });
-                    previous.setEnabled(pdfPage > 0);
-                    add(controls, previous);
-                    Button next =
-                            button(
-                                    "Next page",
-                                    () -> {
-                                        pdfPage++;
-                                        render();
-                                    });
-                    next.setEnabled(pdfPage + 1 < count);
-                    add(controls, next);
-                    status.setText(
-                            "PDF page "
-                                    + (pdfPage + 1)
-                                    + " / "
-                                    + count
-                                    + " · platform renderer; scripts/links are not executed");
+                    pdfPreview = observation;
+                    showPdfPage(observation);
                 });
+    }
+
+    private void capturePdfScroll() {
+        if (pdfPan != null) pdfScrollX = pdfPan.getScrollX();
+        if (pdfScroll != null) pdfScrollY = pdfScroll.getScrollY();
+    }
+
+    /** Layout changes reuse the captured raster instead of parsing the PDF again. */
+    private void showPdfPage(PdfPagePreview.Result observation) {
+        if (isDestroyed() || pdfPreview != observation) return;
+        content.removeAllViews();
+        controls.removeAllViews();
+        pdfPan = null;
+        pdfScroll = null;
+        ImageView image = new ImageView(this);
+        image.setTag("content-pdf");
+        image.setContentDescription(name + " · PDF page " + (pdfPage + 1));
+        image.setImageBitmap(observation.bitmap);
+        image.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        if (pdfActualPixels) {
+            HorizontalScrollView horizontal = new HorizontalScrollView(this);
+            horizontal.setTag("content-pdf-pan");
+            horizontal.addView(
+                    image,
+                    new android.widget.FrameLayout.LayoutParams(
+                            observation.bitmap.getWidth(), observation.bitmap.getHeight()));
+            ScrollView vertical = new ScrollView(this);
+            vertical.setTag("content-pdf-scroll");
+            vertical.addView(
+                    horizontal,
+                    new android.widget.FrameLayout.LayoutParams(
+                            -1, observation.bitmap.getHeight()));
+            content.addView(vertical, new LinearLayout.LayoutParams(-1, -1));
+            pdfPan = horizontal;
+            pdfScroll = vertical;
+            vertical.addOnLayoutChangeListener(
+                    new View.OnLayoutChangeListener() {
+                        @Override
+                        public void onLayoutChange(
+                                View view,
+                                int left,
+                                int top,
+                                int right,
+                                int bottom,
+                                int oldLeft,
+                                int oldTop,
+                                int oldRight,
+                                int oldBottom) {
+                            if (right <= left || bottom <= top) return;
+                            vertical.removeOnLayoutChangeListener(this);
+                            if (!isDestroyed()
+                                    && pdfPreview == observation
+                                    && pdfActualPixels
+                                    && pdfPan == horizontal
+                                    && pdfScroll == vertical) {
+                                horizontal.scrollTo(pdfScrollX, 0);
+                                vertical.scrollTo(0, pdfScrollY);
+                            }
+                        }
+                    });
+        } else content.addView(image, new LinearLayout.LayoutParams(-1, -1));
+        Button previous =
+                button(
+                        "Previous page",
+                        () -> {
+                            if (pdfPreview != observation || pdfPage <= 0) return;
+                            pdfPage--;
+                            render();
+                        });
+        previous.setEnabled(pdfPage > 0);
+        add(controls, previous);
+        Button next =
+                button(
+                        "Next page",
+                        () -> {
+                            if (pdfPreview != observation || pdfPage + 1 >= observation.pageCount)
+                                return;
+                            pdfPage++;
+                            render();
+                        });
+        next.setEnabled(pdfPage + 1 < observation.pageCount);
+        add(controls, next);
+        add(
+                controls,
+                button(
+                        pdfActualPixels ? "Fit page" : "Actual pixels",
+                        () -> {
+                            if (pdfPreview != observation) return;
+                            capturePdfScroll();
+                            pdfActualPixels = !pdfActualPixels;
+                            showPdfPage(observation);
+                        }));
+        status.setText(
+                observation.description()
+                        + (pdfActualPixels
+                                ? "\nActual raster pixels · scroll horizontally/vertically"
+                                : "\nFit page · choose Actual pixels for small text"));
     }
 
     private void media(int ticket) {
@@ -1073,6 +1157,10 @@ public final class ContentPreviewActivity extends Activity {
         super.onSaveInstanceState(saved);
         saved.putString("mode", mode);
         saved.putInt("pdfPage", pdfPage);
+        capturePdfScroll();
+        saved.putBoolean("pdfActualPixels", pdfActualPixels);
+        saved.putInt("pdfScrollX", pdfScrollX);
+        saved.putInt("pdfScrollY", pdfScrollY);
         saved.putLong("textOffset", textCursor.offset);
         saved.putLongArray("textHistory", textCursor.history());
         saved.putBoolean("textHistoryExpired", textCursor.expired);
