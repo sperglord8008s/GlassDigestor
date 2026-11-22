@@ -1405,3 +1405,21 @@ After the offline SDK change, required `scripts/test.sh`, a fresh
 fixtures and all seven publication guard regressions also pass. No inspected
 application was executed. The release APK's exact-source static audit passes;
 current main preparation preserves that immutable checkpoint and all old APKs.
+
+PR #20's first PR build confirmed HTTP **429** from Maven Central on every
+bounded retry, before any native compilation. Source push 44969089853 passed
+SDK acquisition on a different runner; this was a hosted-runner rate limit,
+not an image hash change. SDK acquisition now tries the Maven Central Google
+storage mirror, then canonical Central, with the **same** SHA-256 and 200 MiB
+limit at both hosts. Edited caches and missing offline inputs fail before any
+fallback/network request. Partial and wrong downloads are discarded.
+
+New isolated shell fixtures verify mirror success, limited/corrupt mirror
+fallback, both-source failures, unchanged verified reuse, edited-cache refusal
+and missing-offline no-network behavior. A complete **106,130,412-byte** API 28
+image was independently streamed from the mirror and matches the existing pin
+`dbb1c88987b54cef3132695a1b4d2f4851ba06286a6fa7d15772f98fd1f0cdf7`;
+receipt `/workspace/work/offline-sdk-mirror-stream-verification.json`. Both
+fetch suites and offline verification of all three real cached images pass.
+The immutable pre-alpha.16 release is unaffected; inspect the newest PR #20
+source/runtime CI before accepting the build-only follow-up.

@@ -12,7 +12,23 @@ while read -r checksum name; do
   fi
   version="${name#android-all-instrumented-}"
   version="${version%.jar}"
-  fetch_verified_dependency "$sdk_directory/$name" "$checksum" \
-    "https://repo.maven.apache.org/maven2/org/robolectric/android-all-instrumented/$version/$name" \
-    209715200
+  destination="$sdk_directory/$name"
+  relative="org/robolectric/android-all-instrumented/$version/$name"
+  if [[ -e "$destination" || -L "$destination" || "${DIE_OFFLINE:-false}" = true ]]; then
+    # A bad existing cache or missing offline input must fail without replacement/network.
+    fetch_verified_dependency "$destination" "$checksum" \
+      "https://repo.maven.apache.org/maven2/$relative" 209715200
+    continue
+  fi
+  acquired=false
+  # Some hosted runners receive HTTP 429 from Central. Both locations must supply
+  # the same independently pinned bytes; no mirror can change the accepted image.
+  for base in https://maven-central.storage-download.googleapis.com/maven2 \
+              https://repo.maven.apache.org/maven2; do
+    if fetch_verified_dependency "$destination" "$checksum" "$base/$relative" 209715200; then
+      acquired=true
+      break
+    fi
+  done
+  if [[ "$acquired" != true ]]; then echo "Pinned Robolectric SDK unavailable: $name" >&2; exit 1; fi
 done < scripts/robolectric-sdk.sha256
