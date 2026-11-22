@@ -8,10 +8,13 @@ mkdir -p "$tmp/bin"
 cat > "$tmp/bin/curl" <<'MOCK'
 #!/usr/bin/env bash
 set -eu
+limit=''
 while [[ $# -gt 0 ]]; do
-  if [[ "$1" = -o ]]; then destination="$2"; shift 2; else shift; fi
+  if [[ "$1" = -o ]]; then destination="$2"; shift 2
+  elif [[ "$1" = --max-filesize ]]; then limit="$2"; shift 2
+  else shift; fi
 done
-printf 'called\n' >> "$DEPENDENCY_FETCH_CALLS"
+printf 'called %s\n' "$limit" >> "$DEPENDENCY_FETCH_CALLS"
 case "$DEPENDENCY_FETCH_MODE" in
   valid) printf 'known complete bytes\n' > "$destination" ;;
   checksum) printf 'wrong complete bytes\n' > "$destination" ;;
@@ -43,4 +46,15 @@ export DIE_OFFLINE=true DEPENDENCY_FETCH_MODE=valid
 fetch_verified_dependency "$tmp/cache/dependency.jar" "$checksum" https://fixture.invalid/public.jar
 if fetch_verified_dependency "$tmp/cache/missing.jar" "$checksum" https://fixture.invalid/public.jar; then echo 'Missing offline input was accepted.' >&2; exit 1; fi
 test "$(wc -l < "$tmp/calls")" -eq 3
+unset DIE_OFFLINE
+fetch_verified_dependency "$tmp/cache/custom.jar" "$checksum" https://fixture.invalid/public.jar 64
+test "$(tail -n 1 "$tmp/calls")" = 'called 64'
+if fetch_verified_dependency "$tmp/cache/oversize.jar" "$checksum" https://fixture.invalid/public.jar 16; then echo 'Oversize download was published.' >&2; exit 1; fi
+test ! -e "$tmp/cache/oversize.jar"
+test -z "$(find "$tmp/cache" -name '*.download.*' -print)"
+if fetch_verified_dependency "$tmp/cache/custom.jar" "$checksum" https://fixture.invalid/public.jar 16; then echo 'Oversize cache was accepted.' >&2; exit 1; fi
+for invalid in 0 -1 268435457 99999999999999999999 invalid; do
+  if fetch_verified_dependency "$tmp/cache/invalid.jar" "$checksum" https://fixture.invalid/public.jar "$invalid"; then echo 'Invalid byte limit was accepted.' >&2; exit 1; fi
+done
+test "$(wc -l < "$tmp/calls")" -eq 5
 printf '%s\n' 'Verified dependency acquisition: reuse, interrupted/incorrect download cleanup, unchanged edited cache and offline no-network behavior passed.'

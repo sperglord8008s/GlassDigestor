@@ -1335,3 +1335,23 @@ suite failed during Robolectric SDK artifact acquisition (195 setup failures,
 the HTTP cause. Full exception logging and failure-only XML/HTML artifacts are
 now enabled before retrying; no assertion, dependency check or release gate is
 removed. Publication remains blocked on a successful exact-source five-job run.
+
+Host Android SDK test images are now explicit pinned build inputs rather than
+downloads inside each Robolectric JVM. `scripts/robolectric-sdk.sha256` records
+the exact API 26/28/35 instrumentation-i7 images used by Robolectric 4.14.1;
+their full SHA-512 identities were independently compared with Maven Central
+before recording SHA-256 pins. `prepareRobolectricSdks` verifies every cached
+image, and test JVMs use Robolectric's offline dependency directory. The default
+cache is `.ci-cache/robolectric`; `ROBOLECTRIC_SDK_DIR` overrides it and
+`DIE_OFFLINE=true` refuses a missing image without network access. CI acquires
+these inputs before native compilation so failures are immediate and explicit.
+Images are build-only dependencies and are not packaged in the app.
+
+The shared atomic fetch helper retains its 16 MiB default and permits an
+explicit checked limit up to 256 MiB; SDK acquisition requests 200 MiB per image.
+Downloaded and reused file sizes are checked as well as SHA-256. Added fetch
+fixtures cover custom limits, oversize cache/download rejection, cleanup and
+invalid limits; original no-network/edited-cache/partial-download cases remain.
+Local verified SDK bytes are hard-linked into the cache to avoid duplicate
+storage. Focused API 26/28 renderer/media cases pass with in-test downloading
+disabled; the complete 195-case rerun is recorded separately.

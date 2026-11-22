@@ -1,5 +1,7 @@
 plugins { id 'com.android.application' }
 def nativeEnabled = providers.gradleProperty('withCdie').orElse('true').get().toBoolean()
+def robolectricSdkDirectory = providers.environmentVariable('ROBOLECTRIC_SDK_DIR')
+        .map { rootProject.file(it) }.orElse(rootProject.file('.ci-cache/robolectric'))
 def buildIdentity = new groovy.json.JsonSlurper().parseText(providers.exec {
     workingDir rootProject.projectDir
     commandLine 'python3', rootProject.file('scripts/build-version.py').absolutePath
@@ -60,6 +62,7 @@ android {
             forkEvery = 1
             // Include dependency/engine failure causes in CI, not only exception class names.
             testLogging { exceptionFormat = 'full' }
+            dependsOn 'prepareRobolectricSdks'
             maxHeapSize = '1g'
             systemProperty 'user.home', file('build/test-runtime-home').absolutePath
             doFirst { file('build/test-runtime-home').mkdirs() }
@@ -76,9 +79,19 @@ android {
             inputs.file(new File(binaryLibraryDirectory, 'libdiebinwalk.so')).withPropertyName('hostBinwalkLibrary')
             inputs.file(new File(mediaLibraryDirectory, 'libdiempv.so')).withPropertyName('hostMpvLibrary')
             inputs.file(new File(carvingLibraryDirectory, 'libdiephotorec.so')).withPropertyName('hostPhotoRecLibrary')
-            systemProperty 'robolectric.dependency.repo.url', 'https://repo.maven.apache.org/maven2'
+            systemProperty 'robolectric.offline', 'true'
+            systemProperty 'robolectric.dependency.dir', robolectricSdkDirectory.get().absolutePath
+            inputs.file(rootProject.file('scripts/robolectric-sdk.sha256'))
+                    .withPropertyName('robolectricSdkPins')
         }
     }
+}
+
+tasks.register('prepareRobolectricSdks', Exec) {
+    workingDir rootProject.projectDir
+    environment 'ROBOLECTRIC_SDK_DIR', robolectricSdkDirectory.get().absolutePath
+    commandLine 'bash', rootProject.file('scripts/fetch-robolectric-sdks.sh').absolutePath
+    // Always revalidate cached inputs before executing tests, including offline builds.
 }
 
 def buildBinwalkAndroid = tasks.register('buildBinwalkAndroid', Exec) {
