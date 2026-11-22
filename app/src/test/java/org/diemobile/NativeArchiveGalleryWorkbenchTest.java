@@ -150,6 +150,38 @@ public final class NativeArchiveGalleryWorkbenchTest {
     }
 
     @Test
+    @Config(
+            shadows = {
+                NativeArchiveWorkbenchTest.HostTransport.class,
+                PdfPagePreviewWorkbenchTest.Renderer.class,
+                PdfPagePreviewWorkbenchTest.Page.class
+            })
+    public void pdfMemberHasPageThumbnailAndExactTypedSaveDespiteMisleadingName() throws Exception {
+        PdfPagePreviewWorkbenchTest.Renderer.count = 2;
+        PdfPagePreviewWorkbenchTest.Renderer.width = 144;
+        PdfPagePreviewWorkbenchTest.Renderer.height = 96;
+        PdfPagePreviewWorkbenchTest.Renderer.fail = false;
+        PdfPagePreviewWorkbenchTest.Renderer.afterRender = null;
+        byte[] pdf = MetadataFixtureFactory.coloredPdf();
+        open(zip(Map.of("report.mp3", pdf)), null);
+        click("Gallery");
+        View tile = grid().getAdapter().getView(0, null, grid());
+        settle();
+        tile = grid().getAdapter().getView(0, tile, grid());
+        assertNotNull(tagged(tile, "archive-thumbnail:0"));
+        TextView status = tagged(tile, "archive-preview-status:0");
+        assertTrue(
+                status.getText().toString(),
+                status.getText().toString().contains("PDF page 1 / 2"));
+        tagged(tile, "save-archive-file:0").performClick();
+        settle();
+        assertNotNull(staged());
+        assertEquals("entry-000000-report.pdf", staged().name);
+        assertEquals("application/pdf", staged().mime);
+        assertArrayEquals(pdf, Files.readAllBytes(staged().file.toPath()));
+    }
+
+    @Test
     public void mislabeledImageGetsCheckedThumbnailTypedSaveAndDirectPreview() throws Exception {
         byte[] png = MetadataFixtureFactory.png();
         File source = zip(Map.of("folder/photo.wav", png));

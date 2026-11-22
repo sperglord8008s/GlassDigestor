@@ -641,7 +641,7 @@ public final class GallerizeActivity extends Activity {
         try {
             JSONObject details = card.json();
             if (galleryAdapter != null) {
-                JSONObject observation = galleryAdapter.mediaObservation(card);
+                JSONObject observation = galleryAdapter.platformObservation(card);
                 if (observation != null) details.put("transientPlatformPreview", observation);
             }
             TextView value = text(details.toString(2), 13);

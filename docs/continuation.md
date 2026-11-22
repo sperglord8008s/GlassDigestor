@@ -1259,3 +1259,79 @@ source-build job. Keep frozen APKs/pinned sources/toolchains; reclaim only
 verified duplicate wrappers or regenerable compiler caches. The generated x86
 archive dependency cache must be regenerated for a new local lab build; compiled
 JNI libraries remain. Do not mix native recompilation with a loaded test JVM.
+
+
+## Active PDF page viewing and thumbnail slice
+
+Starting main **836f463** has green five-job CI **44942054750** and eight-case
+API 26/35 runtime **44942054708**. Branch **codex/pdf-page-previews** is now
+pre-alpha.16/code22. No production native source, dependency, application ID,
+signing or permissions change. Prior frozen APKs remain intact.
+
+`PdfPagePreview` provides source-checked, read-only-descriptor page rendering,
+logical point/raster pixel geometry, bounded output and private embedded-range
+staging. Gallerize and native archive PDFs get thumbnails, and the full viewer
+uses the same helper. Fit/Actual pixels reuses a bitmap without reparsing;
+two-axis pan, page/view/position recreation and stale navigation guards are
+implemented. Full source identity expands from two display lines. Reports are
+transient and do not relabel original native findings or prove full validity.
+
+Six new renderer-shadow/model/widget cases and one actual-libarchive PDF case
+pass; existing gallery/recovery cases pass. The first full **195-case** suite
+passes before the final Actual pixels extension; the final full suite is now
+running in `/workspace/work/pdf-page-full-ui-final.log`. Required generic/native
+and original PhotoRec >9 MiB PDF native/Python regressions pass. Logs:
+`pdf-page-generic.log`, `pdf-page-required-native.log`, `pdf-page-native-pdf.log`.
+Independent original-440-byte/two-page xref/color checks are retained in
+`/workspace/work/pdf-page-oracle/verification.json`; colored PDF is 692 bytes,
+SHA-256 `f3961ece0dc19dfc3cbe2250a819f677721ae3184799cbc1237f576f799756f1`.
+
+A combined focused run stalled in Robolectric's animation clock while setting
+up a later Gallerize case (not the real PDF engine). Its JVM was stopped after
+capturing `/workspace/work/pdf-page-pixel-view-stack.txt`; it is not acceptance
+evidence. App host-test configuration now uses serial `forkEvery = 1` JVMs,
+matching the previously successful local full-suite isolation. All assertions
+and real native backends remain; production builds/actual Android execution are
+unaffected. The 28-case focused rerun passes, including Actual pixels, source
+expansion and view/scroll restoration. No source edit occurs during compilation.
+
+The ninth Android contract `exact-recovered-platform-pdf-pages` and runner's
+exact nine-name/count gate are implemented. It performs actual native recovery
+then real PdfRenderer calls for independent red/green vectors, target sizes,
+source/UID/range/bytes and cleanup. Instrumentation Java compilation passes;
+actual Android execution remains pending. The original eight contracts remain.
+The shared helper/ownership/export classes are added to exact source staging
+and static verification; notices and three native libraries are unchanged.
+
+To fit disk, only generated runtime merge/strip caches and host archive static
+dependency cache were reclaimed, after fallback/JNI SHA checks. Receipt:
+`/workspace/work/reclaimed-preview-compiler-and-merge-caches.json`. Required
+native tests rebuilt host xxfclib; its object cache was reclaimed afterward
+with working JNI preserved (`reclaimed-host-objects-after-pdf-page-native.json`).
+Do not rebuild/overwrite native libraries while a host test JVM has them loaded.
+
+Next finish the final 195-case suite, correct failures, compile/lint/static-
+check ARM64, assemble/static-check the lab from clean committed source, freeze
+unique .16 checkpoints, push/PR and run both CI workflows. Publish only after
+all five source jobs and all nine actual API 26/35 contracts pass, preserving
+exact source/asset guards and immutable old releases. Use the existing audited
+unchanged CDiE/hash native task exclusions for local packaging if needed; clean
+CI continues full native builds. Keep actual renderer/host/ARM64/handset scopes
+separate in the parity checklist and release notes.
+
+The final local 195-case suite passed with zero failures/errors/skips; clean
+ARM64 assembly/lint/static APK verification and fresh runtime APK/static checks
+also pass. The immutable local .16 checkpoint is under
+`/workspace/work/checkpoints/0.6.0-pre-alpha.16-local`, source `db132b2`, APK
+SHA-256 `3f7f54176e4811d5e191a084e452285d66c44ca66be77d8194382f1ab9a02a47`.
+All nine actual x86 API 26/35 contracts pass in push run **44966758145** and PR
+run **44966805137**. Independently downloaded report/APK/source/library hashes,
+exact nine names/completion counts and red/green PDF geometry/pixels pass the
+audit at `/workspace/work/runtime-evidence/db132b2/verification.json`.
+
+Source CI **44966758141** passed native/binary/media/signature jobs but its host
+suite failed during Robolectric SDK artifact acquisition (195 setup failures,
+`MavenArtifactFetcher` / `HttpURLConnection`). The short default log omitted
+the HTTP cause. Full exception logging and failure-only XML/HTML artifacts are
+now enabled before retrying; no assertion, dependency check or release gate is
+removed. Publication remains blocked on a successful exact-source five-job run.

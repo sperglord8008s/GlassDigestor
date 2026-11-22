@@ -54,6 +54,12 @@ android {
             def carvingLibraryDirectory = file('build/host-photorec')
             def archiveLibraryDirectory = file('build/host-archive')
             def archiveFixtures = file('build/host-archive-fixtures')
+            // Robolectric SDK/animation state and loaded JNI belong to one test class.
+            // Fresh serial JVMs also release per-class engine copies on constrained builders.
+            maxParallelForks = 1
+            forkEvery = 1
+            // Include dependency/engine failure causes in CI, not only exception class names.
+            testLogging { exceptionFormat = 'full' }
             maxHeapSize = '1g'
             systemProperty 'user.home', file('build/test-runtime-home').absolutePath
             doFirst { file('build/test-runtime-home').mkdirs() }

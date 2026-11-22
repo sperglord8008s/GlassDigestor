@@ -153,3 +153,19 @@ APK/native-library identity were independently checked;
 The next adapter-5 source extends the PDF case to a file larger than 9 MiB,
 checking its exact native bytes and explicit optional-date work limit. That new
 large-file Android execution is pending.
+
+
+## PDF rasterization extension (development pre-alpha.16)
+
+The existing eight contracts passed at source 2dcfce3;
+[downloaded evidence](../docs/verification/android-worker-runtime-2dcfce3.json).
+A ninth `exact-recovered-platform-pdf-pages` contract now compiles. It recovers
+an owned 692-byte, two-page red/green PDF from a prefixed mislabeled blob through
+the real isolated PhotoRec service, then calls the unchanged production
+`PdfPagePreview` helper in the normal UID. It requires exact bytes/SHA, 144×96
+point geometry, 24×16 thumbnails, red/green center pixels, 1536×1024 full-view
+pixels, original parent/range identities, out-of-range refusal and stage cleanup.
+The shared helper/OwnedContent/PreparedExport source bytes are included in the
+static identity check. Real API 26/35 execution is pending for this source;
+compilation/host shadows are not rendering proof. This tests the rendering
+helper, not a full gallery/SAF/handset UI.

@@ -1,0 +1,1 @@
+PDF first-page thumbnails in recovered-file and archive galleries. Shared bounded PDF renderer with explicit point/pixel geometry. Fit or inspect actual raster pixels with two-axis scrolling; retain page/view/position after recreation. Source identity expands on tap. Exact file exports and native evidence remain available.

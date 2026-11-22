@@ -3,6 +3,7 @@ package org.diemobile;
 
 import android.app.Instrumentation;
 import android.content.*;
+import android.graphics.Color;
 import android.os.*;
 import android.system.*;
 
@@ -53,8 +54,8 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
                             "Actual x86_64 Android production worker, hash/archive/PhotoRec JNI,"
                                 + " Binder, descriptors, PDF file recovery, compiled manifest"
                                 + " declarations, token cancellation and the production platform"
-                                + " media preview helper. This does not verify ARM64, UI, MPV"
-                                + " playback/PDF or 16 KiB-page runtime.");
+                                + " media/PDF preview helpers. This does not verify ARM64, full UI,"
+                                + " MPV playback or 16 KiB-page runtime.");
             require(
                     android.os.Process.myUid() == target.getApplicationInfo().uid,
                     "Instrumentation must run as the normal target app UID");
@@ -76,6 +77,7 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
             archive();
             compiledManifest();
             photoRecPdf();
+            pdfPages();
             mediaPreview();
             cancelBlockedReporter(abc);
             record("normal-client-recovers-after-worker-death", hash(abc));
@@ -461,7 +463,7 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
                         require(
                                 block[i] == largePayload[position + i],
                                 "Actual large PDF native range differs from the expected file"
-                                    + " bytes");
+                                        + " bytes");
                     position += count;
                 }
             }
@@ -483,6 +485,124 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
                                 Inspector.toHex(MessageDigest.getInstance("SHA-256").digest(pdf)))
                         .put("physicalOffset", 37)
                         .put("pdfRendererExecuted", false));
+    }
+
+    private void pdfPages() throws Exception {
+        byte[] payload = MetadataFixtureFactory.coloredPdf();
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        bytes.write(new byte[37]);
+        bytes.write(payload);
+        bytes.write(new byte[97]);
+        File disguised = new File(directory, "two-pages-disguised-as-audio.wav");
+        write(disguised, bytes.toByteArray());
+        JSONObject nativeReport, firstReport, secondReport, fullReport;
+        String expectedSha = Inspector.toHex(MessageDigest.getInstance("SHA-256").digest(payload));
+        try (InputSnapshot blob = InputSnapshot.acquire(disguised, directory, 65536, () -> false);
+                BinaryWorkerClient client = new BinaryWorkerClient(target, "photorec")) {
+            nativeReport = new JSONObject(client.scan(blob.file, () -> false));
+            worker(nativeReport, "photorec");
+            JSONObject row = pdfRow(nativeReport, 37);
+            require(
+                    row.getLong("reportedSizeBytes") == payload.length,
+                    "Native recovery did not supply the two-page PDF's complete file extent");
+            FileRange range = new FileRange(blob.size, 37, row.getLong("reportedSizeBytes"));
+            PdfPagePreview.Result first =
+                    PdfPagePreview.thumbnail(
+                            blob,
+                            range,
+                            new File(directory, "pdf-thumbnail-inputs"),
+                            24,
+                            () -> false);
+            try {
+                firstReport = first.report();
+                require(
+                        first.pageCount == 2
+                                && first.pageIndex == 0
+                                && first.widthPoints == 144
+                                && first.heightPoints == 96
+                                && first.bitmap.getWidth() == 24
+                                && first.bitmap.getHeight() == 16,
+                        "Actual PDF thumbnail count, logical geometry or bounded raster differs");
+                require(
+                        first.bitmap.getPixel(12, 8) == Color.RED,
+                        "Actual first PDF page did not render its independent red vector field");
+                require(
+                        firstReport.getString("sourceSha256").equals(expectedSha)
+                                && firstReport.getString("parentSourceSha256").equals(blob.sha256)
+                                && firstReport.getLong("physicalOffset") == 37
+                                && firstReport.getInt("applicationUid")
+                                        == target.getApplicationInfo().uid,
+                        "Actual PDF preview source/offset/normal-UID evidence differs");
+                firstReport.put(
+                        "centerPixelArgb", Integer.toHexString(first.bitmap.getPixel(12, 8)));
+            } finally {
+                first.bitmap.recycle();
+            }
+            try (InputSnapshot recovered =
+                    OwnedContent.stageRange(blob, range, directory, () -> false)) {
+                require(
+                        Arrays.equals(
+                                payload, java.nio.file.Files.readAllBytes(recovered.file.toPath())),
+                        "Actual renderer input differs from the complete recovered PDF bytes");
+                PdfPagePreview.Result second = PdfPagePreview.read(recovered, 1, 24, () -> false);
+                try {
+                    secondReport = second.report();
+                    require(
+                            second.pageIndex == 1
+                                    && second.pageCount == 2
+                                    && second.bitmap.getWidth() == 24
+                                    && second.bitmap.getHeight() == 16
+                                    && second.bitmap.getPixel(12, 8) == Color.GREEN,
+                            "Actual second PDF page did not render its independent green field");
+                    secondReport.put(
+                            "centerPixelArgb", Integer.toHexString(second.bitmap.getPixel(12, 8)));
+                } finally {
+                    second.bitmap.recycle();
+                }
+                PdfPagePreview.Result full =
+                        PdfPagePreview.read(recovered, 0, PdfPagePreview.MAX_TARGET, () -> false);
+                try {
+                    fullReport = full.report();
+                    require(
+                            full.bitmap.getWidth() == 1536
+                                    && full.bitmap.getHeight() == 1024
+                                    && full.bitmap.getPixel(768, 512) == Color.RED,
+                            "Actual full viewer helper did not rasterize logical points to bounded"
+                                + " useful pixels");
+                    fullReport.put(
+                            "centerPixelArgb", Integer.toHexString(full.bitmap.getPixel(768, 512)));
+                } finally {
+                    full.bitmap.recycle();
+                }
+                boolean refused = false;
+                try {
+                    PdfPagePreview.read(recovered, 2, 24, () -> false);
+                } catch (IOException expected) {
+                    refused = true;
+                }
+                require(refused, "Actual renderer accepted a page outside its returned count");
+                recovered.checkIdentity(() -> false);
+            }
+            blob.checkIdentity(() -> false);
+            require(
+                    Objects.requireNonNull(new File(directory, "pdf-thumbnail-inputs").list())
+                                    .length
+                            == 0,
+                    "Temporary embedded PDF thumbnail bytes were retained after decoding");
+        }
+        record(
+                "exact-recovered-platform-pdf-pages",
+                new JSONObject()
+                        .put("nativeRecovery", nativeReport)
+                        .put("firstPage", firstReport)
+                        .put("secondPage", secondReport)
+                        .put("fullViewerPage", fullReport)
+                        .put("expectedPayloadSizeBytes", payload.length)
+                        .put("expectedPayloadSha256", expectedSha)
+                        .put("expectedPageCount", 2)
+                        .put("outOfRangePageRefused", true)
+                        .put("pdfRendererExecuted", true)
+                        .put("fullGalleryUiExecuted", false));
     }
 
     private void mediaPreview() throws Exception {
