@@ -1,6 +1,6 @@
 # Development continuation point
 
-The workbench is on main through PR #19 (`d76307c`) in **sperglord8008s/GlassDigestor** (the owner's rename of DiE-Android-, repository ID 1460636999). **0.6.0-pre-alpha.16 / code 22**, source `04e93c0`, is published. Current follow-up branch `codex/offline-host-test-sdks` pins build-only Android test images and records release verification. User priority is the actual recovered files: PhotoRec/Binwalk/archive galleries, usable in-app previews and exact file exports. Preserve production `org.diemobile`, existing signing and immutable checkpoint APKs. Full desktop parity and production handset verification remain incomplete. Read AGENTS.md and the three design/parity documents before changes. The latest continuation entry is at the end; older entries retain historical verification scope.
+The workbench is on main through PR #20 (`1b0a44b`) in **sperglord8008s/GlassDigestor** (the owner's rename of DiE-Android-, repository ID 1460636999). **0.6.0-pre-alpha.16 / code 22**, source `04e93c0`, is published. The pinned offline host-test-image follow-up is accepted at `95e46b3`; final source/runtime gates are recorded below. User priority is the actual recovered files: PhotoRec/Binwalk/archive galleries, usable in-app previews and exact file exports. Preserve production `org.diemobile`, existing signing and immutable checkpoint APKs. Full desktop parity and production handset verification remain incomplete. Read AGENTS.md and the three design/parity documents before changes. The latest continuation entry is at the end; older entries retain historical verification scope.
 
 ## Implemented and fixture-verified in this work
 
@@ -1423,3 +1423,49 @@ receipt `/workspace/work/offline-sdk-mirror-stream-verification.json`. Both
 fetch suites and offline verification of all three real cached images pass.
 The immutable pre-alpha.16 release is unaffected; inspect the newest PR #20
 source/runtime CI before accepting the build-only follow-up.
+
+
+## Accepted offline build follow-up and next media integration
+
+PR #20 merged as **1b0a44b**, accepted source **95e46b3**. Push source CI
+**44969620792** and PR source CI **44969624052** pass all five jobs, including
+all **195** host cases, full ARM64 assembly/lint/static APK and corresponding-
+source checks. All **nine** actual x86 API 26/35 contracts pass again in
+**44969620798 / 44969624033**. The merge tree equals accepted 95e46b3 exactly.
+Subsequent main/doc builds are separate source identities; inspect their current
+Actions status before the next functional change. No release asset was replaced:
+pre-alpha.16 remains immutable source **04e93c0**, independently audited above.
+
+Only regenerable compiler/static-library caches were reclaimed after the final
+native rebuild/regressions. **119,180,107 bytes** were removed from
+`app/build/host-native/xxfclib` and `app/build/archive-libraries-android`, while
+all **40** checked compiled JNI/frozen APK hashes remain unchanged. Receipt:
+`/workspace/work/reclaimed-compiler-caches-after-alpha16-release.json`.
+Approximately 270 MiB free remains. Rebuilding those caches requires additional
+space; keep every actual compiled library, pinned input and immutable APK.
+Clean CI performs full builds without the local unchanged-native exclusions.
+
+A next-feature feasibility experiment is retained outside production at
+`/workspace/work/mpv-software-render-probe`. The actual external host libmpv
+software renderer, existing bounded read-only stream callbacks and mandatory
+reference/config/script/sidecar/network guards render authored **64×48 TIFF
+and PPM** fixtures with exact red/green pixels and unchanged input hashes.
+`verification.json` records source/header/library/fixture identities, dimensions,
+pixels, byte counters and zero ungranted URIs. Its README and C source reproduce
+the experiment. The pinned render header came from MPV 0b7ed670; its client
+header matches the production header exactly. The original pinned MPV source
+archive is retained in `/workspace/work/mpv-integration/sources/mpv.tar`.
+
+This is **host feasibility only**, not an implemented APK fallback, Android
+rendering acceptance or full playback. Before integration, replace the fixture-
+color completion oracle with reviewed native present-frame semantics; retain
+pixel/stride bounds and initialize opaque alpha (rgb0's fourth byte is undefined).
+Use the production isolated worker and checked output descriptors, all-path
+context/engine/resource cleanup, cancellation/stale-result ownership and exact
+source/pixel/report identities. Verify software-render support in the exact
+ARM64 runtime, add the pinned licensed header/source-bundle inputs, and run
+native/widget/ARM64/CI checks. Do not copy the disposable prototype's early-exit
+cleanup shortcuts into the app. Original native findings and actual file exports
+must remain independent of transient rendered pixels. This is a concrete next
+route to viewing more recovered media; MPV playback and F-Droid source-building
+remain separate work.
