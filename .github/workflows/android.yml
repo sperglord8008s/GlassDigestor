@@ -37,6 +37,13 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.11.1'
+      - name: Restore pinned host Android test images
+        uses: actions/cache@v4
+        with:
+          path: .ci-cache/robolectric
+          key: robolectric-sdk-v1-${{ runner.os }}-${{ hashFiles('scripts/robolectric-sdk.sha256') }}
+      - name: Acquire pinned offline host Android test images
+        run: bash scripts/fetch-robolectric-sdks.sh
       - uses: android-actions/setup-android@v4
         with:
           packages: 'platform-tools'
@@ -148,6 +155,7 @@ jobs:
           python-version: '3.12'
       - run: bash scripts/test-apk.sh
       - run: bash tests/test-dependency-fetch.sh
+      - run: bash tests/test-robolectric-sdk-fetch.sh
       - run: bash scripts/test-models.sh
       - run: bash scripts/test-system-services.sh
       - run: bash scripts/test-profiles.sh

@@ -82,7 +82,7 @@ member with a misleading audio suffix, exact `.pdf`/MIME save bytes, full-view
 page navigation and recreation. These tests do not count as PDF engine runtime
 verification.
 
-A ninth actual Android lab contract is implemented. It recovers an owned
+A ninth actual Android lab contract passes. It recovers an owned
 two-page PDF from a mislabeled prefixed blob through the real isolated PhotoRec
 worker, then uses the unchanged production helper in the normal app UID. The
 fixture has independently known red and green vector pages, 144 × 96 points.
@@ -91,9 +91,12 @@ raster, exact recovered bytes/SHA-256, page-bound refusal, source/UID/range
 identity and private-stage cleanup. Independent Python checks the fixture's
 xref/object offsets and original 440-byte recovery fixture identity.
 
-Instrumentation compilation passes; actual API 26/35 execution and the final
-source/build gates are recorded separately in the release checklist. No actual
-PDF rendering result is claimed until that new contract passes. Production
+All 195 host cases, generic/native regressions, ARM64 assembly/lint/static APK
+and both five-job source CI gates pass for published pre-alpha.16, source
+`04e93c0`. All nine actual x86 API 26/35 contracts pass in run 44967525584.
+Downloaded source/APK/native-library/full-report identities, exact completion
+counts and known page pixels/geometry were independently verified;
+[evidence](verification/android-worker-runtime-04e93c0.json). Production
 ARM64/handset/gallery/SAF acceptance, arbitrary PDFs, text selection/search,
 forms/annotations/passwords, animation and all document formats remain outside
 this verification.

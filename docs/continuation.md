@@ -1,6 +1,6 @@
 # Development continuation point
 
-The workbench is on main through PR #13 (`faa3272`) in **sperglord8008s/GlassDigestor** (the owner's rename of DiE-Android-, repository ID 1460636999). Current work uses `codex/pdf-footer-budgets`, **0.6.0-pre-alpha.14 / code 20**. User priority is the actual recovered files: combined PhotoRec/Binwalk galleries, usable in-app previews and file exports. Preserve production `org.diemobile`, existing signing and immutable checkpoint APKs. Full desktop parity and handset verification remain incomplete. Read AGENTS.md and the three design/parity documents before changes.
+The workbench is on main through PR #19 (`d76307c`) in **sperglord8008s/GlassDigestor** (the owner's rename of DiE-Android-, repository ID 1460636999). **0.6.0-pre-alpha.16 / code 22**, source `04e93c0`, is published. Current follow-up branch `codex/offline-host-test-sdks` pins build-only Android test images and records release verification. User priority is the actual recovered files: PhotoRec/Binwalk/archive galleries, usable in-app previews and exact file exports. Preserve production `org.diemobile`, existing signing and immutable checkpoint APKs. Full desktop parity and production handset verification remain incomplete. Read AGENTS.md and the three design/parity documents before changes. The latest continuation entry is at the end; older entries retain historical verification scope.
 
 ## Implemented and fixture-verified in this work
 
@@ -1335,3 +1335,91 @@ suite failed during Robolectric SDK artifact acquisition (195 setup failures,
 the HTTP cause. Full exception logging and failure-only XML/HTML artifacts are
 now enabled before retrying; no assertion, dependency check or release gate is
 removed. Publication remains blocked on a successful exact-source five-job run.
+
+Host Android SDK test images are now explicit pinned build inputs rather than
+downloads inside each Robolectric JVM. `scripts/robolectric-sdk.sha256` records
+the exact API 26/28/35 instrumentation-i7 images used by Robolectric 4.14.1;
+their full SHA-512 identities were independently compared with Maven Central
+before recording SHA-256 pins. `prepareRobolectricSdks` verifies every cached
+image, and test JVMs use Robolectric's offline dependency directory. The default
+cache is `.ci-cache/robolectric`; `ROBOLECTRIC_SDK_DIR` overrides it and
+`DIE_OFFLINE=true` refuses a missing image without network access. CI acquires
+these inputs before native compilation so failures are immediate and explicit.
+Images are build-only dependencies and are not packaged in the app.
+
+The shared atomic fetch helper retains its 16 MiB default and permits an
+explicit checked limit up to 256 MiB; SDK acquisition requests 200 MiB per image.
+Downloaded and reused file sizes are checked as well as SHA-256. Added fetch
+fixtures cover custom limits, oversize cache/download rejection, cleanup and
+invalid limits; original no-network/edited-cache/partial-download cases remain.
+Local verified SDK bytes are hard-linked into the cache to avoid duplicate
+storage. Focused API 26/28 renderer/media cases pass with in-test downloading
+disabled; the complete 195-case rerun is recorded separately.
+
+## Published pre-alpha.16; pinned offline host test images
+
+PR #19 merged as **d76307c**, source **04e93c0**, code **22**. All 195 host
+cases and required generic/native/ARM64/lint/static APK checks pass. Push source
+CI **44967525630** and PR source CI **44967529622** pass every job. All nine
+actual x86 API 26/35 contracts pass in **44967525584 / 44967529605**. Downloaded
+source/APK/native-library/full-report/completion identities and exact known
+red/green PDF pixels, page/point/raster geometry and parent coordinates are
+independently checked; [evidence](verification/android-worker-runtime-04e93c0.json).
+Audit scripts/artifacts remain under `/workspace/work/runtime-evidence/04e93c0`.
+
+Publisher **44968611004** succeeded. [Pre-alpha.16](releases/0.6.0-pre-alpha.16.md)
+is public with all fourteen assets; the downloaded original six-file checkpoint
+matches its inventory and public asset digests. Exact-source APK static checks
+pass in `/workspace/release-source` at 04e93c0. The original CI files and separate
+hard-linked static audit are under `/workspace/work/releases/0.6.0-pre-alpha.16`.
+APK: **52,852,629 bytes**, SHA-256
+`e8b1d6a3f49c8540bad82a95325597df7f04c8e335614c2ee3e8240661e82b26`.
+Corresponding-source archives were publisher-verified, not all downloaded again.
+The verified outer checkpoint ZIP was reclaimed after all original files were
+retained. All earlier frozen APKs remain unchanged.
+
+The separate host SDK follow-up passes all **195** cases with Robolectric
+network acquisition disabled, plus the bounded-fetch regressions. The first
+rerun had six batch setup failures with only 71 MiB free. Reclaiming 199,811,188
+bytes of regenerable app JNI merge/strip copies, while hash-checking retained
+compiled libraries and APKs, restored all thirteen batch cases unchanged and
+then the full 195-case suite. No budget/assertion was relaxed. Logs:
+`pdf-page-offline-sdk-all-host-final.log`, `pdf-page-offline-sdk-host-summary.json`,
+`pdf-page-restored-space-batch.log`; reclaim receipt:
+`/workspace/work/reclaimed-app-merge-after-pdf16.json`. Keep at least 250 MiB
+free for full host fixtures; native recompilation/assembly needs more. The
+pinned SDK cache hard-links previously verified jars and does not duplicate
+400 MiB locally. New-source CI for this follow-up remains the next gate.
+
+Continue with actual recovered files: audit additional PhotoRec file-check
+modules against read-only/bounded descriptor semantics before enabling them;
+retain unresolved extents when no native boundary is established. Improve
+viewing of currently unsupported media through the pinned MPV engine, keeping
+native findings, exact file bytes and transient render observations distinct.
+The MPV source-build/F-Droid blocker and matching upstream recipe remain in
+[fdroid.md](fdroid.md). Preserve offline operation, licensing and explicit
+host/x86-helper/production-ARM64/SAF verification scopes.
+
+After the offline SDK change, required `scripts/test.sh`, a fresh
+`scripts/test-native.sh` rebuild/regression run, bounded dependency acquisition
+fixtures and all seven publication guard regressions also pass. No inspected
+application was executed. The release APK's exact-source static audit passes;
+current main preparation preserves that immutable checkpoint and all old APKs.
+
+PR #20's first PR build confirmed HTTP **429** from Maven Central on every
+bounded retry, before any native compilation. Source push 44969089853 passed
+SDK acquisition on a different runner; this was a hosted-runner rate limit,
+not an image hash change. SDK acquisition now tries the Maven Central Google
+storage mirror, then canonical Central, with the **same** SHA-256 and 200 MiB
+limit at both hosts. Edited caches and missing offline inputs fail before any
+fallback/network request. Partial and wrong downloads are discarded.
+
+New isolated shell fixtures verify mirror success, limited/corrupt mirror
+fallback, both-source failures, unchanged verified reuse, edited-cache refusal
+and missing-offline no-network behavior. A complete **106,130,412-byte** API 28
+image was independently streamed from the mirror and matches the existing pin
+`dbb1c88987b54cef3132695a1b4d2f4851ba06286a6fa7d15772f98fd1f0cdf7`;
+receipt `/workspace/work/offline-sdk-mirror-stream-verification.json`. Both
+fetch suites and offline verification of all three real cached images pass.
+The immutable pre-alpha.16 release is unaffected; inspect the newest PR #20
+source/runtime CI before accepting the build-only follow-up.
