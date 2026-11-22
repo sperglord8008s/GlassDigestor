@@ -1318,3 +1318,20 @@ exact source/asset guards and immutable old releases. Use the existing audited
 unchanged CDiE/hash native task exclusions for local packaging if needed; clean
 CI continues full native builds. Keep actual renderer/host/ARM64/handset scopes
 separate in the parity checklist and release notes.
+
+The final local 195-case suite passed with zero failures/errors/skips; clean
+ARM64 assembly/lint/static APK verification and fresh runtime APK/static checks
+also pass. The immutable local .16 checkpoint is under
+`/workspace/work/checkpoints/0.6.0-pre-alpha.16-local`, source `db132b2`, APK
+SHA-256 `3f7f54176e4811d5e191a084e452285d66c44ca66be77d8194382f1ab9a02a47`.
+All nine actual x86 API 26/35 contracts pass in push run **44966758145** and PR
+run **44966805137**. Independently downloaded report/APK/source/library hashes,
+exact nine names/completion counts and red/green PDF geometry/pixels pass the
+audit at `/workspace/work/runtime-evidence/db132b2/verification.json`.
+
+Source CI **44966758141** passed native/binary/media/signature jobs but its host
+suite failed during Robolectric SDK artifact acquisition (195 setup failures,
+`MavenArtifactFetcher` / `HttpURLConnection`). The short default log omitted
+the HTTP cause. Full exception logging and failure-only XML/HTML artifacts are
+now enabled before retrying; no assertion, dependency check or release gate is
+removed. Publication remains blocked on a successful exact-source five-job run.
