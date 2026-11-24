@@ -70,7 +70,7 @@ final class ApkSigningEvidence {
                                     + " range; false alone does not establish absence.")
                         .put(
                                 "interpretation",
-                                "Integrity and signer evidence, not publisher trust, software"
+                                "Integrity and signer information, not publisher trust, software"
                                     + " safety, installation success, runtime behavior or a device"
                                     + " update decision. Certificate times are recorded without"
                                     + " PKIX/revocation/network validation.");

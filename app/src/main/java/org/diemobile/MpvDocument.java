@@ -93,7 +93,7 @@ final class MpvDocument implements AutoCloseable {
     }
     JSONObject provenance() throws Exception {
         return new JSONObject(header.toString()).put("input",new JSONObject().put("name",name).put("sizeBytes",snapshot.size).put("sha256",snapshot.sha256))
-            .put("scope","Actual libmpv file/stream metadata, engine capabilities and unavailable property evidence from an audited getter set. Full property names are cataloged without invoking unrelated device/system/clipboard getters.")
+            .put("scope","Actual libmpv file/stream metadata, engine capabilities and unavailable property information from an audited getter set. Full property names are cataloged without invoking unrelated device/system/clipboard getters.")
             .put("interpretation","Container/codec facts are library observations, not proof of authenticity, file safety, complete decoding or playback support on this device. Some properties are runtime state rather than stored metadata; initialization can decode initial media packets into null outputs.")
             .put("locationPolicy","MPV nodes supply decoded values, not physical file offsets. No tag, stream, chapter or attachment offset is inferred.")
             .put("stringPolicy","Values/keys retain exact engine-supplied UTF-8 hex. Invalid UTF-8 is displayed with replacements; libmpv C strings cannot expose bytes beyond an embedded NUL. These bytes are decoded engine values, not original stored file ranges.");

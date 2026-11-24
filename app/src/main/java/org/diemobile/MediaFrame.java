@@ -208,7 +208,7 @@ final class MediaFrame {
                                         + " interval. It does not change native finding bounds,"
                                         + " validate every stream/frame, or establish playback"
                                         + " support, complete validity or safety. Full media"
-                                        + " evidence remains available in MPV codecs / streams /"
+                                        + " information remains available in MPV codecs / streams /"
                                         + " tags.");
             Result result = new Result(bitmap, metadata, status, framePolicyRefused, report);
             success = true;

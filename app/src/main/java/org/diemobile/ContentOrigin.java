@@ -102,7 +102,7 @@ final class ContentOrigin implements AutoCloseable {
                         .put("relationship", relationship)
                         .put(
                                 "meaning",
-                                "Captured discovery/acquisition evidence for these exact bytes."
+                                "Captured discovery/acquisition information for these exact bytes."
                                     + " SHA-256 identifies the capture; it does not authenticate an"
                                     + " engine or establish complete validity, runtime behavior or"
                                     + " safety.");
