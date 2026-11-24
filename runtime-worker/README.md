@@ -250,3 +250,39 @@ not execute Binwalk JNI, a Binwalk worker request, the full app UI or SAF, and
 does not verify ARM64 or handset behavior. Actual API 26/35 execution of the
 twelfth contract is pending until fresh clean-source runtime jobs pass; all
 eleven preceding checks and their assertions remain intact.
+
+
+## Larger MPEG packet recovery and retained continuation headers
+
+A thirteenth `isolated-photorec-large-mpeg-pack-retention` contract exercises
+PhotoRec adapter 6 through the actual private isolated worker. It generates
+4,608 owned 2,048-byte MPEG-2 pack/padding sectors, wrapped in 37 prefix and
+64 suffix bytes. The 9,437,184-byte payload has the independent fixed SHA-256
+`a78ec64f310dbedba7ef3c37c0e20b213559a1a55fd562095833c2f7a40b82ba`.
+The complete 9,437,285-byte wrapped source has SHA-256
+`86593e36855315d927182606268da1303dc15cd5236cc97c1c4274aada59f000`.
+No NIST media, coordinates or expected layout data are used or packaged.
+
+The large request passes a Binder-duplicated read-only descriptor sharing an
+original open-file position of 17. That descriptor must stay valid, preserve
+its position/device/inode/size/times, and return the actual isolated UID and
+captured worker limits. The complete source SHA-256 is rechecked after parsing
+and exact native-range copying. All 4,608 original pack occurrences remain in
+the report; the first obtains the exact >8 MiB boundary. Every later pack keeps
+its accepted header, original ordinal, bounded owner reference and unknown
+independent extent while its redundant optional data callback is suppressed.
+
+Separate tiny packet fixtures require SCR=0 inside an existing owner to run
+independently without splitting the outer result, a standalone nonzero-SCR
+stream to establish its own boundary, and truncated packets to retain unknown
+extents without acquiring suppression owners. Complete native reports and
+small source/payload/descriptor identities remain in the captured JSON for
+independent auditing. The streaming data-work budget is 64 MiB per candidate;
+PDF read-only stdio remains separately bounded to 8 MiB, including the existing
+large-PDF assertion updated to adapter 6.
+
+This checks owned contiguous packet recovery, not MPEG playback or fragmented
+reconstruction. Full UI, SAF, production ARM64 and handset execution remain
+unverified. The preceding twelve contracts, including PDF/captured-preference/
+privacy assertions, remain intact. Actual API 26/35 execution of this new
+contract is pending fresh clean-source jobs.

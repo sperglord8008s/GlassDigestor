@@ -22,6 +22,7 @@ CHECKS = {
     "exact-text-actions-platform-clipboard-and-uris",
     "aliased-cache-bzip2-session-and-exact-large-file",
     "captured-analysis-limits-and-private-diagnostics",
+    "isolated-photorec-large-mpeg-pack-retention",
 }
 
 

@@ -68,3 +68,29 @@ manifest digests are refused. Nine small independent negative/positive fixtures
 run without corpus downloads in `scripts/test.sh`. This scoring/oracle code is
 test tooling only; production discovery never receives reference coordinates.
 Fragmented, missing-data and unacquired cases remain unscored.
+
+
+## Run acquisition, discovery and real file exports
+
+The optional end-to-end harness rebuilds the three host native engines, acquires
+the pinned compressed input through the production archive session (including a
+trusted ancestor alias), and decodes it byte-for-byte. A production Gallerize
+session runs both descriptor-based native engines against its owned decoded
+input. It exports **all bounded non-text file cards**, without consulting layout
+coordinates, then invokes the independent ZIP scorer:
+
+```sh
+bash scripts/test-nist-recovery.sh /path/to/L0_Video.dd.bz2 /new/output-directory
+```
+
+An existing output directory is refused. Outputs retain the actual payload ZIP,
+lossless raw native captures and complete gallery report, execution/identity
+receipts and independent score. A missing reference file makes the scoring step
+return 1; additional/duplicate exports remain visible. The external image and
+its media are never bundled. Peak work includes several owned image copies,
+bounded native/Java reports and the resulting ZIP. Run native builds/tests
+serially: never replace a library while a test JVM has it loaded. This checks
+host engines/models/file bytes; Android UI and SAF acceptance stay separate.
+
+The pre-alpha.20 implementation is under verification. The published baseline
+above remains 5/6 until the actual run and independent score pass.
