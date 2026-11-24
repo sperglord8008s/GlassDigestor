@@ -288,7 +288,7 @@ public final class ApkSigningWorkbenchTest {
         search("V4_SIG_APK_TREE_DID_NOT_VERIFY");
         assertEquals(1, list().getAdapter().getCount());
         assertEquals("v4/0", row(0).json().getString("scope"));
-        root("All collected signing evidence");
+        root("All collected signing information");
         EvidenceRows complete = ReflectionHelpers.getField(activity, "source");
         int count = complete.size();
         assertTrue(count > 10);

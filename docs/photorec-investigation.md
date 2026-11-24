@@ -129,7 +129,7 @@ continue to stream fully expanded, named fields.
 ## Limits and verification
 
 Limits: **256 MiB input**, **250,000 candidate occurrences**, **10,000 patterns**,
-**8 MiB copied data per candidate / 256 MiB aggregate data-block copying**, **24 MiB native report**,
+**64 MiB streamed data work per candidate / 8 MiB PDF file-read work per candidate / 256 MiB aggregate callback work**, **24 MiB native report**,
 **30-second cooperative native deadline**, and the shared **45-second request
 watchdog / 32 MiB pipe envelope**. Input/match/report/deadline caps fail with no successful prefix. Data-work caps preserve complete magic/header discovery, mark each limited candidate with null extent and an explicit reason, and expose aggregate counts in help/exports.
 Expensive native callbacks may need the parent watchdog. The Java boundary checks
@@ -234,3 +234,51 @@ partial-metadata flags/counts are retained. Java validates the exact policy,
 flags and counters; older captures keep their original stricter semantics.
 The input and memory/work caps stay unchanged. Actual >9 MiB file/gallery/export
 and independent xref/byte tests pass; see [PDF policy](pdf-file-recovery.md).
+
+## Adapter 6: larger streaming checks and repeated MPEG packs
+
+Adapter 6 raises only the per-candidate streaming data-work allowance to
+**64 MiB**. PDF file reads retain their separate **8 MiB** cap and adapter 5's
+established-footer/optional-metadata policy. All callbacks still share the
+**256 MiB** aggregate work cap. Input buffers, source bounds, 30-second native
+deadline, candidate count and 24 MiB report cap remain unchanged. These are
+read-work allowances, not promised recovered file sizes: a 64 MiB stream can
+need another block to observe its stop and therefore remain unresolved.
+
+MPEG program streams contain repeated `000001ba` pack headers. After an
+upstream data callback establishes a positive, source-bounded MPEG extent with
+`DC_STOP` and no offset error, the adapter can omit repeated optional data
+walks within that interval. The original standalone safe-header callback still
+runs for every occurrence. For an accepted pack inside the interval, an
+additional upstream header check receives a scoped active-MPEG context. Its
+ignored-header result authorizes omission of the optional data walk. This
+context has no file handle and executes no file check or recovery operation.
+PhotoRec deliberately accepts an SCR=0 pack as an independent stream even in
+that context; its data callback runs normally. Native overlapping extents are
+retained without manually splitting the earlier stream.
+
+An omitted walk has `dataCheckMode` equal to
+`upstream-active-mpeg-header-ignored/data-callback-suppressed` and an earlier
+`dataCheckSuppressedByCandidate` row ordinal. Its original header/raw state
+remains present, `dataCheckExecuted` is false, status and independent extent
+are null, and processed data bytes are zero. The owner reference describes a
+captured covering interval; it never gives the inner pack an inherited file
+size. `dataCallbacksSuppressedCount` and `mpegContinuationPolicy` expose the
+policy in complete metadata/Source exports. This intentional optional-work
+omission is distinct from `dataCheckLimited` and its budget-exhaustion count.
+Every raw header/candidate remains searchable and exportable. Additional
+independent content inside a covering stream may remain unvalidated.
+
+Java validates the exact work/policy fields, earlier owner index, MPEG pack
+pattern, independent owner data-stop witness, source containment, unexecuted
+inner state and exact counts. Adapters 2–5 remain readable under their original
+limits and cannot claim adapter 6's optional-work omission.
+
+`bash scripts/test-photorec-mpeg.sh` runs generated packet-stream checks:
+exact 9 MiB exported payload hashes, every repeated pack, nonzero-SCR suffixes
+with and without owners, independent SCR=0 overlaps, owner endpoints,
+truncated packets, 64 MiB stop/lookahead work limits, malformed owner/policy
+refusals, legacy adapter-5 reading, descriptor position and cancellation
+cleanup. The standard PhotoRec script also runs these cases. Existing PDF
+checks separately retain the 8 MiB file-read cap. These host contracts do not
+establish actual Android/SAF/handset acceptance or complete media integrity.

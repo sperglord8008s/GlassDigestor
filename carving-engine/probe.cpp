@@ -28,12 +28,14 @@ extern "C" {
 #include "log.h"
 extern file_enable_t array_file_enable[];
 extern file_check_list_t file_check_list;
+extern const file_hint_t file_hint_mpg;
 }
 
 namespace {
 constexpr uint64_t MAX_BLOB_BYTES = 256ULL * 1024 * 1024;
 constexpr uint64_t MAX_WORK = 256ULL * 1024 * 1024;
-constexpr uint64_t MAX_CANDIDATE_WORK = 8ULL * 1024 * 1024;
+constexpr uint64_t MAX_CANDIDATE_DATA_WORK = 64ULL * 1024 * 1024;
+constexpr uint64_t MAX_CANDIDATE_FILE_WORK = 8ULL * 1024 * 1024;
 constexpr size_t MAX_ROWS = 250000;
 constexpr size_t MAX_REPORT = 24 * 1024 * 1024;
 constexpr unsigned BLOCK = 65536;
@@ -169,6 +171,7 @@ struct Registry {
 struct Budget {
     uint64_t bytes = 0;
     size_t limited_candidates = 0;
+    size_t suppressed_candidates = 0;
     size_t file_attempted = 0, file_checked = 0, file_limited = 0, file_metadata_limited = 0;
     std::chrono::steady_clock::time_point deadline = std::chrono::steady_clock::now() + std::chrono::seconds(30);
     void check(uint64_t amount = 0) {
@@ -178,8 +181,44 @@ struct Budget {
     }
 };
 
-std::string candidate(const Registry &registry, size_t pattern, uint64_t magic,
-                      diemobile::BlobInput &input, uint64_t source_size, Budget &budget) {
+struct MpegOwner {
+    size_t ordinal = 0;
+    uint64_t start = 0, size = 0;
+    bool contains_pack(uint64_t position) const {
+        return size >= 4 && position > start && position - start <= size - 4;
+    }
+};
+
+struct CandidateResult {
+    std::string row;
+    uint64_t bounded_mpeg_size = 0;
+};
+
+// Keep the standalone header result. This additional, tightly scoped upstream
+// check distinguishes ignored in-stream packs from intentional new SCR=0 starts.
+bool mpeg_continuation(const file_check_t *pattern, const unsigned char *header,
+                       const file_recovery_t &standalone, uint64_t start, const MpegOwner &owner) {
+    static constexpr unsigned char pack_magic[] = {0, 0, 1, 0xba};
+    if (!owner.contains_pack(start) || pattern->file_stat->file_hint != &file_hint_mpg ||
+            pattern->offset != 0 || pattern->length != sizeof(pack_magic) ||
+            std::memcmp(pattern->value, pack_magic, sizeof(pack_magic)) != 0 ||
+            standalone.file_check == nullptr || standalone.data_check == nullptr) return false;
+    file_recovery_t active{}, contextual{};
+    reset_file_recovery(&active); reset_file_recovery(&contextual);
+    active.blocksize = BLOCK; contextual.blocksize = BLOCK;
+    active.file_stat = pattern->file_stat;
+    active.file_check = standalone.file_check;
+    // The reviewed pack callback only consults active file_stat/file_check. No
+    // file handle, filesystem recovery or upstream file-check callback is used.
+    header_ignored(nullptr);
+    const int accepted = pattern->header_check(header, BLOCK, 1, &active, &contextual);
+    header_ignored(nullptr);
+    return accepted == 0;
+}
+
+CandidateResult candidate(const Registry &registry, size_t pattern, uint64_t magic,
+                      diemobile::BlobInput &input, uint64_t source_size, Budget &budget,
+                      const MpegOwner &owner) {
     const auto *p = registry.patterns[pattern];
     const auto *hint = p->file_stat->file_hint;
     uint64_t start = magic - p->offset;
@@ -213,7 +252,7 @@ std::string candidate(const Registry &registry, size_t pattern, uint64_t magic,
             << recovered.checkpoint_status << ',' << recovered.data_check_tmp << ','
             << quoted(std::to_string(recovered.file_size).c_str()) << ','
             << (recovered.extension ? quoted(recovered.extension) : "null") << ']';
-        return rejected.str();
+        return {rejected.str(), 0};
     }
     uint64_t initial_calculated = recovered.calculated_file_size;
     uint64_t minimum = recovered.min_filesize;
@@ -227,7 +266,12 @@ std::string candidate(const Registry &registry, size_t pattern, uint64_t magic,
     const char *limit_reason = nullptr;
     const char *data_mode = "not-run";
     const char *meaning = accepted ? "header-accepted/extent-unknown" : "header-rejected";
-    if (accepted && has_data && recovered.calculated_file_size >= PHOTOREC_MAX_FILE_SIZE)
+    const bool suppressed = mpeg_continuation(p, header, recovered, start, owner);
+    if (suppressed) {
+        ++budget.suppressed_candidates;
+        data_mode = "upstream-active-mpeg-header-ignored/data-callback-suppressed";
+        meaning = "header-accepted/inside-bounded-mpeg/independent-extent-unknown";
+    } else if (accepted && has_data && recovered.calculated_file_size >= PHOTOREC_MAX_FILE_SIZE)
         meaning = "header-accepted/calculated-size-outside-upstream-data-contract";
     else if (accepted && has_data) {
         if (recovered.data_check == &data_check_size) {
@@ -242,7 +286,7 @@ std::string candidate(const Registry &registry, size_t pattern, uint64_t magic,
           std::vector<unsigned char> window(2 * BLOCK, 0);
           for (uint64_t offset = 0; offset < remaining && recovered.data_check; offset += BLOCK) {
             unsigned count = unsigned(std::min<uint64_t>(remaining - offset, BLOCK));
-            if (count > MAX_WORK-budget.bytes || count > MAX_CANDIDATE_WORK-processed) {
+            if (count > MAX_WORK-budget.bytes || count > MAX_CANDIDATE_DATA_WORK-processed) {
                 limited = true;
                 limit_reason = count > MAX_WORK-budget.bytes ? "aggregate-data-buffer-budget" : "per-candidate-data-buffer-budget";
                 ++budget.limited_candidates;
@@ -281,7 +325,7 @@ std::string candidate(const Registry &registry, size_t pattern, uint64_t magic,
     std::string file_failure;
     if (file_attempted) {
         ++budget.file_attempted;
-        diemobile::ReadOnlyFile view(input, start, remaining, MAX_CANDIDATE_WORK,
+        diemobile::ReadOnlyFile view(input, start, remaining, MAX_CANDIDATE_FILE_WORK,
                 [&budget](uint64_t count) {
                     if (count > MAX_WORK - budget.bytes) throw diemobile::ReadOnlyFile::WorkLimit();
                     budget.check(count);
@@ -334,7 +378,9 @@ std::string candidate(const Registry &registry, size_t pattern, uint64_t magic,
         << ",\"minimumFileSizeBytes\":" << quoted(std::to_string(minimum).c_str())
         << ",\"dataCheckAvailable\":" << (has_data ? "true" : "false")
         << ",\"dataCheckExecuted\":" << (status >= 0 ? "true" : "false")
-        << ",\"dataCheckMode\":" << quoted(data_mode)
+        << ",\"dataCheckMode\":" << quoted(data_mode);
+    if (suppressed) out << ",\"dataCheckSuppressedByCandidate\":" << owner.ordinal;
+    out
         << ",\"dataCheckLimited\":" << (limited ? "true" : "false")
         << ",\"dataCheckLimitReason\":" << (limit_reason ? quoted(limit_reason) : "null")
         << ",\"dataCheckStatus\":" << (status < 0 ? "null" : std::to_string(status))
@@ -359,7 +405,7 @@ std::string candidate(const Registry &registry, size_t pattern, uint64_t magic,
         << ",\"fileCheckBoundaryEstablished\":" << (file_attempted && extent > 0 ? "true" : "false")
         << ",\"renameCheckExecuted\":false"
         << ",\"upstreamTime\":" << int64_t(recovered.time) << ",\"upstreamFlags\":" << recovered.flags << '}';
-    return out.str();
+    return {out.str(), hint == &file_hint_mpg ? extent : 0};
 }
 
 std::string scan(int fd) {
@@ -375,6 +421,7 @@ std::string scan(int fd) {
     std::vector<size_t> occurrences(registry.patterns.size(), 0);
     size_t report_bytes = registry.catalog.size();
     uint64_t underflow = 0;
+    MpegOwner mpeg_owner;
     size_t node = 0;
     std::vector<unsigned char> scan_buffer(diemobile::BlobInput::SCAN_BYTES);
     for (size_t block_start = 0; block_start < source_size; block_start += scan_buffer.size()) {
@@ -412,7 +459,15 @@ std::string scan(int fd) {
                         << ",\"fileCheckExecuted\":false,\"renameCheckExecuted\":false"
                         << ",\"parserStatus\":\"magic-matched/negative-candidate-start/header-not-called\"}";
                     row = rejected.str();
-                } else row = candidate(registry, pattern, magic, input, source_size, budget);
+                } else {
+                    CandidateResult result = candidate(registry, pattern, magic, input, source_size, budget, mpeg_owner);
+                    row = std::move(result.row);
+                    const uint64_t start = magic - p->offset;
+                    // All candidates are retained. An independent SCR=0 stream
+                    // may overlap this owner; never split or inherit its extent.
+                    if (result.bounded_mpeg_size > 0 && start + result.bounded_mpeg_size > mpeg_owner.start + mpeg_owner.size)
+                        mpeg_owner = {rows.size(), start, result.bounded_mpeg_size};
+                }
                 if (!row.empty() && row.front() == '[') {
                     auto found = state_indices.find(row);
                     size_t state;
@@ -436,7 +491,7 @@ std::string scan(int fd) {
     out << "{\"ok\":true,\"schema\":\"org.diemobile.photorec-evidence\",\"schemaVersion\":2"
         << ",\"engine\":\"PhotoRec\",\"engineVersion\":\"7.2\",\"sourceRevision\":" << quoted(REVISION)
         << ",\"sourceArchiveSha256\":\"0cfd82ca6890188a3a4fe01c9b970f654eb3af396580f408ed024789e2873616\""
-        << ",\"adapter\":\"diemobile-photorec-5\",\"fileSizeBytes\":" << source_size
+        << ",\"adapter\":\"diemobile-photorec-6\",\"fileSizeBytes\":" << source_size
         << ",\"compactRejectedCandidateCount\":" << compact_rejections
         << ",\"rejectedRecoveryStateCount\":" << rejected_states.size()
         << ",\"compactRejectedEncoding\":\"[patternIndex,magicOffset,recoveryStateIndex]; original row ordinal is unchanged\""
@@ -459,13 +514,15 @@ std::string scan(int fd) {
         << ",\"fileCheckCandidatesAttempted\":" << budget.file_attempted
         << ",\"fileCheckCandidatesExecuted\":" << budget.file_checked
         << ",\"fileCheckCandidatesLimited\":" << budget.file_limited
-        << ",\"maximumCandidateFileReadBytes\":" << MAX_CANDIDATE_WORK
+        << ",\"maximumCandidateFileReadBytes\":" << MAX_CANDIDATE_FILE_WORK
         << ",\"fileCheckReadBufferBytes\":" << diemobile::ReadOnlyFile::BUFFER_BYTES
         << ",\"renameCallbacksExecuted\":false,\"filesystemRecoveryExecuted\":false"
         << ",\"safeHeaderOnly\":true,\"auxiliarySignatureFiles\":false,\"optionalLibraries\":[]"
         << ",\"callbackBufferWorkBytes\":" << budget.bytes << ",\"maximumCallbackBufferWorkBytes\":" << MAX_WORK
-        << ",\"maximumCandidateDataBufferBytes\":" << MAX_CANDIDATE_WORK
+        << ",\"maximumCandidateDataBufferBytes\":" << MAX_CANDIDATE_DATA_WORK
         << ",\"dataCallbacksLimitedCount\":" << budget.limited_candidates
+        << ",\"dataCallbacksSuppressedCount\":" << budget.suppressed_candidates
+        << ",\"mpegContinuationPolicy\":\"standalone-header-retained/active-mpeg-header-ignored/bounded-owner-only\""
         << ",\"negativeStartMagicMatches\":" << underflow
         << ",\"signatureCount\":" << registry.format_count << ",\"patternCount\":" << registry.patterns.size()
         << ",\"searchedPatternCount\":" << registry.searched_patterns

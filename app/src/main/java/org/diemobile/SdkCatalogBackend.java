@@ -43,7 +43,7 @@ final class SdkCatalogBackend extends InvestigationBackend {
     @Override List<Link> roots(String request,BooleanSupplier stop) throws Exception {
         EvidenceRows.check(stop);List<Link> links=new ArrayList<>();
         links.add(Link.view("Every canonical SDK / library matcher",query(-1,false,"")));
-        for(int type=0;type<NameMatcher.TYPES.length;type++) links.add(Link.view(NameMatcher.TYPES[type],query(type,false,"")));
+        for(int type=0;type<NameMatcher.TYPES.length;type++) links.add(Link.view(NameMatcher.displayTypeLabel(type),query(type,false,"")));
         links.add(Link.view("Unsupported regex diagnostics",query(-1,true,"")));return links;
     }
     @Override List<Link> related(String request,EvidenceRows rows,EvidenceRows.Row row,BooleanSupplier stop) throws Exception {

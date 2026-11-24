@@ -52,7 +52,7 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
                     .put(
                             "scope",
                             "Actual x86_64 Android production worker, hash/archive/PhotoRec JNI,"
-                                + " Binder, descriptors, PDF file recovery, compiled manifest"
+                                + " Binder, descriptors, PDF/MPEG file recovery, compiled manifest"
                                 + " declarations, token cancellation and the production platform"
                                 + " media/PDF preview, text clipboard/URI helpers, captured"
                                 + " analysis limits and private diagnostics. This does not verify"
@@ -79,6 +79,7 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
             archiveSession();
             compiledManifest();
             photoRecPdf();
+            photoRecMpeg();
             pdfPages();
             mediaPreview();
             cancelBlockedReporter(abc);
@@ -1100,12 +1101,13 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
             worker(valid, "photorec");
             require(
                     valid.getBoolean("ok")
-                            && valid.getString("adapter").equals("diemobile-photorec-5"),
+                            && valid.getString("adapter").equals("diemobile-photorec-6"),
                     "Actual Android PhotoRec adapter differs from the reviewed file-check scope");
             require(
                     valid.getString("fileCheckCallbackScope")
                                     .equals("pdf-only/read-only-relative-stdio")
-                            && valid.getLong("maximumInputReadBufferBytes") == 1376256,
+                            && valid.getLong("maximumInputReadBufferBytes") == 1376256
+                            && valid.getLong("maximumCandidateFileReadBytes") == 8L * 1024 * 1024,
                     "Actual PhotoRec stdio/input budget differs");
             JSONObject row = pdfRow(valid, 37);
             require(
@@ -1182,6 +1184,340 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
                                 Inspector.toHex(MessageDigest.getInstance("SHA-256").digest(pdf)))
                         .put("physicalOffset", 37)
                         .put("pdfRendererExecuted", false));
+    }
+
+    private static final String MPEG_SUPPRESSED_MODE =
+            "upstream-active-mpeg-header-ignored/data-callback-suppressed";
+
+    private static byte[] mpegSector(boolean restart) {
+        byte[] pack = {
+            0, 0, 1, (byte) 0xba, 0x44, 0, 4, 0, 4, 1, 0x43, 0x38, (byte) 0xdb, (byte) 0xf8
+        };
+        if (!restart) pack[5] = 1;
+        byte[] sector = new byte[2048];
+        Arrays.fill(sector, (byte) 0xa7);
+        System.arraycopy(pack, 0, sector, 0, pack.length);
+        int at = pack.length, payload = sector.length - at - 6;
+        sector[at] = 0;
+        sector[at + 1] = 0;
+        sector[at + 2] = 1;
+        sector[at + 3] = (byte) 0xbe;
+        sector[at + 4] = (byte) (payload >>> 8);
+        sector[at + 5] = (byte) payload;
+        return sector;
+    }
+
+    private static String writeMpeg(File source, int sectors, boolean firstRestart, int restartAt)
+            throws Exception {
+        MessageDigest payload = MessageDigest.getInstance("SHA-256");
+        byte[] prefix = new byte[37], suffix = new byte[64];
+        Arrays.fill(prefix, (byte) 0x5a);
+        Arrays.fill(suffix, (byte) 0x5a);
+        try (OutputStream output = new FileOutputStream(source)) {
+            output.write(prefix);
+            for (int index = 0; index < sectors; index++) {
+                byte[] bytes = mpegSector(index == 0 ? firstRestart : index == restartAt);
+                output.write(bytes);
+                payload.update(bytes);
+            }
+            output.write(suffix);
+        }
+        return Inspector.toHex(payload.digest());
+    }
+
+    private static List<Integer> mpegRows(JSONObject report) throws Exception {
+        JSONArray rows = report.getJSONArray("rows");
+        List<Integer> ordinals = new ArrayList<>();
+        for (int index = 0; index < rows.length(); index++) {
+            Object value = rows.get(index);
+            if (value instanceof JSONObject && ((JSONObject) value).getString("name").equals("mpg"))
+                ordinals.add(index);
+        }
+        return ordinals;
+    }
+
+    /**
+     * Actual Binder duplicate shares the original open-file position, independently checked below.
+     */
+    private JSONObject photoRecSharedDescriptor(File source, JSONObject descriptor)
+            throws Exception {
+        AtomicReference<Messenger> remote = new AtomicReference<>();
+        CountDownLatch connected = new CountDownLatch(1);
+        ServiceConnection connection =
+                new ServiceConnection() {
+                    @Override
+                    public void onServiceConnected(ComponentName name, IBinder binder) {
+                        remote.set(new Messenger(binder));
+                        connected.countDown();
+                    }
+
+                    @Override
+                    public void onServiceDisconnected(ComponentName name) {
+                        connected.countDown();
+                    }
+                };
+        boolean bound =
+                target.bindService(
+                        new Intent(target, BinaryWorkerService.class),
+                        connection,
+                        Context.BIND_AUTO_CREATE);
+        require(bound, "Cannot bind the actual MPEG descriptor worker");
+        ParcelFileDescriptor[] pipe = null;
+        try (RandomAccessFile original = new RandomAccessFile(source, "r")) {
+            require(
+                    connected.await(15, TimeUnit.SECONDS) && remote.get() != null,
+                    "Actual MPEG descriptor worker did not connect");
+            original.seek(17);
+            StructStat before = Os.fstat(original.getFD());
+            pipe = ParcelFileDescriptor.createPipe();
+            AnalysisTimeLimits.Request limits = AnalysisTimeLimits.capture(target, "photorec");
+            try (ParcelFileDescriptor shared = ParcelFileDescriptor.dup(original.getFD())) {
+                Message run = Message.obtain(null, BinaryWorkerService.RUN);
+                Bundle data = run.getData();
+                data.putString("engine", "photorec");
+                data.putString("token", UUID.randomUUID().toString());
+                limits.writeTo(data);
+                data.putParcelable("input", shared);
+                data.putParcelable("output", pipe[1]);
+                remote.get().send(run);
+            }
+            pipe[1].close();
+            pipe[1] = null;
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            try (InputStream reader = new ParcelFileDescriptor.AutoCloseInputStream(pipe[0])) {
+                pipe[0] = null;
+                byte[] block = new byte[65536];
+                for (int count; (count = reader.read(block)) != -1; ) {
+                    require(
+                            count <= 32 * 1024 * 1024 - bytes.size(),
+                            "MPEG worker report exceeds 32 MiB");
+                    bytes.write(block, 0, count);
+                }
+            }
+            StructStat after = Os.fstat(original.getFD());
+            require(
+                    original.getFD().valid() && original.getFilePointer() == 17,
+                    "Actual isolated MPEG parser changed caller descriptor ownership/position");
+            require(
+                    before.st_dev == after.st_dev
+                            && before.st_ino == after.st_ino
+                            && before.st_size == after.st_size
+                            && before.st_mtime == after.st_mtime
+                            && before.st_ctime == after.st_ctime,
+                    "Actual isolated MPEG parser changed its source descriptor identity");
+            JSONObject envelope = new JSONObject(bytes.toString(StandardCharsets.UTF_8.name()));
+            JSONObject nativeReport = envelope.getJSONObject("report");
+            limits.validateEnvelope(envelope, nativeReport);
+            envelope.remove("report");
+            nativeReport.put("worker", envelope);
+            worker(nativeReport, "photorec");
+            descriptor
+                    .put("callerPositionBefore", 17)
+                    .put("callerPositionAfter", original.getFilePointer())
+                    .put("callerDescriptorStillValid", true)
+                    .put("deviceInodeSizeAndTimesUnchanged", true)
+                    .put("descriptorSizeBytes", before.st_size)
+                    .put("reportTransportBytes", bytes.size());
+            return nativeReport;
+        } finally {
+            if (pipe != null) for (ParcelFileDescriptor fd : pipe) if (fd != null) fd.close();
+            target.unbindService(connection);
+        }
+    }
+
+    private void photoRecMpeg() throws Exception {
+        final int sectors = 4608;
+        final long payloadBytes = 9L * 1024 * 1024;
+        final String expectedSha =
+                "a78ec64f310dbedba7ef3c37c0e20b213559a1a55fd562095833c2f7a40b82ba";
+        final String expectedSourceSha =
+                "86593e36855315d927182606268da1303dc15cd5236cc97c1c4274aada59f000";
+        File source = new File(directory, "mpeg-packets-disguised.jpeg");
+        File recovered = new File(directory, "mpeg-actual-recovered.private");
+        File restartFile = new File(directory, "mpeg-independent-restart.blob");
+        File unownedFile = new File(directory, "mpeg-nonzero-first.blob");
+        File truncatedFile = new File(directory, "mpeg-incomplete-packet.blob");
+        try {
+            require(
+                    writeMpeg(source, sectors, true, -1).equals(expectedSha),
+                    "Generated MPEG payload differs from the independent fixed packet oracle");
+            require(source.length() == 37 + payloadBytes + 64, "MPEG source was not fully written");
+            String sourceSha = reportDigest(source);
+            require(
+                    sourceSha.equals(expectedSourceSha),
+                    "Generated MPEG wrapper differs from the independent fixed source oracle");
+            JSONObject descriptor = new JSONObject();
+            JSONObject large = photoRecSharedDescriptor(source, descriptor);
+            require(
+                    large.getBoolean("ok")
+                            && large.getString("adapter").equals("diemobile-photorec-6")
+                            && large.getLong("fileSizeBytes") == source.length()
+                            && large.getLong("maximumCandidateDataBufferBytes") == 64L * 1024 * 1024
+                            && large.getLong("maximumCandidateFileReadBytes") == 8L * 1024 * 1024
+                            && large.getLong("maximumCallbackBufferWorkBytes") == 256L * 1024 * 1024
+                            && large.getString("mpegContinuationPolicy")
+                                    .equals(
+                                            "standalone-header-retained/active-mpeg-header-ignored/bounded-owner-only"),
+                    "Actual isolated MPEG adapter budgets/policy differ");
+            require(
+                    large.getBoolean("ownedDescriptorDuplicate")
+                            && large.getBoolean("callerDescriptorPositionPreserved")
+                            && large.getString("inputReadMode").equals("bounded-pread-windows")
+                            && large.getLong("maximumInputReadBufferBytes") == 1376256
+                            && large.getLong("sourceReadBytes") >= source.length()
+                            && large.getBoolean("fullBlobSearch")
+                            && !large.getBoolean("nestedResultsPruned")
+                            && !large.getBoolean("unknownExtentsInferred"),
+                    "Actual isolated MPEG input/search contracts differ");
+            List<Integer> rows = mpegRows(large);
+            require(
+                    rows.size() == sectors
+                            && large.getInt("dataCallbacksSuppressedCount") == sectors - 1,
+                    "Original MPEG pack occurrences were dropped or optional-work count differs");
+            int ownerIndex = rows.get(0);
+            JSONObject owner = large.getJSONArray("rows").getJSONObject(ownerIndex);
+            require(
+                    owner.getLong("physicalOffset") == 37
+                            && owner.getBoolean("headerAccepted")
+                            && owner.getBoolean("dataCheckExecuted")
+                            && owner.getInt("dataCheckStatus") == 2
+                            && !owner.getBoolean("dataCheckLimited")
+                            && owner.isNull("dataCheckSuppressedByCandidate")
+                            && owner.getLong("reportedSizeBytes") == payloadBytes
+                            && owner.getLong("dataCheckSourceBytesProcessed") == payloadBytes + 64,
+                    "The >8 MiB MPEG owner did not obtain its exact native boundary");
+            for (int index = 1; index < rows.size(); index++) {
+                JSONObject row = large.getJSONArray("rows").getJSONObject(rows.get(index));
+                require(
+                        row.getLong("physicalOffset") == 37L + index * 2048
+                                && row.getBoolean("headerAccepted")
+                                && row.isNull("reportedSizeBytes")
+                                && !row.getBoolean("dataCheckExecuted")
+                                && row.isNull("dataCheckStatus")
+                                && !row.getBoolean("dataCheckLimited")
+                                && row.isNull("dataCheckLimitReason")
+                                && row.getLong("dataCheckSourceBytesProcessed") == 0
+                                && row.getString("dataCheckMode").equals(MPEG_SUPPRESSED_MODE)
+                                && row.getInt("dataCheckSuppressedByCandidate") == ownerIndex,
+                        "MPEG continuation lost a header, owner ordinal or unknown independent"
+                                + " extent");
+            }
+            try (OutputStream output = new FileOutputStream(recovered)) {
+                RangeAnalysis.copy(
+                        source,
+                        new FileRange(source.length(), 37, owner.getLong("reportedSizeBytes")),
+                        output,
+                        () -> false);
+            }
+            require(
+                    recovered.length() == payloadBytes
+                            && reportDigest(recovered).equals(expectedSha)
+                            && reportDigest(source).equals(sourceSha),
+                    "Native MPEG range copy changed payload bytes or source identity");
+
+            JSONObject restart, unowned, truncated;
+            String restartSha, unownedSha, truncatedSha;
+            try (BinaryWorkerClient client = new BinaryWorkerClient(target, "photorec")) {
+                writeMpeg(restartFile, 8, true, 3);
+                restartSha = reportDigest(restartFile);
+                restart = new JSONObject(client.scan(restartFile, () -> false));
+                worker(restart, "photorec");
+                List<Integer> restartRows = mpegRows(restart);
+                require(
+                        restart.getBoolean("ok")
+                                && restartRows.size() == 8
+                                && restart.getInt("dataCallbacksSuppressedCount") == 6,
+                        "Independent MPEG restart candidate/count differs");
+                JSONObject outer = restart.getJSONArray("rows").getJSONObject(restartRows.get(0));
+                JSONObject inner = restart.getJSONArray("rows").getJSONObject(restartRows.get(3));
+                require(
+                        outer.getLong("reportedSizeBytes") == 8 * 2048
+                                && inner.getLong("physicalOffset") == 37 + 3 * 2048
+                                && inner.getBoolean("dataCheckExecuted")
+                                && inner.getLong("reportedSizeBytes") == 5 * 2048
+                                && inner.isNull("dataCheckSuppressedByCandidate"),
+                        "SCR=0 restart was suppressed or the original owner was manually split");
+                writeMpeg(unownedFile, 8, false, -1);
+                unownedSha = reportDigest(unownedFile);
+                unowned = new JSONObject(client.scan(unownedFile, () -> false));
+                worker(unowned, "photorec");
+                JSONObject standalone =
+                        unowned.getJSONArray("rows").getJSONObject(mpegRows(unowned).get(0));
+                require(
+                        unowned.getBoolean("ok")
+                                && standalone.getBoolean("dataCheckExecuted")
+                                && standalone.isNull("dataCheckSuppressedByCandidate")
+                                && standalone.getLong("reportedSizeBytes") == 8 * 2048,
+                        "A standalone nonzero-SCR pack was suppressed without a bounded owner");
+                writeMpeg(truncatedFile, 5, true, -1);
+                try (RandomAccessFile file = new RandomAccessFile(truncatedFile, "rw")) {
+                    file.setLength(37 + 5 * 2048 - 17);
+                }
+                truncatedSha = reportDigest(truncatedFile);
+                truncated = new JSONObject(client.scan(truncatedFile, () -> false));
+                worker(truncated, "photorec");
+                List<Integer> unresolved = mpegRows(truncated);
+                require(
+                        truncated.getBoolean("ok")
+                                && unresolved.size() == 5
+                                && truncated.getInt("dataCallbacksSuppressedCount") == 0,
+                        "An unbounded MPEG stream acquired a suppression owner");
+                for (int ordinal : unresolved) {
+                    JSONObject row = truncated.getJSONArray("rows").getJSONObject(ordinal);
+                    require(
+                            row.isNull("reportedSizeBytes")
+                                    && row.getBoolean("dataCheckExecuted")
+                                    && row.isNull("dataCheckSuppressedByCandidate"),
+                            "Truncated MPEG header acquired an invented extent or skipped"
+                                    + " callback");
+                }
+            }
+            require(
+                    reportDigest(restartFile).equals(restartSha)
+                            && reportDigest(unownedFile).equals(unownedSha)
+                            && reportDigest(truncatedFile).equals(truncatedSha),
+                    "Small MPEG source identities changed during isolated parsing");
+            record(
+                    "isolated-photorec-large-mpeg-pack-retention",
+                    new JSONObject()
+                            .put("sourceSizeBytes", source.length())
+                            .put("sourceSha256", sourceSha)
+                            .put("expectedSourceSha256", expectedSourceSha)
+                            .put("payloadOffset", 37)
+                            .put("payloadSizeBytes", payloadBytes)
+                            .put("expectedPayloadSha256", expectedSha)
+                            .put("recoveredPayloadSha256", reportDigest(recovered))
+                            .put("sourceIdentityUnchanged", true)
+                            .put("descriptor", descriptor)
+                            .put("mpegPackRows", rows.size())
+                            .put("ownerOriginalRowOrdinal", ownerIndex)
+                            .put("suppressedOptionalCallbacks", sectors - 1)
+                            .put("allContinuationIndependentExtentsUnknown", true)
+                            .put("scrZeroRestartCheckedIndependently", true)
+                            .put("standaloneNonzeroScrCheckedIndependently", true)
+                            .put("unboundedOwnerSuppressionRefused", true)
+                            .put("restartSourceSizeBytes", restartFile.length())
+                            .put("restartSourceSha256", restartSha)
+                            .put("standaloneSourceSizeBytes", unownedFile.length())
+                            .put("standaloneSourceSha256", unownedSha)
+                            .put("truncatedSourceSizeBytes", truncatedFile.length())
+                            .put("truncatedSourceSha256", truncatedSha)
+                            .put("smallSourceIdentitiesUnchanged", true)
+                            .put("largeNativeReport", large)
+                            .put("restartNativeReport", restart)
+                            .put("standaloneNativeReport", unowned)
+                            .put("truncatedNativeReport", truncated)
+                            .put("uiExecuted", false)
+                            .put("safExecuted", false)
+                            .put("arm64Executed", false)
+                            .put("mpegPlaybackExecuted", false)
+                            .put("fragmentedRecoveryExecuted", false)
+                            .put("nistMediaOrCoordinatesUsed", false));
+        } finally {
+            for (File file :
+                    new File[] {source, recovered, restartFile, unownedFile, truncatedFile})
+                file.delete();
+        }
     }
 
     private void pdfPages() throws Exception {

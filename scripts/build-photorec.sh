@@ -17,7 +17,7 @@ if [[ "$mode" = host ]]; then
   cmake -S carving-engine -B "$build" -DCMAKE_BUILD_TYPE=Release
 elif [[ "$mode" = android ]]; then
   ndk="${ANDROID_NDK_HOME:-${ANDROID_HOME:?Set ANDROID_HOME}/ndk/28.2.13676358}"
-  output="app/build/generated-photorec-jni/$abi"
+  output="${DIE_PHOTOREC_JNI_ROOT:-app/build/generated-photorec-jni}/$abi"
   cmake -S carving-engine -B "$build" -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_TOOLCHAIN_FILE="$ndk/build/cmake/android.toolchain.cmake" \
     -DANDROID_ABI="$abi" -DANDROID_PLATFORM=android-26 -DANDROID_STL=c++_static

@@ -313,7 +313,7 @@ final class PackageSetBackend extends InvestigationBackend {
                                 new JSONObject()
                                         .put(
                                                 "name",
-                                                "Relationship analysis unavailable; source evidence"
+                                                "Relationship analysis unavailable; source information"
                                                         + " remains inspectable")
                                         .put("error", graphError)
                                         .put("graphAvailable", false)));
@@ -385,7 +385,7 @@ final class PackageSetBackend extends InvestigationBackend {
                             table,
                             0,
                             new JSONObject()
-                                    .put("name", "Signing evidence unavailable for " + source.name)
+                                    .put("name", "Signing information unavailable for " + source.name)
                                     .put("errors", source.errors)
                                     .put("available", false)));
             return;
@@ -469,7 +469,7 @@ final class PackageSetBackend extends InvestigationBackend {
         links.add(Link.view("Captured APK sources / failures", query("sources", -1)));
         links.add(
                 Link.view(
-                        "All collected package-set evidence / complete export", query("all", -1)));
+                        "All collected package-set information / complete export", query("all", -1)));
         return links;
     }
 

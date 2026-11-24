@@ -124,7 +124,7 @@ final class MpvTables {
         };
     }
     EvidenceRows summary() {
-        return new EvidenceRows("mpv-source","MPV source / scope / collected evidence") {
+        return new EvidenceRows("mpv-source","MPV source / scope / collected information") {
             int size() { return 1; }
             Row row(int i, BooleanSupplier stop) throws Exception {
                 EvidenceRows.check(stop);

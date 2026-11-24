@@ -95,3 +95,22 @@ remain distinct from source/deadline failures. Original failure/work/time fields
 separate boundary/partial-metadata flags and complete counts remain in evidence.
 Java validates the new policy while older captures retain their own semantics.
 No input/work buffer limit is increased; see the PDF recovery contract.
+
+Adapter 6 separates a **64 MiB per-candidate streaming data-work cap** from
+the unchanged **8 MiB per-PDF file-read cap**, sharing the existing 256 MiB
+aggregate callback budget. The input/callback window sizes remain unchanged.
+After a successful source-bounded upstream MPEG data stop, later accepted pack
+headers can omit repeated optional data walks only when the upstream active-MPEG
+header check ignores them. SCR=0 headers still run independently. Structured
+candidate results establish covering intervals without reparsing generated JSON.
+Every standalone header/raw occurrence remains present; an inner pack keeps a
+null independent extent and records its mode/earlier owner ordinal. Counts and
+the exact policy are captured and validated, and adapters 2–5 remain readable.
+See the [adapter 6 protocol](../docs/photorec-investigation.md#adapter-6-larger-streaming-checks-and-repeated-mpeg-packs).
+
+`bash scripts/test-photorec-mpeg.sh` independently generates packet streams and
+checks exact >8 MiB payload exports, SCR=0/continuation/suffix/boundary behavior,
+truncation, 64 MiB work exhaustion, malformed relationships, legacy reading and
+descriptor/cancellation ownership. It is included in `test-photorec.sh` and the
+standalone corresponding-source archive. Expected NIST layouts/hashes never
+enter production discovery.

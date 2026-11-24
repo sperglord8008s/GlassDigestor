@@ -1,0 +1,1460 @@
+{
+  "schema": "org.glassdigestor.nist-recovery-score",
+  "schemaVersion": 1,
+  "meaning": "Actual ZIP bytes scored; additional exports are retained and unscored. Android UI acceptance is recorded separately.",
+  "sourceSha256": "20d8a231ded5223bbecab97d4155d028ef9cd0760a5dd3ecef22123c46b48870",
+  "sourceSizeBytes": 62578688,
+  "expectedReferenceFiles": 6,
+  "exactReferenceFiles": 6,
+  "allReferenceFilesRecovered": true,
+  "exportFileCount": 86,
+  "referenceFiles": [
+    {
+      "name": "vid1.mp4",
+      "offset": 5120000,
+      "sizeBytes": 1136007,
+      "sha256": "0ee69d3b50e9e0fa83d4d1f022510f99d4d013fd42fa4da5804d5fe0c66ffda4",
+      "exactExportMatches": [
+        "recovered-004e2000-1136007.mp4"
+      ],
+      "status": "exact"
+    },
+    {
+      "name": "vid2.avi",
+      "offset": 11376128,
+      "sizeBytes": 1470360,
+      "sha256": "e0063e655acae16079cc8bae5ad1862d52b449f5aad919d311c9222f63f38693",
+      "exactExportMatches": [
+        "recovered-00ad9600-1470360.avi",
+        "recovered-00ad9600-1470360.riff"
+      ],
+      "status": "exact"
+    },
+    {
+      "name": "vid3.mov",
+      "offset": 17966592,
+      "sizeBytes": 497414,
+      "sha256": "a080ef2d7afce448e981e9eceaed709beffc073dccdea12f7b6fe08c3c891323",
+      "exactExportMatches": [
+        "recovered-01122600-497414.mov"
+      ],
+      "status": "exact"
+    },
+    {
+      "name": "vid4.flv",
+      "offset": 23584256,
+      "sizeBytes": 3713213,
+      "sha256": "e846f9806e5c9f471f4be8c40f435aece8c42d64966db79960d248eed071f198",
+      "exactExportMatches": [
+        "recovered-0167de00-3713213.flv"
+      ],
+      "status": "exact"
+    },
+    {
+      "name": "vid5.mpg",
+      "offset": 32417792,
+      "sizeBytes": 22579200,
+      "sha256": "b5332c2cb5be61711e1f15efd9438e1505b94b75cb0e9980ad0cab12ec884878",
+      "exactExportMatches": [
+        "recovered-01eea800-22579200.mpg"
+      ],
+      "status": "exact"
+    },
+    {
+      "name": "vid6.wmv",
+      "offset": 60116992,
+      "sizeBytes": 2461696,
+      "sha256": "a2363a893e588db5d4456e0e8028d39abfdbadc7fe6858ec43d8665f3d29b109",
+      "exactExportMatches": [
+        "recovered-03955000-2461696.wmv"
+      ],
+      "status": "exact"
+    }
+  ],
+  "additionalExports": [
+    {
+      "file": "recovered-004e2028-1135967.mov",
+      "sizeBytes": 1135967,
+      "sha256": "af2dfe62326ecc2124feb0c6473856731b8a0aae8fc4aee98960274a8c07aac6",
+      "physicalOffset": 5120040,
+      "mime": "video/quicktime"
+    },
+    {
+      "file": "recovered-004e20bd-1135818.mov",
+      "sizeBytes": 1135818,
+      "sha256": "c7a6c3ccae1da3fe652718efa0dd0b79ea1e5242fc24ea42ca0165f8b7619495",
+      "physicalOffset": 5120189,
+      "mime": "video/quicktime"
+    },
+    {
+      "file": "recovered-004e2159-1135662.mov",
+      "sizeBytes": 1135662,
+      "sha256": "4b01cba901ad42dc0e839f59afcf36b1a7a134d9ae02a64de3841c3cecaa5d88",
+      "physicalOffset": 5120345,
+      "mime": "video/quicktime"
+    },
+    {
+      "file": "recovered-004e21ee-1135513.mov",
+      "sizeBytes": 1135513,
+      "sha256": "f20770dd8f3faa648a3b7d99d768cb736e4d64f1f1b448edfa6143ebf4a894bd",
+      "physicalOffset": 5120494,
+      "mime": "video/quicktime"
+    },
+    {
+      "file": "recovered-004e3403-1130884.mov",
+      "sizeBytes": 1130884,
+      "sha256": "95392027e01ed754aea4710de825136e5266a910f797327296a397449c6a430a",
+      "physicalOffset": 5125123,
+      "mime": "video/quicktime"
+    },
+    {
+      "file": "recovered-004e3487-1130752.mov",
+      "sizeBytes": 1130752,
+      "sha256": "ab624d895c7e0cda4081d6dc1e388c819afccf919c74305b5ab3912b2edddec0",
+      "physicalOffset": 5125255,
+      "mime": "video/quicktime"
+    },
+    {
+      "file": "recovered-004e351e-1130601.mov",
+      "sizeBytes": 1130601,
+      "sha256": "1db8d23b8cf808965e302926d78b1172d0b2f6a8135a99c0cce42f4f4e281d79",
+      "physicalOffset": 5125406,
+      "mime": "video/quicktime"
+    },
+    {
+      "file": "recovered-004e35c7-1130432.mov",
+      "sizeBytes": 1130432,
+      "sha256": "6adaa4efdeab31bae41b23cde59b6d126b8449628e90e470e77576deabb258c8",
+      "physicalOffset": 5125575,
+      "mime": "video/quicktime"
+    },
+    {
+      "file": "recovered-004e362b-1130332.mov",
+      "sizeBytes": 1130332,
+      "sha256": "efa678b2783c61cb7e18a84ce2ed084dcb9afabbcd360b7a6140d7391a8fa601",
+      "physicalOffset": 5125675,
+      "mime": "video/quicktime"
+    },
+    {
+      "file": "recovered-004e36c4-1130179.mov",
+      "sizeBytes": 1130179,
+      "sha256": "81cd2a09e8d04ae619ad1dbc1e0ccbacd7e400d2edbeabb2ba08c7c7600c6095",
+      "physicalOffset": 5125828,
+      "mime": "video/quicktime"
+    },
+    {
+      "file": "recovered-004e37d4-1129907.mov",
+      "sizeBytes": 1129907,
+      "sha256": "901ac9427be683a1a8a153e9aa04a09b1a25880dd620480b745e722274f8473c",
+      "physicalOffset": 5126100,
+      "mime": "video/quicktime"
+    },
+    {
+      "file": "recovered-004f6815-319218.bin",
+      "sizeBytes": 319218,
+      "sha256": "fa1b12ff32f61344a97adeedfc557c66f91d748f7695a7d304245f409a3a0b28",
+      "physicalOffset": 5203989,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-004f97bc-307019.bin",
+      "sizeBytes": 307019,
+      "sha256": "db80a1260155697fad3d61561757fbad3506bdf1a046359b5a22ccfac34e75e7",
+      "physicalOffset": 5216188,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-004fb173-300436.bin",
+      "sizeBytes": 300436,
+      "sha256": "08e3f0ff01013e67e848f3fdb79ed9f0310fdba3fafe92bce141d1a5279fac5a",
+      "physicalOffset": 5222771,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-00515070-194199.bin",
+      "sizeBytes": 194199,
+      "sha256": "29a5eae3e00a66e15963600df4c73220c5f89c4c7a3c6de4469b2f20cd9a1aaa",
+      "physicalOffset": 5329008,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-00517cf1-182806.bin",
+      "sizeBytes": 182806,
+      "sha256": "5cc59252d58a8a4ebeb6ffc7bc309817f152614f0464b0ccebfd61d164fb8ab2",
+      "physicalOffset": 5340401,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-0051a688-172159.bin",
+      "sizeBytes": 172159,
+      "sha256": "4106c5d6a40b9a623ffb5ec5c64f8cda4cf5408811fd247f23c5bf5d135bb72e",
+      "physicalOffset": 5351048,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-00520c02-146181.bin",
+      "sizeBytes": 146181,
+      "sha256": "2cdcd8dfd2234b04ccb6b9758fefcf8d2d1c092d1450ddbebded3d088b93298d",
+      "physicalOffset": 5377026,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-0053fab2-19541.bin",
+      "sizeBytes": 19541,
+      "sha256": "9fbaf3782c53c4349237c7f751ac019e77cfc22ed805cc0a5a5f9953615ca669",
+      "physicalOffset": 5503666,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-0058aa26-6090533.bin",
+      "sizeBytes": 6090533,
+      "sha256": "131fa35438d51a54f8da942c333965ec7c18a512e69321dd0e6428a2fa910096",
+      "physicalOffset": 5810726,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-005bbd43-5889032.bin",
+      "sizeBytes": 5889032,
+      "sha256": "30d70d90bf4c3e5237f464a1e8421b0d1bce66f7dd896efe2074f5c023a5cf44",
+      "physicalOffset": 6012227,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-005bd2b3-5883544.bin",
+      "sizeBytes": 5883544,
+      "sha256": "85a6fb6c44b215e8d289c51c97a2c0ec147da8bcc7270a3d95fb1787d505aba1",
+      "physicalOffset": 6017715,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-005c94a3-5833896.bin",
+      "sizeBytes": 5833896,
+      "sha256": "4594f72484b8c888e499a8ca690c2711183f958be12337152d2eb10f4f1a9c73",
+      "physicalOffset": 6067363,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-005cdca4-5815463.bin",
+      "sizeBytes": 5815463,
+      "sha256": "2cbe05cfc3493d3774819622e603e65564032c985c9d4c49188b0fc97c37a319",
+      "physicalOffset": 6085796,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-005d5dc5-5782406.bin",
+      "sizeBytes": 5782406,
+      "sha256": "87cb173d36c5e02ba5e7e01dd29d0047c33ee0cd8ea982af886968d09e794bed",
+      "physicalOffset": 6118853,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-005e0b8a-5737921.bin",
+      "sizeBytes": 5737921,
+      "sha256": "2a9dcbb0b230037c700b2054dce424673e060e6affe124bbdd3680ff51ed0b02",
+      "physicalOffset": 6163338,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-005ee013-5683512.bin",
+      "sizeBytes": 5683512,
+      "sha256": "f8ad71ea6222095112d43f715123b0ec98feb38df29e1d8b5abecd28134159a5",
+      "physicalOffset": 6217747,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-005f2a83-5664456.bin",
+      "sizeBytes": 5664456,
+      "sha256": "938a66e8ac352290df610d042ec8d8ee8bab09ef87af22aa5f1c4c4480110358",
+      "physicalOffset": 6236803,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-005f3998-5660595.bin",
+      "sizeBytes": 5660595,
+      "sha256": "38ac3748e1e6f58e18b84d747245140de5dcd24dae47561b477b8a4cc6a366c3",
+      "physicalOffset": 6240664,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-00b1255f-291820.bin",
+      "sizeBytes": 291820,
+      "sha256": "c3d084ecc2c9ff5f7ba327a8ce3e9dde9c291ffe30dfbd86fe0af9fbe7967b72",
+      "physicalOffset": 11609439,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-00b30343-169480.bin",
+      "sizeBytes": 169480,
+      "sha256": "ba208b7768e926c99035314e7e87fb548ef387af7488d551440fd9b353f01caf",
+      "physicalOffset": 11731779,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-00b6b7e3-624536.bin",
+      "sizeBytes": 624536,
+      "sha256": "57b62947781f0063f9ee3f594ee5863d43750b52e6a6d11544b04aa990b0924d",
+      "physicalOffset": 11974627,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-00b7c46c-555791.bin",
+      "sizeBytes": 555791,
+      "sha256": "a2ff7b42c160372353c2e0c31baf88b149d544b335d78624c9cd454f6159913e",
+      "physicalOffset": 12043372,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-00b87e27-5.bin",
+      "sizeBytes": 5,
+      "sha256": "e18474dc8cc8c525cf9c68858cbdbd9884f6c30aa620f6fe3c10238fcc2b7ad9",
+      "physicalOffset": 12090919,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-00b8d7ce-485293.bin",
+      "sizeBytes": 485293,
+      "sha256": "0589a3bbb2d2ba9e07d994dd8cf119baa8ee3f9aad5db5b048ba0a8b53de8d64",
+      "physicalOffset": 12113870,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-00b92164-466455.bin",
+      "sizeBytes": 466455,
+      "sha256": "02fa2a7f9e4e34574124b5f13c9806ac59e32156950bb232dd2f28d52505ffe9",
+      "physicalOffset": 12132708,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-00b9ff9d-409566.bin",
+      "sizeBytes": 409566,
+      "sha256": "0f0751627150f079e836e31bb48c087da345e7b249416475dc4b7176110a82dc",
+      "physicalOffset": 12189597,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-00ba1be9-402322.bin",
+      "sizeBytes": 402322,
+      "sha256": "d1d046387f1f5c6651ed30892240615ea54ec323d363fcec161386af8deeeacd",
+      "physicalOffset": 12196841,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-00bb15a3-338392.bin",
+      "sizeBytes": 338392,
+      "sha256": "e5dd02d1cf4fbc2f305c66eb2f2ac771ab181f79e50beb9cb2e07cfd84e093ee",
+      "physicalOffset": 12260771,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-00bf033a-80961.bin",
+      "sizeBytes": 80961,
+      "sha256": "14099219a9540ba6348f79e20637352cc58e584b7bc684e1c577e8a478c49703",
+      "physicalOffset": 12518202,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-01122620-497382.mov",
+      "sizeBytes": 497382,
+      "sha256": "197987dfb95cd0436682b10e0814488886121c0908b6744dafbf9c28d08e62fc",
+      "physicalOffset": 17966624,
+      "mime": "video/quicktime"
+    },
+    {
+      "file": "recovered-01122694-497266.mov",
+      "sizeBytes": 497266,
+      "sha256": "0137474b1e79139f3f510f57dfce9691a5f785781b8b143b7b9defe56eeb2f95",
+      "physicalOffset": 17966740,
+      "mime": "video/quicktime"
+    },
+    {
+      "file": "recovered-01122760-497062.mov",
+      "sizeBytes": 497062,
+      "sha256": "c5113f90e7df4e7af2bd5a8ff5575082665e64631963135b04d8ac5762483213",
+      "physicalOffset": 17966944,
+      "mime": "video/quicktime"
+    },
+    {
+      "file": "recovered-0112283b-496843.mov",
+      "sizeBytes": 496843,
+      "sha256": "0071a8ca79c27a2d92a4d43b6a3e000db84d6e962cf74ec1720d7bdcc78f1eb8",
+      "physicalOffset": 17967163,
+      "mime": "video/quicktime"
+    },
+    {
+      "file": "recovered-01124692-489076.mov",
+      "sizeBytes": 489076,
+      "sha256": "5d8cf0d6faa612567ac636fee481849fe7b3249708413887a07141c503cae638",
+      "physicalOffset": 17974930,
+      "mime": "video/quicktime"
+    },
+    {
+      "file": "recovered-0112469a-489068.mov",
+      "sizeBytes": 489068,
+      "sha256": "0079d504d89508bfc303fd173f124abd66eaba2c9c4f5cfb1fada09dc5518ecd",
+      "physicalOffset": 17974938,
+      "mime": "video/quicktime"
+    },
+    {
+      "file": "recovered-011246a2-489060.mov",
+      "sizeBytes": 489060,
+      "sha256": "999528c09220ad5e0e321aa9f3055b19084ec29dccc56ab931cc4635aa97bad8",
+      "physicalOffset": 17974946,
+      "mime": "video/quicktime"
+    },
+    {
+      "file": "recovered-011246aa-8.mov",
+      "sizeBytes": 8,
+      "sha256": "93a74d6de167819b81a4e164d99d3637c29a218ed42b636195578ebd68568bb4",
+      "physicalOffset": 17974954,
+      "mime": "video/quicktime"
+    },
+    {
+      "file": "recovered-01693760-18.bin",
+      "sizeBytes": 18,
+      "sha256": "b5f752b088b1169bb8f46bb48551846df733a2e3287200dfe12a2a7dbfd734d6",
+      "physicalOffset": 23672672,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-0175594f-42.bin",
+      "sizeBytes": 42,
+      "sha256": "ba466e7b08849f15938feeb93e5440cb03be5d33d7514a484585010f2687e7cc",
+      "physicalOffset": 24467791,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-01ffa790-10.bin",
+      "sizeBytes": 10,
+      "sha256": "defcbfa39ff0ccef11b1f7c5ca118f1c77417ba79f6b39629c6580a3b3b96368",
+      "physicalOffset": 33531792,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-0208462b-19.bin",
+      "sizeBytes": 19,
+      "sha256": "8e58011b51c847e029a107bc00e4ed2bb1ef2e4570bbb417ab98695836df07e2",
+      "physicalOffset": 34096683,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-0210c0d0-14.bin",
+      "sizeBytes": 14,
+      "sha256": "fd3bdb7ca97c59d5eb9c122e696d28e9777f23720c08bea623c1a4f7069fea85",
+      "physicalOffset": 34652368,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-021cfdf0-10.bin",
+      "sizeBytes": 10,
+      "sha256": "c8a2dafafd09ebbc8a2b70a8730b3b5af3711fc3c1f0dcc0c62824eaf5cc0476",
+      "physicalOffset": 35454448,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-021d1770-11.bin",
+      "sizeBytes": 11,
+      "sha256": "abf3d8afce75f3f686f4968a9a758e39939681d75622e937fdda37c19d363a33",
+      "physicalOffset": 35460976,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-02208057-5.bin",
+      "sizeBytes": 5,
+      "sha256": "5e0b0d78ea2dad074b6311bd9116e621c49cef64bb03b0c938aa8fc7483f62c4",
+      "physicalOffset": 35684439,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-02341bd8-6.bin",
+      "sizeBytes": 6,
+      "sha256": "977bdaab94530467a1d20c14da1d1ad4498e4a4391b4b4522c2c671003b35a2b",
+      "physicalOffset": 36969432,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-023704c8-31.bin",
+      "sizeBytes": 31,
+      "sha256": "5db0ef0d3111ab5aa0c6857e2cde7a2753e8b680574d99183f0eda1b905a1297",
+      "physicalOffset": 37160136,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-023c5de9-7.bin",
+      "sizeBytes": 7,
+      "sha256": "268a3ae69f3b9c29a43c59eb77e91b9e1a2e3443b5258855a70896fa85a45684",
+      "physicalOffset": 37510633,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-025148b7-8.bin",
+      "sizeBytes": 8,
+      "sha256": "76ea46fb3f84c05f213fb96d0c0382c725986e5322f7f5326c7ae0a510cf20bd",
+      "physicalOffset": 38881463,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-0256965e-9.bin",
+      "sizeBytes": 9,
+      "sha256": "0d63ad4b867bf7161a40bb13ea7d53152dd4153667f6fc098d390c24942e6997",
+      "physicalOffset": 39229022,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-025aa235-12.bin",
+      "sizeBytes": 12,
+      "sha256": "650c54a88e3c986c2234633bddbb7baaa6da4f501c3161b24e74924a45934d5e",
+      "physicalOffset": 39494197,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-02a9c02f-9.bin",
+      "sizeBytes": 9,
+      "sha256": "7a46debbc914ee0ded9c364369b012a1985095d2496a1ac5232119c8c6d98feb",
+      "physicalOffset": 44679215,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-02bb4fc6-13.bin",
+      "sizeBytes": 13,
+      "sha256": "093d5b6c00e8a0701e74069b1c7f5111dcf97e7499aedd061c340a1032719cb3",
+      "physicalOffset": 45830086,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-02c14068-11.bin",
+      "sizeBytes": 11,
+      "sha256": "7846ade78c247619bcb63f5a442165f3470cce0bb816bea98d3e0b04dc1496c6",
+      "physicalOffset": 46219368,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-02c3eb69-13.bin",
+      "sizeBytes": 13,
+      "sha256": "2c745a4184751e2f8e5c7e393936f83869a52170010ba346977075ef5adc1c3c",
+      "physicalOffset": 46394217,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-02cc1e33-6.bin",
+      "sizeBytes": 6,
+      "sha256": "567a655f6362a0714f1d94fd13d2843c7976e07bc518f3a1100d6a457ceb585d",
+      "physicalOffset": 46931507,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-02fd4ac7-24.bin",
+      "sizeBytes": 24,
+      "sha256": "5dcb236c45b6913edab5190d0a12173e6935962e70b6e08c535fca4960a807b8",
+      "physicalOffset": 50154183,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-031f9b12-15.bin",
+      "sizeBytes": 15,
+      "sha256": "23885abcc09662a2ea6181d53ee78e87065748ed7c824af675b3ca318ecabdfe",
+      "physicalOffset": 52402962,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-0340de20-6.bin",
+      "sizeBytes": 6,
+      "sha256": "f8a5d3379118419992f0cc7d33f37932ecc740c3935f1212104ade91b48a5975",
+      "physicalOffset": 54582816,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-03417358-19.bin",
+      "sizeBytes": 19,
+      "sha256": "6d32692e21942ae76be3bc2315853eed704704a2427c55ffcc9d8b20ea7cd784",
+      "physicalOffset": 54621016,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-039dbbd0-43.bin",
+      "sizeBytes": 43,
+      "sha256": "aab9377e2e140f3f5d747d833bf729c4399796b2cbf3ce87649087182105594c",
+      "physicalOffset": 60668880,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-039fb5a4-89.bin",
+      "sizeBytes": 89,
+      "sha256": "838b38f273967bd15b1eb107edc28d969d3afa263d023be2d890dc19ace85fe5",
+      "physicalOffset": 60798372,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-03a3bb0b-39.bin",
+      "sizeBytes": 39,
+      "sha256": "63f43080f1f6abb0c3b156a64a7c242038fbcf68f57b92423fd4c5a0b7493b35",
+      "physicalOffset": 61061899,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-03a63d1c-6.bin",
+      "sizeBytes": 6,
+      "sha256": "5cd8044bd0c85c37969edcfb51c649ed3bd36730674216a51a8817eeddb02192",
+      "physicalOffset": 61226268,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-03a6e31b-50.bin",
+      "sizeBytes": 50,
+      "sha256": "7199f4c1637ed71d580fe7d964662951aabc1ade4b05e2098ddfb20fde74f2ca",
+      "physicalOffset": 61268763,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-03a6ebdd-112.bin",
+      "sizeBytes": 112,
+      "sha256": "e700788089c86588e7f1f973b25f632659a2f1c48c1acce79f78632663707c78",
+      "physicalOffset": 61271005,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-03b7c1d4-56.bin",
+      "sizeBytes": 56,
+      "sha256": "391ae9881196f70b46ec221dee3b9b9e9483c24e68ddeb218cc63feaecaea6f0",
+      "physicalOffset": 62374356,
+      "mime": "application/octet-stream"
+    },
+    {
+      "file": "recovered-03b9f13e-22.bin",
+      "sizeBytes": 22,
+      "sha256": "da04be4aed12af3700e41709ceef6ad21832512f075c0c74aa586bd7598e7533",
+      "physicalOffset": 62517566,
+      "mime": "application/octet-stream"
+    }
+  ],
+  "manifestSha256": "a7dc1fe2e0d22109b8ab224732ce75cf9c640a6d39c15a659243b1b9800255f9",
+  "zipSha256": "4859afeb8f5db44defaf446dad93bee81a162010c80cc0325e7c2cc0c38ee3f5",
+  "oracleSha256": "fc9afd2f130ead0e304bedd7225cbde833b93c3b0a88474ecb0352bbe6ebc619",
+  "modelSourceRevision": "832f6afde8c0ae61f41a99557560895fdf44f468",
+  "sourceWorkingTreeDirty": false,
+  "environment": "Actual host archive JNI -> both FD native engines -> production Gallerize -> actual ZIP -> independent payload scoring; no replay, Android UI or SAF.",
+  "nativeCaptureDecodedSha256": "b3636f1cbc0a112a164ea1f3e05cecba2e9c519f4093778631587c34c5a28d1f",
+  "nativeCaptureDecodedSizeBytes": 16010548,
+  "identities": {
+    "sourceRevision": "832f6afde8c0ae61f41a99557560895fdf44f468",
+    "sourceWorkingTreeDirty": false,
+    "inputFiles": {
+      "tests/NistRecoveryIntegrationTest.java": "00d888cc6edf5017f5831c1f021a3a488e34e82abf1de6549e8c5499b0149a06",
+      "scripts/test-nist-recovery.sh": "f05b076f18ed284c170d9282401a0c7a9331ab0935ac63723c77ed36a1ce86af",
+      "carving-engine/probe.cpp": "bf778a1d636eac6e663463422f9468225309742589052032f5e681bce5cb989d",
+      "carving-engine/source-lock.json": "32e1389f5ecb2289e108d79718fb309dfe56a3aaa8cf06ccbe9735a88fdbfd06",
+      "app/src/main/java/org/diemobile/PhotoRecReport.java": "40e0b51f860bd04cc7a53d01c8fa9b1d909c49e5c41bd405aeefdb7650d71aec",
+      "app/src/main/java/org/diemobile/PhotoRecFileChecks.java": "ba7b5b56dea96eeaa5d41015123abe3cb9ec213fd37f07f345e44bcb71123a6a",
+      "app/src/main/java/org/diemobile/CarvingBackend.java": "09a146a105494a182ce2ceaa4a32a068605a3caacbe360201acd26c5dfa4f821",
+      "app/src/main/java/org/diemobile/GallerizeSession.java": "1038d0ae8221202fdc5d3ad7dcb8f6c3f85af11356e224defb8106dbb801ce43",
+      "app/src/main/java/org/diemobile/ContentMap.java": "8c354364fa656580c5c498114769ec2eded8ad4c095605d0801403ecbc3604c5",
+      "app/src/main/java/org/diemobile/RecoveredFiles.java": "8e0d10e3129f8daccde2109411836eaa6ac2623e29e27ac3bbb20d42ac8df0ed",
+      "app/build/host-archive/libdiearchive.so": "a3843daf1f8204746e4f2c5a4b9aca265cd259f8b3eefd7af1f6681a91b26ae7",
+      "app/build/host-binwalk/libdiebinwalk.so": "991c989a600e9ae04ffb8778f5630bebb30c8ac316d3a775103e6b85be047131",
+      "app/build/host-photorec/libdiephotorec.so": "7c7ce0dfb53bbe3d12a309a3cc10d030ba2f501687b73d65e21dcabd4119fcd0"
+    },
+    "outputFiles": {
+      "execution.json": "f448aea7070ce725bfb433d7daa9ff121c5fe61ec1facba7504d50c3ea0e46bc",
+      "gallery-report.json.gz": "abd2249a86f79fcb33e4aef30f41dd51cd88fa31ec87f6d1064cd9d0ce7469fd",
+      "native-binwalk.json.gz": "2250347922beffd28874533ca758f8c1423b6453d0975defcdb63b6633ab7a1c",
+      "native-photorec.json.gz": "b91b873476c1fdab54d77616c9e753a44b943efb9c494635bb57855bcd14a612",
+      "recovered-files.zip": "4859afeb8f5db44defaf446dad93bee81a162010c80cc0325e7c2cc0c38ee3f5"
+    }
+  },
+  "nativeSummary": {
+    "adapter": "diemobile-photorec-6",
+    "candidateCount": 28890,
+    "maximumCandidateDataBufferBytes": 67108864,
+    "maximumCandidateFileReadBytes": 8388608,
+    "maximumCallbackBufferWorkBytes": 268435456,
+    "dataCallbacksSuppressedCount": 11024,
+    "dataCallbacksLimitedCount": 0,
+    "callbackBufferWorkBytes": 47972352,
+    "mpegContinuationPolicy": "standalone-header-retained/active-mpeg-header-ignored/bounded-owner-only"
+  },
+  "execution": {
+    "schema": "org.glassdigestor.nist-native-recovery",
+    "archiveAcquisition": {
+      "schema": "org.diemobile.archive-evidence",
+      "formatCode": 589824,
+      "scopeOffset": 0,
+      "acquiredSizeBytes": 62578688,
+      "filesystemReaderEnabled": false,
+      "hasEncryptedEntries": -2,
+      "scopeMeaning": "Bounded parsing interval; not an inferred recovered archive extent",
+      "error": null,
+      "sourceReadOperations": 302,
+      "maximumTransformedStreamBytes": 536870912,
+      "iterationMode": "selected-member data reads with metadata iteration",
+      "ownedDescriptorDuplicate": true,
+      "errorBytesHex": null,
+      "passphraseSupport": false,
+      "acquisitionMeaning": "Only complete successful extraction publishes derived logical bytes; sparse holes are zeros, member names are never output paths, and stored-byte locations are not inferred.",
+      "maximumSourceReadWorkBytes": 4294967296,
+      "engineDetails": "libarchive 3.8.11 zlib/1.3.1 liblzma/5.8.4 bz2lib/1.0.8 liblz4/1.10.0 libzstd/1.5.7 libb2/bundled",
+      "iterationMeaning": "Metadata iteration and skips; upstream may decode/check as needed. No independent full-member validation is implied.",
+      "ok": true,
+      "engineVersion": "libarchive 3.8.11",
+      "schemaVersion": 1,
+      "adapter": "diemobile-libarchive-1",
+      "scopeSizeBytes": 19741341,
+      "maximumInputBytes": 1073741824,
+      "formatName": "raw",
+      "pathExtractionEnabled": false,
+      "filters": [
+        {
+          "code": 2,
+          "name": "bzip2",
+          "bytesConsumed": 62578688,
+          "index": 0
+        },
+        {
+          "code": 0,
+          "name": "none",
+          "bytesConsumed": 19741341,
+          "index": 1
+        }
+      ],
+      "maximumMemberBytes": 268435456,
+      "headerWarningCount": 0,
+      "entryDataReadRequested": true,
+      "selectedIndex": 0,
+      "fileSizeBytes": 19741341,
+      "entries": [
+        {
+          "deviceMajor": 0,
+          "aclEntries": [],
+          "hardlinkUtf8": null,
+          "digestPresence": null,
+          "macMetadataSizeBytes": 0,
+          "sparseRanges": [],
+          "mtime": null,
+          "fileFlagsText": null,
+          "headerPositionMeaning": "Raw archive_read_header_position observation from this iteration; CAB values can change after data reads. Not a physical offset or stable entry identity",
+          "inode": null,
+          "mode": 33188,
+          "headerDiagnostic": null,
+          "hardlink": null,
+          "symlinkUtf8": null,
+          "permissions": 420,
+          "linkCount": 0,
+          "ctime": null,
+          "specialDeviceIsSet": false,
+          "atime": null,
+          "dataReadRequested": false,
+          "index": 0,
+          "pathname": {
+            "meaning": "libarchive accessor C-string bytes; original stored encoding/physical location not implied",
+            "utf8Valid": true,
+            "text": "data",
+            "returnedBytesHex": "64617461"
+          },
+          "dataEncrypted": 0,
+          "groupName": null,
+          "groupNameUtf8": null,
+          "specialDeviceMajor": 0,
+          "specialDeviceMinor": 0,
+          "metadataEncrypted": 0,
+          "gid": null,
+          "uid": null,
+          "formatNameAtHeader": "raw",
+          "digestAccessorBuffers": {
+            "SHA256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "SHA1": "0000000000000000000000000000000000000000",
+            "SHA384": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "RMD160": "0000000000000000000000000000000000000000",
+            "SHA512": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "MD5": "00000000000000000000000000000000"
+          },
+          "symlink": null,
+          "headerStatus": 0,
+          "fileFlagsClearUnsigned": "0",
+          "symlinkType": 0,
+          "userNameUtf8": null,
+          "pathnameUtf8": {
+            "meaning": "libarchive accessor C-string bytes; original stored encoding/physical location not implied",
+            "utf8Valid": true,
+            "text": "data",
+            "returnedBytesHex": "64617461"
+          },
+          "digestMeaning": "Pinned public getters return buffers even when unset; no public presence accessor exists. These are returned state bytes, not asserted declared/verified digests.",
+          "userName": null,
+          "sizeBytes": null,
+          "deviceIsSet": false,
+          "aclTypes": 0,
+          "encrypted": 0,
+          "sourcePathAccessor": null,
+          "xattrs": [],
+          "deviceMinor": 0,
+          "macMetadataHex": null,
+          "birthtime": null,
+          "fileFlagsSetUnsigned": "0",
+          "fileType": 32768,
+          "modeText": "-rw-r--r-- ",
+          "headerPositionUncompressedStream": 0
+        }
+      ],
+      "entryCount": 1,
+      "selectedEntry": {
+        "deviceMajor": 0,
+        "aclEntries": [],
+        "hardlinkUtf8": null,
+        "digestPresence": null,
+        "macMetadataSizeBytes": 0,
+        "sparseRanges": [],
+        "mtime": null,
+        "fileFlagsText": null,
+        "headerPositionMeaning": "Raw archive_read_header_position observation from this iteration; CAB values can change after data reads. Not a physical offset or stable entry identity",
+        "inode": null,
+        "mode": 33188,
+        "headerDiagnostic": null,
+        "hardlink": null,
+        "symlinkUtf8": null,
+        "permissions": 420,
+        "linkCount": 0,
+        "ctime": null,
+        "specialDeviceIsSet": false,
+        "atime": null,
+        "dataReadRequested": false,
+        "index": 0,
+        "pathname": {
+          "meaning": "libarchive accessor C-string bytes; original stored encoding/physical location not implied",
+          "utf8Valid": true,
+          "text": "data",
+          "returnedBytesHex": "64617461"
+        },
+        "dataEncrypted": 0,
+        "groupName": null,
+        "groupNameUtf8": null,
+        "specialDeviceMajor": 0,
+        "specialDeviceMinor": 0,
+        "metadataEncrypted": 0,
+        "gid": null,
+        "uid": null,
+        "formatNameAtHeader": "raw",
+        "digestAccessorBuffers": {
+          "SHA256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "SHA1": "0000000000000000000000000000000000000000",
+          "SHA384": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "RMD160": "0000000000000000000000000000000000000000",
+          "SHA512": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "MD5": "00000000000000000000000000000000"
+        },
+        "symlink": null,
+        "headerStatus": 0,
+        "fileFlagsClearUnsigned": "0",
+        "symlinkType": 0,
+        "userNameUtf8": null,
+        "pathnameUtf8": {
+          "meaning": "libarchive accessor C-string bytes; original stored encoding/physical location not implied",
+          "utf8Valid": true,
+          "text": "data",
+          "returnedBytesHex": "64617461"
+        },
+        "digestMeaning": "Pinned public getters return buffers even when unset; no public presence accessor exists. These are returned state bytes, not asserted declared/verified digests.",
+        "userName": null,
+        "sizeBytes": null,
+        "deviceIsSet": false,
+        "aclTypes": 0,
+        "encrypted": 0,
+        "sourcePathAccessor": null,
+        "xattrs": [],
+        "deviceMinor": 0,
+        "macMetadataHex": null,
+        "birthtime": null,
+        "fileFlagsSetUnsigned": "0",
+        "fileType": 32768,
+        "modeText": "-rw-r--r-- ",
+        "headerPositionUncompressedStream": 0
+      },
+      "sourceRevision": "03036ffa409a2aa1c5bbad35be2202641a040fda",
+      "sourceReadBytes": 19741341,
+      "complete": true,
+      "formatRegistrations": [
+        {
+          "registrationStatus": 0,
+          "format": "7zip",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": 0,
+          "format": "ar",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": 0,
+          "format": "cab",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": 0,
+          "format": "cpio",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": 0,
+          "format": "empty",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": 0,
+          "format": "iso9660",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": 0,
+          "format": "lha",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": 0,
+          "format": "rar",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": 0,
+          "format": "rar5",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": 0,
+          "format": "tar",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": 0,
+          "format": "warc",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": -20,
+          "format": "xar",
+          "diagnostic": "Xar not supported on this platform"
+        },
+        {
+          "registrationStatus": 0,
+          "format": "zip",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": 0,
+          "format": "raw-transformed-only",
+          "diagnostic": null
+        }
+      ],
+      "formatCapabilities": 0,
+      "memoryLimitMeaning": "Limits selected codec dictionaries/windows, not total upstream/worker heap or RSS",
+      "externalProgramsEnabled": false,
+      "lzmaDecoderMemoryLimitBytes": 67108864,
+      "callerDescriptorPositionPreserved": true,
+      "zstdMaximumWindowBytes": 67108864,
+      "maximumEntries": 20000,
+      "cooperativeDeadlineSeconds": 30
+    },
+    "boundedArtifactCount": 86,
+    "exportPassed": true,
+    "exactReferenceScore": "independent score.json required",
+    "zipSizeBytes": 48566090,
+    "cardCount": 11122,
+    "selectedFileCards": 86,
+    "androidUiExecuted": false,
+    "archiveInspection": {
+      "schema": "org.diemobile.archive-evidence",
+      "formatCode": 589824,
+      "scopeOffset": 0,
+      "acquiredSizeBytes": null,
+      "filesystemReaderEnabled": false,
+      "hasEncryptedEntries": -2,
+      "scopeMeaning": "Bounded parsing interval; not an inferred recovered archive extent",
+      "error": null,
+      "sourceReadOperations": 13,
+      "maximumTransformedStreamBytes": 536870912,
+      "iterationMode": "metadata iteration and skips",
+      "ownedDescriptorDuplicate": true,
+      "errorBytesHex": null,
+      "passphraseSupport": false,
+      "acquisitionMeaning": "Only complete successful extraction publishes derived logical bytes; sparse holes are zeros, member names are never output paths, and stored-byte locations are not inferred.",
+      "maximumSourceReadWorkBytes": 4294967296,
+      "engineDetails": "libarchive 3.8.11 zlib/1.3.1 liblzma/5.8.4 bz2lib/1.0.8 liblz4/1.10.0 libzstd/1.5.7 libb2/bundled",
+      "iterationMeaning": "Metadata iteration and skips; upstream may decode/check as needed. No independent full-member validation is implied.",
+      "ok": true,
+      "engineVersion": "libarchive 3.8.11",
+      "schemaVersion": 1,
+      "adapter": "diemobile-libarchive-1",
+      "scopeSizeBytes": 19741341,
+      "maximumInputBytes": 1073741824,
+      "formatName": "raw",
+      "pathExtractionEnabled": false,
+      "filters": [
+        {
+          "code": 2,
+          "name": "bzip2",
+          "bytesConsumed": 0,
+          "index": 0
+        },
+        {
+          "code": 0,
+          "name": "none",
+          "bytesConsumed": 800389,
+          "index": 1
+        }
+      ],
+      "maximumMemberBytes": 268435456,
+      "headerWarningCount": 0,
+      "entryDataReadRequested": false,
+      "selectedIndex": -1,
+      "fileSizeBytes": 19741341,
+      "entries": [
+        {
+          "deviceMajor": 0,
+          "aclEntries": [],
+          "hardlinkUtf8": null,
+          "digestPresence": null,
+          "macMetadataSizeBytes": 0,
+          "sparseRanges": [],
+          "mtime": null,
+          "fileFlagsText": null,
+          "headerPositionMeaning": "Raw archive_read_header_position observation from this iteration; CAB values can change after data reads. Not a physical offset or stable entry identity",
+          "inode": null,
+          "mode": 33188,
+          "headerDiagnostic": null,
+          "hardlink": null,
+          "symlinkUtf8": null,
+          "permissions": 420,
+          "linkCount": 0,
+          "ctime": null,
+          "specialDeviceIsSet": false,
+          "atime": null,
+          "dataReadRequested": false,
+          "index": 0,
+          "pathname": {
+            "meaning": "libarchive accessor C-string bytes; original stored encoding/physical location not implied",
+            "utf8Valid": true,
+            "text": "data",
+            "returnedBytesHex": "64617461"
+          },
+          "dataEncrypted": 0,
+          "groupName": null,
+          "groupNameUtf8": null,
+          "specialDeviceMajor": 0,
+          "specialDeviceMinor": 0,
+          "metadataEncrypted": 0,
+          "gid": null,
+          "uid": null,
+          "formatNameAtHeader": "raw",
+          "digestAccessorBuffers": {
+            "SHA256": "0000000000000000000000000000000000000000000000000000000000000000",
+            "SHA1": "0000000000000000000000000000000000000000",
+            "SHA384": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "RMD160": "0000000000000000000000000000000000000000",
+            "SHA512": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "MD5": "00000000000000000000000000000000"
+          },
+          "symlink": null,
+          "headerStatus": 0,
+          "fileFlagsClearUnsigned": "0",
+          "symlinkType": 0,
+          "userNameUtf8": null,
+          "pathnameUtf8": {
+            "meaning": "libarchive accessor C-string bytes; original stored encoding/physical location not implied",
+            "utf8Valid": true,
+            "text": "data",
+            "returnedBytesHex": "64617461"
+          },
+          "digestMeaning": "Pinned public getters return buffers even when unset; no public presence accessor exists. These are returned state bytes, not asserted declared/verified digests.",
+          "userName": null,
+          "sizeBytes": null,
+          "deviceIsSet": false,
+          "aclTypes": 0,
+          "encrypted": 0,
+          "sourcePathAccessor": null,
+          "xattrs": [],
+          "deviceMinor": 0,
+          "macMetadataHex": null,
+          "birthtime": null,
+          "fileFlagsSetUnsigned": "0",
+          "fileType": 32768,
+          "modeText": "-rw-r--r-- ",
+          "headerPositionUncompressedStream": 0
+        }
+      ],
+      "entryCount": 1,
+      "selectedEntry": null,
+      "sourceRevision": "03036ffa409a2aa1c5bbad35be2202641a040fda",
+      "sourceReadBytes": 851968,
+      "complete": true,
+      "formatRegistrations": [
+        {
+          "registrationStatus": 0,
+          "format": "7zip",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": 0,
+          "format": "ar",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": 0,
+          "format": "cab",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": 0,
+          "format": "cpio",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": 0,
+          "format": "empty",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": 0,
+          "format": "iso9660",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": 0,
+          "format": "lha",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": 0,
+          "format": "rar",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": 0,
+          "format": "rar5",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": 0,
+          "format": "tar",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": 0,
+          "format": "warc",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": -20,
+          "format": "xar",
+          "diagnostic": "Xar not supported on this platform"
+        },
+        {
+          "registrationStatus": 0,
+          "format": "zip",
+          "diagnostic": null
+        },
+        {
+          "registrationStatus": 0,
+          "format": "raw-transformed-only",
+          "diagnostic": null
+        }
+      ],
+      "formatCapabilities": 0,
+      "memoryLimitMeaning": "Limits selected codec dictionaries/windows, not total upstream/worker heap or RSS",
+      "externalProgramsEnabled": false,
+      "lzmaDecoderMemoryLimitBytes": 67108864,
+      "callerDescriptorPositionPreserved": true,
+      "zstdMaximumWindowBytes": 67108864,
+      "maximumEntries": 20000,
+      "cooperativeDeadlineSeconds": 30
+    },
+    "exportSelection": "all bounded non-text file cards; no oracle coordinates",
+    "zipSha256": "4859afeb8f5db44defaf446dad93bee81a162010c80cc0325e7c2cc0c38ee3f5",
+    "expectedLayoutUsedForDiscovery": false,
+    "case": "L0_Video",
+    "gallery": {
+      "schema": "org.diemobile.gallerize",
+      "textScope": "Strict printable UTF-8 runs of at least 8 code points outside the union of native bounded artifacts; UTF-16 and other encodings remain in classified strings",
+      "schemaVersion": 1,
+      "discoveries": [
+        {
+          "engine": "photorec",
+          "native": {
+            "rejectedRecoveryStateFields": [
+              "headerCalculatedSizeBytes",
+              "minimumFileSizeBytes",
+              "dataCheckAvailable",
+              "fileCheckAvailable",
+              "upstreamTime",
+              "upstreamFlags",
+              "upstreamOffsetOk",
+              "upstreamOffsetError",
+              "upstreamExtra",
+              "upstreamCheckpointOffset",
+              "upstreamCheckpointStatus",
+              "upstreamDataCheckTemporary",
+              "dataCheckFileSizeCounterBytes",
+              "reportedExtension"
+            ],
+            "maximumCandidateFileReadBytes": 8388608,
+            "compactRejectedEncoding": "[patternIndex,magicOffset,recoveryStateIndex]; original row ordinal is unchanged",
+            "rejectedRecoveryStateCount": 1,
+            "fullBlobSearch": true,
+            "renameCallbacksExecuted": false,
+            "excludedPatternCount": 193,
+            "fileCheckCandidatesLimited": 0,
+            "optionalLibraries": [],
+            "inputReadMode": "bounded-pread-windows",
+            "signatureCount": 349,
+            "inputSizedBufferAllocation": false,
+            "fileCheckMetadataReadLimitedCount": 0,
+            "fileCheckReadBufferBytes": 65536,
+            "candidateCount": 28890,
+            "engineVersion": "7.2",
+            "fileCheckCallbacksExecuted": false,
+            "searchCoverage": "Every byte for catalog patterns marked searched; one-byte/all-zero signatures remain catalogued but require an anchored scope not implemented by this adapter",
+            "adapter": "diemobile-photorec-6",
+            "maximumInputBytes": 268435456,
+            "dataCallbacksLimitedCount": 0,
+            "mpegContinuationPolicy": "standalone-header-retained/active-mpeg-header-ignored/bounded-owner-only",
+            "dataCallbacksSuppressedCount": 11024,
+            "maximumCandidateRecords": 250000,
+            "maximumCallbackBufferWorkBytes": 268435456,
+            "sourceArchiveSha256": "0cfd82ca6890188a3a4fe01c9b970f654eb3af396580f408ed024789e2873616",
+            "fileSizeBytes": 62578688,
+            "fileCheckCandidatesAttempted": 0,
+            "safeHeaderOnly": true,
+            "input": {
+              "sha256": "20d8a231ded5223bbecab97d4155d028ef9cd0760a5dd3ecef22123c46b48870",
+              "name": "L0_Video.dd",
+              "sizeBytes": 62578688
+            },
+            "fileCheckCandidatesExecuted": 0,
+            "sourceRevision": "281be432dd79121e08e0898887a9ee1f30fb3e96",
+            "maximumReportBytes": 25165824,
+            "headerCacheWindows": 2,
+            "sourceReadBytes": 174956544,
+            "searchedPatternCount": 581,
+            "headerCacheWindowBytes": 131072,
+            "maximumCandidateDataBufferBytes": 67108864,
+            "validationLimits": "Upstream standalone safe-header/data callbacks and, in adapters 4/5/6, the reviewed PDF file_check through bounded read-only relative stdio. No other file checks, rename, fragmented/disk recovery or optional codec libraries. 64 KiB windows use explicit zero padding near EOF; a reported range must remain within actual source bytes. Unknown extents remain null. Adapter 6 can omit repeated optional MPEG data scans only inside independently bounded owners; every original header remains visible with its own unknown independent size.",
+            "schema": "org.diemobile.photorec-evidence",
+            "compactRejectedCandidateCount": 17835,
+            "negativeStartMagicMatches": 0,
+            "fileCheckCallbackScope": "pdf-only/read-only-relative-stdio",
+            "sourceReadOperations": 1284,
+            "auxiliarySignatureFiles": false,
+            "cooperativeDeadlineMs": 30000,
+            "ownedDescriptorDuplicate": true,
+            "maximumInputReadBufferBytes": 1376256,
+            "engine": "PhotoRec",
+            "scanReadBufferBytes": 1048576,
+            "nestedResultsPruned": false,
+            "scope": "Every byte for catalog patterns marked searched; one-byte and all-zero patterns remain visible with explicit search exclusions. Nested/overlapping results retained; no inferred next-hit/EOF sizes.",
+            "ok": true,
+            "confidenceMeaning": "Header acceptance and streaming data-stop are separate observations; no security score or complete-file validation is implied.",
+            "schemaVersion": 2,
+            "unknownExtentsInferred": false,
+            "headerWindowMode": "borrowed bounded pread cache; explicit zero padding near EOF",
+            "callbackBufferWorkBytes": 47972352,
+            "externalExtractorsExecuted": false,
+            "callerDescriptorPositionPreserved": true,
+            "filesystemRecoveryExecuted": false,
+            "fileCheckBoundaryPolicy": "native-positive-footer-survives-optional-post-footer-read-limit",
+            "patternCount": 774
+          },
+          "capture": {
+            "sha256": "b3636f1cbc0a112a164ea1f3e05cecba2e9c519f4093778631587c34c5a28d1f",
+            "sizeBytes": 16010548
+          },
+          "completed": true,
+          "status": "OPTIONAL MPEG DATA CHECKS: 11024 pack headers remain visible inside bounded streams; their repeated data checks were omitted and independent lengths remain unknown. PARTIAL CATALOG COVERAGE: 581 / 774 patterns searched at every byte. One-byte/all-zero patterns remain catalogued with reasons. Other file checks/fragment recovery remain pending; PDF file-check scope is recorded separately."
+        },
+        {
+          "engine": "binwalk",
+          "native": {
+            "schema": "org.diemobile.binwalk-evidence",
+            "minimumCooperativeDeadlineMs": 1000,
+            "rawMagicMatches": 2875,
+            "fullBlobSearch": true,
+            "sourceReadOperations": 955,
+            "cooperativeDeadlineMs": 120000,
+            "ownedDescriptorDuplicate": true,
+            "maximumInputReadBufferBytes": 67108864,
+            "maximumSourceReadRequestBytes": 65536,
+            "parserCallbacksPreemptible": false,
+            "engine": "Binwalk",
+            "inputReadMode": "owned-bounded-pread-copy",
+            "nestedResultsPruned": false,
+            "signatureCount": 111,
+            "scope": "Every raw magic pattern across the entire supported private blob; short patterns included; nested/overlapping results retained. No inferred next-hit/EOF size and no automatic external extraction.",
+            "inputReadBufferBytes": 62578688,
+            "inputSizedBufferAllocation": true,
+            "maximumCooperativeDeadlineMs": 1800000,
+            "ok": true,
+            "candidateCount": 2875,
+            "networkUsed": false,
+            "engineVersion": "3.1.1",
+            "confidenceMeaning": "Raw Binwalk parser confidence (0/128/250 conventions), not a security score or proof that a recovered file fully decodes.",
+            "adapter": "diemobile-binwalk-3",
+            "schemaVersion": 1,
+            "unknownExtentsInferred": false,
+            "parserPanics": 0,
+            "maxInputBytes": 67108864,
+            "fileSizeBytes": 62578688,
+            "sourceMetadataUnchanged": true,
+            "parserCoverageComplete": true,
+            "input": {
+              "sha256": "20d8a231ded5223bbecab97d4155d028ef9cd0760a5dd3ecef22123c46b48870",
+              "name": "L0_Video.dd",
+              "sizeBytes": 62578688
+            },
+            "requestedDeadlineMs": 120000,
+            "externalExtractorsExecuted": false,
+            "maxRawMagicMatches": 20000,
+            "sourceRevision": "26713972e3f9f52dc37d4a421c4554b0bd9e82ef",
+            "sourceReadBytes": 62578688,
+            "acceptedParserCalls": 63,
+            "callerDescriptorPositionPreserved": true,
+            "patternCount": 251,
+            "rejectedParserCalls": 2812,
+            "validationLimits": "Format-specific upstream validation varies. Some parsers decompress in memory. A known reported extent enables exact stored-byte export; an unknown extent remains null. Rejected/panicked candidates are visible separately."
+          },
+          "capture": {
+            "sha256": "30a6ab3ba38e04ebd8ae24af0fe97693f81d82e5285e11382a175b32faa40572",
+            "sizeBytes": 971100
+          },
+          "completed": true,
+          "status": ""
+        }
+      ],
+      "native": {
+        "rejectedRecoveryStateFields": [
+          "headerCalculatedSizeBytes",
+          "minimumFileSizeBytes",
+          "dataCheckAvailable",
+          "fileCheckAvailable",
+          "upstreamTime",
+          "upstreamFlags",
+          "upstreamOffsetOk",
+          "upstreamOffsetError",
+          "upstreamExtra",
+          "upstreamCheckpointOffset",
+          "upstreamCheckpointStatus",
+          "upstreamDataCheckTemporary",
+          "dataCheckFileSizeCounterBytes",
+          "reportedExtension"
+        ],
+        "maximumCandidateFileReadBytes": 8388608,
+        "compactRejectedEncoding": "[patternIndex,magicOffset,recoveryStateIndex]; original row ordinal is unchanged",
+        "rejectedRecoveryStateCount": 1,
+        "fullBlobSearch": true,
+        "renameCallbacksExecuted": false,
+        "excludedPatternCount": 193,
+        "fileCheckCandidatesLimited": 0,
+        "optionalLibraries": [],
+        "inputReadMode": "bounded-pread-windows",
+        "signatureCount": 349,
+        "inputSizedBufferAllocation": false,
+        "fileCheckMetadataReadLimitedCount": 0,
+        "fileCheckReadBufferBytes": 65536,
+        "candidateCount": 28890,
+        "engineVersion": "7.2",
+        "fileCheckCallbacksExecuted": false,
+        "searchCoverage": "Every byte for catalog patterns marked searched; one-byte/all-zero signatures remain catalogued but require an anchored scope not implemented by this adapter",
+        "adapter": "diemobile-photorec-6",
+        "maximumInputBytes": 268435456,
+        "dataCallbacksLimitedCount": 0,
+        "mpegContinuationPolicy": "standalone-header-retained/active-mpeg-header-ignored/bounded-owner-only",
+        "dataCallbacksSuppressedCount": 11024,
+        "maximumCandidateRecords": 250000,
+        "maximumCallbackBufferWorkBytes": 268435456,
+        "sourceArchiveSha256": "0cfd82ca6890188a3a4fe01c9b970f654eb3af396580f408ed024789e2873616",
+        "fileSizeBytes": 62578688,
+        "fileCheckCandidatesAttempted": 0,
+        "safeHeaderOnly": true,
+        "input": {
+          "sha256": "20d8a231ded5223bbecab97d4155d028ef9cd0760a5dd3ecef22123c46b48870",
+          "name": "L0_Video.dd",
+          "sizeBytes": 62578688
+        },
+        "fileCheckCandidatesExecuted": 0,
+        "sourceRevision": "281be432dd79121e08e0898887a9ee1f30fb3e96",
+        "maximumReportBytes": 25165824,
+        "headerCacheWindows": 2,
+        "sourceReadBytes": 174956544,
+        "searchedPatternCount": 581,
+        "headerCacheWindowBytes": 131072,
+        "maximumCandidateDataBufferBytes": 67108864,
+        "validationLimits": "Upstream standalone safe-header/data callbacks and, in adapters 4/5/6, the reviewed PDF file_check through bounded read-only relative stdio. No other file checks, rename, fragmented/disk recovery or optional codec libraries. 64 KiB windows use explicit zero padding near EOF; a reported range must remain within actual source bytes. Unknown extents remain null. Adapter 6 can omit repeated optional MPEG data scans only inside independently bounded owners; every original header remains visible with its own unknown independent size.",
+        "schema": "org.diemobile.photorec-evidence",
+        "compactRejectedCandidateCount": 17835,
+        "negativeStartMagicMatches": 0,
+        "fileCheckCallbackScope": "pdf-only/read-only-relative-stdio",
+        "sourceReadOperations": 1284,
+        "auxiliarySignatureFiles": false,
+        "cooperativeDeadlineMs": 30000,
+        "ownedDescriptorDuplicate": true,
+        "maximumInputReadBufferBytes": 1376256,
+        "engine": "PhotoRec",
+        "scanReadBufferBytes": 1048576,
+        "nestedResultsPruned": false,
+        "scope": "Every byte for catalog patterns marked searched; one-byte and all-zero patterns remain visible with explicit search exclusions. Nested/overlapping results retained; no inferred next-hit/EOF sizes.",
+        "ok": true,
+        "confidenceMeaning": "Header acceptance and streaming data-stop are separate observations; no security score or complete-file validation is implied.",
+        "schemaVersion": 2,
+        "unknownExtentsInferred": false,
+        "headerWindowMode": "borrowed bounded pread cache; explicit zero padding near EOF",
+        "callbackBufferWorkBytes": 47972352,
+        "externalExtractorsExecuted": false,
+        "callerDescriptorPositionPreserved": true,
+        "filesystemRecoveryExecuted": false,
+        "fileCheckBoundaryPolicy": "native-positive-footer-survives-optional-post-footer-read-limit",
+        "patternCount": 774
+      },
+      "nativeCapture": {
+        "sha256": "b3636f1cbc0a112a164ea1f3e05cecba2e9c519f4093778631587c34c5a28d1f",
+        "sizeBytes": 16010548
+      },
+      "source": {
+        "sha256": "20d8a231ded5223bbecab97d4155d028ef9cd0760a5dd3ecef22123c46b48870",
+        "name": "L0_Video.dd",
+        "sizeBytes": 62578688
+      },
+      "limits": {
+        "maximumCards": 50000,
+        "decodingProvesCompleteIntegrity": false,
+        "unknownExtentsInferred": false,
+        "maximumInputBytes": 268435456,
+        "externalExtractorsExecuted": false,
+        "textPreviewCodepoints": 512
+      }
+    },
+    "elapsedMs": 9195,
+    "compressedSizeBytes": 19741341,
+    "schemaVersion": 1,
+    "rawNativeRowCount": 31765,
+    "compressedSha256": "91f4bc9c1a7fafdc82088a1c08a457bbfb7a9df6aa520d066054ae20b2502b50",
+    "cardKinds": {
+      "OTHER": 67,
+      "UNASSIGNED": 5,
+      "INPUT": 1,
+      "VIDEO": 11049
+    },
+    "decodedSha256": "20d8a231ded5223bbecab97d4155d028ef9cd0760a5dd3ecef22123c46b48870",
+    "nativeReportsReplayed": false,
+    "environment": "host JNI and unchanged production models; no Android UI or SAF",
+    "safExecuted": false,
+    "decodedSizeBytes": 62578688,
+    "trustedAncestorAliasAccepted": true,
+    "binwalkAnalysisDeadlineMs": 120000
+  },
+  "beforeAfter": {
+    "beforeSourceRevision": "12eecb309ff8f683009ae357589b7f21644e2c17",
+    "beforeExactReferenceFiles": 5,
+    "afterExactReferenceFiles": 6,
+    "additionalExportsBefore": 79,
+    "additionalExportsAfter": 79,
+    "allOriginalPatternsAndOccurrenceCoordinatesInOriginalOrderPreserved": true,
+    "allOriginalHeaderAcceptanceCountsPreserved": true,
+    "rawPhotoRecCandidateCount": 28890
+  },
+  "androidUiExecuted": false,
+  "safExecuted": false,
+  "other29ImagesScored": false
+}

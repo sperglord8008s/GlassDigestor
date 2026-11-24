@@ -42,15 +42,19 @@ frames remain at `savepoint/mpv-frame-foundation-0ef94d3`.
 
 The test-only NIST CFReDS catalog contains all 30 related file-carving images,
 534 original layout rows and seven disclosed inconsistencies. Only L0_Video is
-currently acquired/hash-pinned. Exact exported-payload scoring finds **5/6**
-reference files on host, including two exact AVI copies; 79 additional exports
-remain unscored. The 22.6 MB MPEG hits the current 8 MiB callback-work budget.
-[Baseline](verification/nist-L0-video-export-baseline.json)
+currently acquired/hash-pinned. The pre-alpha.20 **real-native host run exports all 6/6** reference files
+byte-for-byte, including the 22.6 MB MPEG. Its 86 actual files retain the duplicate
+exact AVI and all 79 additional unscored exports. Original raw header ordering,
+coordinates and acceptance counts are unchanged. The separate 64 MiB data-work
+budget and bounded-owner continuation policy use 47,972,352 callback-work bytes;
+PDF read work remains at 8 MiB. [Current actual export receipt](verification/nist-L0-video-native-export.json)
+· [historical 5/6 baseline](verification/nist-L0-video-export-baseline.json)
 · [offline corpus/scoring commands](../tests/fixtures/nist/README.md).
 
-The next pass separates bounded data work from PDF metadata reads and preserves
-all repeated MPEG pack observations without re-running already covered optional
-callbacks. Its implementation and exact exported-byte acceptance are pending.
+Generated native/large-file/PDF regressions pass and the thirteenth actual
+Android contract compiles. Full-suite/ARM64/build/clean CI and actual API 26/35
+regression gates remain pending for pre-alpha.20. Current published pre-alpha.19
+verification above is unchanged.
 The other 29 images, fragmented recovery, MPV decoded-frame integration, broader
 format support and package knowledge remain on the queue. Oracles never guide
 production discovery. Historical narratives live under [history](history/development-through-pre-alpha18.md).

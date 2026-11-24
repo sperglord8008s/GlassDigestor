@@ -8,5 +8,7 @@ java -cp "$tmp" org.diemobile.CustomRuleStoreTest
 java -cp "$tmp" org.diemobile.ArchiveStoreTest
 bash scripts/test-presentation.sh
 python3 tests/test-build-version.py
+python3 tests/test-runtime-report-transfer.py
+python3 tests/test-native-output-ownership.py
 python3 tests/test-nist-catalog.py
 python3 tests/test-nist-recovery-score.py

@@ -562,7 +562,7 @@ final class NativeArchiveSession implements AutoCloseable {
     static String abbreviated(String value, int limit) {
         return value.length() <= limit
                 ? value
-                : value.substring(0, limit) + "… [full value in evidence]";
+                : value.substring(0, limit) + "… [full value in details]";
     }
 
     private static String sha(byte[] bytes) throws Exception {

@@ -444,7 +444,7 @@ public final class PackageSetWorkbenchTest {
     @Test
     public void completeSetExportIgnoresFilterAndPreservesAllSourceAndCertificateIdentities()
             throws Exception {
-        root("All collected package-set evidence");
+        root("All collected package-set information");
         int count = ReflectionHelpers.<EvidenceRows>getField(activity, "source").size();
         assertTrue(count > 100);
         search("looks-like-base.apk");

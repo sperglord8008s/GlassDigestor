@@ -15,9 +15,11 @@ source scripts/test-dependencies.sh
 load_json_test_dependency "$tmp"
 javac -cp "$json_test_jar" -d "$tmp/classes" \
   app/src/main/java/org/diemobile/{Inspector,EvidenceRows,EvidenceJson,InputSnapshot,InvestigationBackend,FileRange,RangeAnalysis,PreparedExport,PhotoRecEngine,PhotoRecReport,BinaryRunner,CarvingBackend,PhotoRecFileChecks,PhotoRecBackend}.java \
-  tests/fixtures/metadata/MetadataFixtureFactory.java tests/fixtures/carving/CarvingFixture.java tests/{PhotoRecInvestigationTest,PhotoRecStreamingTest}.java
+  tests/fixtures/metadata/MetadataFixtureFactory.java tests/fixtures/carving/CarvingFixture.java tests/{PhotoRecInvestigationTest,PhotoRecStreamingTest,PhotoRecMpegTest}.java
 java --add-opens=java.base/java.io=ALL-UNNAMED -Djava.library.path="$PWD/app/build/host-photorec" \
   -cp "$tmp/classes:$json_test_jar" org.diemobile.PhotoRecInvestigationTest "$tmp"
+java -Xmx256m --add-opens=java.base/java.io=ALL-UNNAMED -Djava.library.path="$PWD/app/build/host-photorec" \
+  -cp "$tmp/classes:$json_test_jar" org.diemobile.PhotoRecMpegTest "$tmp"
 
 c++ -std=c++17 -O2 -Wall -Wextra -Werror -Icarving-engine tests/blob_input_test.cpp -o "$tmp/blob-input-test"
 "$tmp/blob-input-test" "$tmp"

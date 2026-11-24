@@ -29,9 +29,9 @@ compile changing sources or overwrite a library while a JVM has it loaded.
 Commit coherent slices and inspect clean CI before another release.
 
 The independently pinned NIST L0_Video archive decodes exactly 62,578,688 bytes
-through host JNI. Actual exported ZIP scoring is **5/6** reference payloads,
-with 79 additional unscored exports retained. MPEG reaches the 8 MiB data-work
-budget. Next: separate 64 MiB streaming data work from 8 MiB PDF read work;
+through host JNI. The new actual host native/export run scores **6/6** reference payloads,
+with 79 additional unscored exports retained. Full pre-alpha.20 gates remain
+pending. Implemented: separate 64 MiB streaming data work from 8 MiB PDF reads;
 record only positively bounded MPEG owners; preserve every raw pack header and
 SCR=0 independent start; skip redundant optional callbacks only inside valid
 owners with explicit source relationships. Keep aggregate/resource bounds,
@@ -39,7 +39,8 @@ legacy captures, PDF behavior, cancellation and source checks. Validate actual
 native acquisition → gallery → exported ZIP against independent hashes, rather
 than replay or header coordinates. Remaining 29 images/fragments are unscored.
 [Corpus/method](../tests/fixtures/nist/README.md)
-· [baseline](verification/nist-L0-video-export-baseline.json).
+· [current actual export](verification/nist-L0-video-native-export.json)
+· [historical baseline](verification/nist-L0-video-export-baseline.json).
 
 The unfinished MPV raw-frame foundation remains remotely at
 `savepoint/mpv-frame-foundation-0ef94d3` (`0ef94d3`). Host pixels/ownership passed;

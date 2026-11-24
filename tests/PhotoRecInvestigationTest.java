@@ -234,15 +234,20 @@ public final class PhotoRecInvestigationTest {
         require(
                 partial.getBoolean("ok")
                         && partial.getBoolean("fullBlobSearch")
-                        && partial.getInt("dataCallbacksLimitedCount") >= 34
+                        && partial.getInt("dataCallbacksLimitedCount") > 0
                         && partial.getLong("callbackBufferWorkBytes") <= 256L * 1024 * 1024,
                 "Data work exhaustion stopped discovery or exceeded its explicit budget");
+        int observedLimited = 0;
         for (int i = 0; i < 34; i++) {
             JSONObject limited = at(partial, "png", i * 512);
+            if (limited.getBoolean("dataCheckLimited")) observedLimited++;
             require(
-                    limited.getBoolean("dataCheckLimited") && limited.isNull("reportedSizeBytes"),
-                    "Limited data callback manufactured a stored extent");
+                    limited.isNull("reportedSizeBytes"),
+                    "Budget-limited or incomplete data callback manufactured a stored extent");
         }
+        require(
+                observedLimited == partial.getInt("dataCallbacksLimitedCount"),
+                "Aggregate-limited candidate count differs from the original rows");
         require(
                 at(partial, "riff", lateWav).getLong("reportedSizeBytes") == fixture.wav.length,
                 "Earlier speculative headers starved the later declared-size callback");

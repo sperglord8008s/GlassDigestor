@@ -452,3 +452,23 @@ Existing ownership, raw fields, catalogs, saved schemas and offline operation
 remain compatible. The NIST exact-export host baseline remains **5/6**;
 MPEG streaming recovery is the next functional pass. Additional exports remain
 visible; [method and scope](../tests/fixtures/nist/README.md).
+
+
+## Pre-alpha.20 MPEG recovery, pending complete gates
+
+PhotoRec adapter 6 uses separate 64 MiB streaming data / 8 MiB PDF read budgets,
+256 MiB aggregate work and unchanged bounded input windows. All original MPEG
+pack rows remain; optional repeated scans require an independently bounded
+owner and the upstream active-stream rejection. SCR=0 starts remain independent.
+Typed captures refuse undocumented omission and invalid owners/counts/limits;
+legacy 2–5 and adapter-5 PDF optional-metadata behavior remain readable.
+
+Actual native archive → both FD engines → production gallery → file ZIP scores
+**6/6 NIST L0_Video reference files** byte-for-byte, with 79 additional exports
+retained. The old real-native baseline is 5/6. All original pattern/coordinates/
+ordering/header acceptance is preserved; [actual receipt](verification/nist-L0-video-native-export.json).
+Generated MPEG exact export, restart/SCR=0/suffix/endpoints/truncation, 64 MiB
+lookahead, forged capture, FD/cancel/legacy and existing 80/256 MiB/PDF checks
+pass. The thirteenth actual Android contract compiles, but execution/full host/
+ARM64/build/static/clean CI gates remain pending. Other images, fragments,
+handset/SAF and arbitrary playback remain separate.

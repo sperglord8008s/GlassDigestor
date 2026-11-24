@@ -43,7 +43,7 @@ public final class PhotoRecStreamingTest {
         JSONObject report = new JSONObject(PhotoRecEngine.scanPath(source.toString()));
         require(report.optBoolean("ok"), report.optString("error"));
         require(
-                report.getString("adapter").equals("diemobile-photorec-5")
+                report.getString("adapter").equals("diemobile-photorec-6")
                         && report.getLong("fileSizeBytes") == size,
                 "Streaming source/version mismatch");
         require(
@@ -99,7 +99,9 @@ public final class PhotoRecStreamingTest {
         File small = directory.resolve("legacy.png").toFile();
         Files.write(small.toPath(), png);
         JSONObject legacy = new JSONObject(PhotoRecEngine.scanPath(small.toString()));
-        legacy.put("adapter", "diemobile-photorec-2").put("maximumInputBytes", 64L * 1024 * 1024);
+        legacy.put("adapter", "diemobile-photorec-2")
+                .put("maximumInputBytes", 64L * 1024 * 1024)
+                .put("maximumCandidateDataBufferBytes", 8L * 1024 * 1024);
         require(new PhotoRecReport(legacy).row(0) != null, "Legacy compact capture rejected");
         JSONObject bad = new JSONObject(report.toString());
         bad.put("maximumInputReadBufferBytes", size);

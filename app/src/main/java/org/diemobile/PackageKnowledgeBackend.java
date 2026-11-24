@@ -186,7 +186,7 @@ final class PackageKnowledgeBackend extends InvestigationBackend {
         if (subject != null)
             links.add(
                     Link.text(
-                            "Captured APK declaration / association evidence and limits",
+                            "Captured APK declaration / association details and limits",
                             query("subject", subject.packageId, "", "", false),
                             "captured-apk-association.json"));
         if (!id.isEmpty()) {
@@ -315,7 +315,7 @@ final class PackageKnowledgeBackend extends InvestigationBackend {
                 + " occurrences, absent target records and missing reciprocity; they are not"
                 + " measured runtime calls. Source coordinates use UTF-16 units, not physical file"
                 + " offsets. Use package, split, signer, component and permission investigations"
-                + " for observed static evidence. This viewer provides no disabling, uninstalling,"
+                + " for observed static information. This viewer provides no disabling, uninstalling,"
                 + " shell execution, automatic URL fetch or network operation.";
     }
 
