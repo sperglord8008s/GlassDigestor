@@ -211,7 +211,8 @@ def main():
     finally:
         for name, command in [
             ("emulator-properties.txt", ["shell", "getprop"]),
-            ("android-process-log.txt", ["logcat", "-d", "-s", "AndroidRuntime", "ActivityManager", "libc"]),
+            ("android-process-log.txt", ["logcat", "-d", "-s", "AndroidRuntime", "ActivityManager",
+                                         "ActivityTaskManager", "WindowManager", "InputDispatcher", "libc"]),
         ]:
             try:
                 result = run(command)

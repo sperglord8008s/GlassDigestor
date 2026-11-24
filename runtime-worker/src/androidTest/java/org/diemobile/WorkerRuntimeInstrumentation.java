@@ -2,6 +2,7 @@
 package org.diemobile;
 
 import android.app.Instrumentation;
+import android.app.UiAutomation;
 import android.content.*;
 import android.graphics.Color;
 import android.os.*;
@@ -25,6 +26,7 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
     private Context target;
     private File directory;
     private long started;
+    private JSONObject pendingContractDiagnostic;
 
     @Override
     public void onCreate(Bundle arguments) {
@@ -93,6 +95,8 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
                 StringWriter text = new StringWriter();
                 failure.printStackTrace(new PrintWriter(text));
                 report.put("failure", text.toString());
+                if (pendingContractDiagnostic != null)
+                    report.put("failedContractDiagnostic", pendingContractDiagnostic);
             } catch (Exception ignored) {
             }
         } finally {
@@ -715,6 +719,10 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
     }
 
     private void textActions() throws Exception {
+        pendingContractDiagnostic =
+                new JSONObject()
+                        .put("contract", "exact-text-actions-platform-clipboard-and-uris")
+                        .put("stage", "launching-focus-fixture");
         TextActionRuntimeActivity activity =
                 (TextActionRuntimeActivity)
                         startActivitySync(
@@ -722,11 +730,20 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
                                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         AtomicReference<Throwable> failure = new AtomicReference<>();
         AtomicReference<Boolean> sensitive = new AtomicReference<>(false);
+        AtomicReference<JSONObject> currentFocus = new AtomicReference<>();
+        Throwable primaryFailure = null;
         String raw = "研究 😀 &?#/\n" + (char) 0 + (char) 0x202e + (char) 0xd800;
         try {
+            pendingContractDiagnostic.put("stage", "awaiting-current-focus");
+            long focusWait = SystemClock.elapsedRealtime();
+            boolean focusReady = activity.awaitFocus();
+            pendingContractDiagnostic.put("focusWaitMs", SystemClock.elapsedRealtime() - focusWait)
+                    .put("readinessReturned", focusReady);
             require(
-                    activity.awaitFocus(),
+                    focusReady,
                     "Clipboard fixture never obtained window focus: " + activity.focusState());
+            pendingContractDiagnostic
+                    .put("stage", "clipboard-main-thread-check");
             waitForIdleSync();
             runOnMainSync(
                     () -> {
@@ -734,7 +751,12 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
                                 (ClipboardManager)
                                         activity.getSystemService(Context.CLIPBOARD_SERVICE);
                         try {
+                            require(
+                                    activity.currentFocusReady(),
+                                    "Clipboard fixture is not currently resumed/visible/focused: "
+                                            + activity.focusState());
                             require(activity.hasWindowFocus(), "Clipboard window lost focus");
+                            currentFocus.set(activity.focusSnapshot());
                             TextActions actions = new TextActions(activity);
                             actions.copy(raw);
                             ClipData copied = clipboard.getPrimaryClip();
@@ -769,6 +791,7 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
                         }
                     });
             require(failure.get() == null, "Platform copy failed: " + failure.get());
+            pendingContractDiagnostic.put("stage", "validating-uri-encodings");
             String query = raw.substring(0, raw.length() - 1);
             JSONArray engines = new JSONArray();
             for (TextActions.Engine engine : TextActions.Engine.values()) {
@@ -813,6 +836,7 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
                     new JSONObject()
                             .put("applicationUid", android.os.Process.myUid())
                             .put("focusedNormalUidWindow", true)
+                            .put("currentFocusSnapshot", currentFocus.get())
                             .put("exactUtf16Clipboard", true)
                             .put("clipboardUtf16Units", raw.length())
                             .put("nulBidiSupplementaryAndIsolatedSurrogate", true)
@@ -822,10 +846,179 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
                             .put("engines", engines)
                             .put("externalBrowserLaunched", false)
                             .put("externalServiceContacted", false));
+            pendingContractDiagnostic = null;
+        } catch (Exception | Error error) {
+            primaryFailure = error;
+            captureFocusFailure(activity, error);
+            throw error;
         } finally {
-            runOnMainSync(activity::finish);
-            waitForIdleSync();
+            FutureTask<Void> finish =
+                    new FutureTask<>(
+                            () -> {
+                                activity.finish();
+                                return null;
+                            });
+            try {
+                activity.runOnUiThread(finish);
+                finish.get(5, TimeUnit.SECONDS);
+            } catch (Exception cleanup) {
+                finish.cancel(false);
+                if (primaryFailure != null) primaryFailure.addSuppressed(cleanup);
+                else throw cleanup;
+            }
         }
+    }
+
+    private void captureFocusFailure(TextActionRuntimeActivity activity, Throwable primary) {
+        ExecutorService diagnostics = null;
+        Future<JSONObject> capture = null;
+        AtomicReference<ParcelFileDescriptor> open = new AtomicReference<>();
+        AtomicReference<String> completedSnapshots = new AtomicReference<>("{}");
+        try {
+            if (pendingContractDiagnostic == null)
+                pendingContractDiagnostic =
+                        new JSONObject()
+                                .put("contract", "exact-text-actions-platform-clipboard-and-uris");
+            pendingContractDiagnostic
+                    .put("failureClass", primary.getClass().getName())
+                    .put("focusAtFailure", activity.focusSnapshot())
+                    .put("snapshotsCapturedBeforeFixtureFinish", true)
+                    .put("snapshotBudgetMs", 8000)
+                    .put("maximumSnapshotBytesPerCommand", 256 * 1024);
+            diagnostics =
+                    Executors.newSingleThreadExecutor(
+                            task -> {
+                                Thread thread = new Thread(task, "runtime-focus-diagnostics");
+                                thread.setDaemon(true);
+                                return thread;
+                            });
+            capture =
+                    diagnostics.submit(
+                            () -> {
+                                UiAutomation automation =
+                                        getUiAutomation(
+                                                UiAutomation
+                                                        .FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES);
+                                JSONObject snapshots =
+                                        new JSONObject()
+                                                .put("powerAndTask", activity.systemFocusState());
+                                completedSnapshots.set(snapshots.toString());
+                                for (String service :
+                                        new String[] {"window windows", "activity activities"}) {
+                                    if (Thread.currentThread().isInterrupted())
+                                        throw new InterruptedIOException(
+                                                "Snapshot capture cancelled");
+                                    String command = "dumpsys -t 2 " + service;
+                                    try (ParcelFileDescriptor descriptor =
+                                            automation.executeShellCommand(command)) {
+                                        if (descriptor == null)
+                                            throw new IOException("No snapshot descriptor");
+                                        open.set(descriptor);
+                                        snapshots.put(
+                                                service, boundedFocusDump(descriptor, command));
+                                    } catch (Exception failure) {
+                                        snapshots.put(
+                                                service,
+                                                new JSONObject()
+                                                        .put("command", command)
+                                                        .put(
+                                                                "errorClass",
+                                                                failure.getClass().getName()));
+                                    } finally {
+                                        open.set(null);
+                                        completedSnapshots.set(snapshots.toString());
+                                    }
+                                }
+                                return snapshots;
+                            });
+            pendingContractDiagnostic
+                    .put("systemFocusSnapshots", capture.get(8, TimeUnit.SECONDS))
+                    .put("systemFocusSnapshotsComplete", true);
+        } catch (Throwable diagnosticFailure) {
+            try {
+                if (pendingContractDiagnostic != null)
+                    pendingContractDiagnostic
+                            .put("focusSnapshotErrorClass", diagnosticFailure.getClass().getName())
+                            .put("systemFocusSnapshots", new JSONObject(completedSnapshots.get()))
+                            .put("systemFocusSnapshotsComplete", false);
+            } catch (Exception ignored) {
+            }
+            if (diagnosticFailure instanceof InterruptedException)
+                Thread.currentThread().interrupt();
+        } finally {
+            if (capture != null) capture.cancel(true);
+            ParcelFileDescriptor descriptor = open.getAndSet(null);
+            if (descriptor != null)
+                try {
+                    descriptor.close();
+                } catch (Exception ignored) {
+                }
+            if (diagnostics != null) diagnostics.shutdownNow();
+        }
+    }
+
+    private static JSONObject boundedFocusDump(ParcelFileDescriptor descriptor, String command)
+            throws Exception {
+        final int maximum = 256 * 1024;
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        boolean complete = false, truncated = false;
+        String error = null;
+        long began = SystemClock.elapsedRealtime(), deadline = began + 2000;
+        try {
+            FileDescriptor input = descriptor.getFileDescriptor();
+            int flags = Os.fcntlInt(input, OsConstants.F_GETFL, 0);
+            Os.fcntlInt(input, OsConstants.F_SETFL, flags | OsConstants.O_NONBLOCK);
+            StructPollfd poll = new StructPollfd();
+            poll.fd = input;
+            poll.events = (short) OsConstants.POLLIN;
+            StructPollfd[] polled = {poll};
+            byte[] block = new byte[4096];
+            while (true) {
+                if (Thread.currentThread().isInterrupted())
+                    throw new InterruptedIOException("Snapshot capture cancelled");
+                long remaining = deadline - SystemClock.elapsedRealtime();
+                if (remaining <= 0) {
+                    error = "read-deadline";
+                    break;
+                }
+                try {
+                    if (Os.poll(polled, (int) remaining) == 0) continue;
+                    if ((poll.revents & (OsConstants.POLLERR | OsConstants.POLLNVAL)) != 0)
+                        throw new IOException("Snapshot descriptor unavailable");
+                    int count = Os.read(input, block, 0, block.length);
+                    if (count == 0) {
+                        complete = true;
+                        break;
+                    }
+                    int retained = Math.min(count, maximum - bytes.size());
+                    bytes.write(block, 0, retained);
+                    if (retained != count) {
+                        truncated = true;
+                        break;
+                    }
+                } catch (ErrnoException failure) {
+                    if (failure.errno != OsConstants.EINTR && failure.errno != OsConstants.EAGAIN)
+                        throw failure;
+                }
+            }
+        } catch (Exception failure) {
+            error = failure.getClass().getName();
+        }
+        byte[] captured = bytes.toByteArray();
+        return new JSONObject()
+                .put("command", command)
+                .put("capturedBytes", captured.length)
+                .put("elapsedMs", SystemClock.elapsedRealtime() - began)
+                .put("readComplete", complete)
+                .put("truncated", truncated)
+                .put("error", error == null ? JSONObject.NULL : error)
+                .put(
+                        "capturedSha256",
+                        Inspector.toHex(MessageDigest.getInstance("SHA-256").digest(captured)))
+                .put(
+                        "rawOutputBase64",
+                        android.util.Base64.encodeToString(captured, android.util.Base64.NO_WRAP))
+                .put("text", new String(captured, StandardCharsets.UTF_8));
     }
 
     private static String reportDigest(File file) throws Exception {
@@ -943,6 +1136,20 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
                 write(source, expected);
                 String expectedSha =
                         Inspector.toHex(MessageDigest.getInstance("SHA-256").digest(expected));
+                JSONObject diagnostic =
+                        new JSONObject()
+                                .put(
+                                        "contract",
+                                        "isolated-report-source-alias-refusal-and-recovery")
+                                .put("caseIndex", index)
+                                .put("case", labels[index])
+                                .put("probeEngine", engines[index])
+                                .put("stage", "opening-alias-descriptors")
+                                .put("expectedSourceSizeBytes", expected.length)
+                                .put("expectedSourceSha256", expectedSha)
+                                .put("workerBinderIdentityHash", binderIdentity)
+                                .put("completedCases", new JSONArray(cases.toString()));
+                pendingContractDiagnostic = diagnostic;
                 try (ParcelFileDescriptor input =
                                 ParcelFileDescriptor.open(
                                         source, ParcelFileDescriptor.MODE_READ_ONLY);
@@ -978,7 +1185,9 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
                     Message alias = Message.obtain(null, BinaryWorkerService.RUN);
                     Bundle arguments = alias.getData();
                     arguments.putString("engine", engines[index]);
-                    arguments.putString("token", UUID.randomUUID().toString());
+                    String aliasToken = UUID.randomUUID().toString();
+                    arguments.putString("token", aliasToken);
+                    diagnostic.put("aliasRequestToken", aliasToken).put("stage", "sending-alias");
                     AnalysisTimeLimits.capture(target, engines[index]).writeTo(arguments);
                     arguments.putParcelable("input", input);
                     arguments.putParcelable("output", report);
@@ -986,7 +1195,8 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
 
                     // Same-Messenger ordering makes the valid reply a processing barrier for
                     // the preceding alias. No sleep or reply on the unsafe descriptor is used.
-                    JSONObject recovered = hashOnConnection(service, source);
+                    JSONObject recovered = hashOnConnection(service, source, diagnostic);
+                    diagnostic.put("stage", "validating-source-and-connection");
                     JSONObject worker = recovered.getJSONObject("worker");
                     int currentUid = worker.getInt("workerUid");
                     if (workerUid == -1) workerUid = currentUid;
@@ -1058,6 +1268,7 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
                             .put("uiExecuted", false)
                             .put("safExecuted", false)
                             .put("arm64Executed", false));
+            pendingContractDiagnostic = null;
         } finally {
             source.delete();
             try {
@@ -1068,11 +1279,20 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
         }
     }
 
-    private JSONObject hashOnConnection(Messenger service, File source) throws Exception {
+    private JSONObject hashOnConnection(Messenger service, File source, JSONObject diagnostic)
+            throws Exception {
         ParcelFileDescriptor[] pipe = ParcelFileDescriptor.createPipe();
         String token = UUID.randomUUID().toString();
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         boolean complete = false;
         try {
+            diagnostic
+                    .put("recoveryRequestToken", token)
+                    .put("stage", "sending-recovery")
+                    .put("sourceSizeBeforeRecoveryBytes", source.length())
+                    .put("recoveryReportComplete", false)
+                    .put("recoveryReportReadDeadlineMs", 30000)
+                    .put("maximumRecoveryReportBytes", 1024 * 1024);
             AnalysisTimeLimits.Request limits = AnalysisTimeLimits.capture(target, "hashes");
             try (ParcelFileDescriptor input =
                     ParcelFileDescriptor.open(source, ParcelFileDescriptor.MODE_READ_ONLY)) {
@@ -1087,7 +1307,7 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
             }
             pipe[1].close();
             pipe[1] = null;
-            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            diagnostic.put("stage", "reading-recovery-report");
             FileDescriptor reader = pipe[0].getFileDescriptor();
             int flags = Os.fcntlInt(reader, OsConstants.F_GETFL, 0);
             Os.fcntlInt(reader, OsConstants.F_SETFL, flags | OsConstants.O_NONBLOCK);
@@ -1117,12 +1337,25 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
                         throw new IOException("Hash recovery report read failed", failure);
                 }
             }
+            diagnostic.put("recoveryReportComplete", true);
+            retainRecoveryBytes(diagnostic, bytes.toByteArray());
             JSONObject envelope = new JSONObject(bytes.toString(StandardCharsets.UTF_8.name()));
             JSONObject report = envelope.getJSONObject("report");
+            diagnostic.put("recoveryEnvelope", new JSONObject(envelope.toString()));
+            JSONObject fields = new JSONObject();
+            for (String field :
+                    new String[] {
+                        "ok", "error", "wholeInputComplete", "bytesRead", "fileSizeBytes"
+                    }) {
+                Object value = report.opt(field);
+                fields.put(field, value == null ? JSONObject.NULL : value);
+            }
+            diagnostic.put("recoveryFields", fields).put("stage", "validating-recovery-envelope");
             limits.validateEnvelope(envelope, report);
             envelope.remove("report");
             report.put("worker", envelope);
             worker(report, "hashes");
+            diagnostic.put("stage", "validating-recovery-report");
             require(
                     report.getBoolean("ok")
                             && report.getBoolean("wholeInputComplete")
@@ -1131,6 +1364,16 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
                     "Same-connection hash request did not recover after the refused alias");
             complete = true;
             return report;
+        } catch (Exception | Error error) {
+            retainRecoveryBytes(diagnostic, bytes.toByteArray());
+            try {
+                diagnostic
+                        .put("failureClass", error.getClass().getName())
+                        .put("binderAliveBeforeCleanup", service.getBinder().isBinderAlive());
+            } catch (Exception ignored) {
+                // Diagnostic collection cannot replace the original failed assertion/read.
+            }
+            throw error;
         } finally {
             if (!complete) {
                 try {
@@ -1148,6 +1391,21 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
                     } catch (IOException ignored) {
                         // Closing a failed channel must not replace its original failure.
                     }
+        }
+    }
+
+    private static void retainRecoveryBytes(JSONObject diagnostic, byte[] bytes) {
+        try {
+            diagnostic
+                    .put("recoveryReportBytes", bytes.length)
+                    .put(
+                            "recoveryReportSha256",
+                            Inspector.toHex(MessageDigest.getInstance("SHA-256").digest(bytes)))
+                    .put(
+                            "rawRecoveryReportBase64",
+                            android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP));
+        } catch (Throwable ignored) {
+            // The read already enforces a 1 MiB bound. This preserves exact failure bytes.
         }
     }
 
