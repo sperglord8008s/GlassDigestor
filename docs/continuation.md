@@ -1,58 +1,55 @@
 # Development continuation
 
-Read [current status](STATUS.md), [project map](PROJECT-MAP.md), [AGENTS.md](../AGENTS.md)
+Read [status](STATUS.md), [project map](PROJECT-MAP.md), [AGENTS.md](../AGENTS.md)
 and the required design/parity/workbench documents first.
 
 ## Integrated baseline
 
-Canonical repository: `sperglord8008s/GlassDigestor`. Main `c2ecc2f` merges PR #22.
-Published **pre-alpha.18 / code 24**, exact source `47bde0b`, has all five source
-jobs, 213 host Android tests and 11 actual x86 API 26/35 contracts passing.
-Both main runs also pass. The 14 public assets, six original CI files and
-116 component-source ZIP members were independently audited.
-[Release](releases/0.6.0-pre-alpha.18.md)
-· [runtime receipt](verification/android-worker-runtime-47bde0b.json)
-· [public asset receipt](verification/pre-alpha18-release.json).
+Canonical repository: `sperglord8008s/GlassDigestor`. Main `7f171ad` merges PR #23.
+Published **pre-alpha.19 / code 25**, exact source `d91e39f`, passes all five
+source/PR jobs, **241 host Android tests** and **12 actual x86 API 26/35
+contracts**. All 14 public assets, six original CI checkpoint files and 116
+component-source ZIP members passed independent audits.
+[Release](releases/0.6.0-pre-alpha.19.md)
+· [runtime receipt](verification/android-worker-runtime-d91e39f.json)
+· [public asset receipt](verification/pre-alpha19-release.json).
 
 Preserve `org.diemobile`, signing configuration, immutable release assets and
-fallback APKs. Keep actual Android/host/production ARM64 claims separate.
+fallback APK bytes. Distinguish host checks, actual x86 fixtures, production
+ARM64 and handset/SAF/UI acceptance. The new platform contract tests settings/
+Parcel/private-log behavior; it does not run Binwalk JNI or full interface.
+[Operational controls](workbench-usability.md).
 
-## Current integration
+## Active pass
 
-`codex/workbench-improvements` is the one active working branch. It contains
-the independent NIST ZIP scorer/oracle foundation (`d9aeafc`) and current parallel
-usability work. Root owns Git/docs/builds; assigned agents own time limits,
-strings, grids, common controls and diagnostics/About without overlapping edits.
-Do not compile sources while another agent is still changing those sources.
-Record handoffs and run focused checks, then full required checks and clean CI.
+`codex/nist-mpeg-recovery` is the current pass. During parallel work, native
+recovery/models/tests and neutral UI labels have disjoint ownership; root owns
+release/docs/version/build integration and actual corpus export/scoring. Do not
+compile changing sources or overwrite a library while a JVM has it loaded.
+Commit coherent slices and inspect clean CI before another release.
 
-The requested pass includes configurable Binwalk/worker deadlines, Strings
-minimum/search/Categories, functional drag scrollbars, compact explanations,
-zoom/range selection, local diagnostics/About and neutral information language.
-Current implementation/verification state belongs in STATUS and feature parity;
-compilation alone never becomes runtime verification.
-
-## Recovery continuation
-
-The exact NIST L0_Video archive identity and all 62,578,688 decoded bytes pass
-host JNI. Independent actual ZIP scoring gives **5/6** reference files and
-79 retained additional exports; MPEG reaches the 8 MiB callback budget.
-The offline oracle regenerates byte-identically and nine scorer contracts pass.
+The independently pinned NIST L0_Video archive decodes exactly 62,578,688 bytes
+through host JNI. Actual exported ZIP scoring is **5/6** reference payloads,
+with 79 additional unscored exports retained. MPEG reaches the 8 MiB data-work
+budget. Next: separate 64 MiB streaming data work from 8 MiB PDF read work;
+record only positively bounded MPEG owners; preserve every raw pack header and
+SCR=0 independent start; skip redundant optional callbacks only inside valid
+owners with explicit source relationships. Keep aggregate/resource bounds,
+legacy captures, PDF behavior, cancellation and source checks. Validate actual
+native acquisition → gallery → exported ZIP against independent hashes, rather
+than replay or header coordinates. Remaining 29 images/fragments are unscored.
 [Corpus/method](../tests/fixtures/nist/README.md)
 · [baseline](verification/nist-L0-video-export-baseline.json).
-Keep larger streaming checks/repeated MPEG packs and the remaining 29 images
-on the queue. Fragmented/missing-data cases are unscored; production discovery
-must never consume expected layout coordinates/hashes.
 
-The unfinished MPV raw-frame foundation is preserved remotely at
-`savepoint/mpv-frame-foundation-0ef94d3` (commit `0ef94d3`). Host pixel/ownership
-checks passed; worker/UI/Android integration remains pending. Resume after the
-current usability/time-limit pass. [Branch consolidation](history/branch-consolidation-2026-11-25.json).
+The unfinished MPV raw-frame foundation remains remotely at
+`savepoint/mpv-frame-foundation-0ef94d3` (`0ef94d3`). Host pixels/ownership passed;
+worker/UI/Android integration remains pending. Resume after recovery stability.
+[Branch consolidation](history/branch-consolidation-2026-11-25.json).
 
 ## Reproduce
 
-Use pinned JDK 17, Gradle 8.11.1, SDK/build-tools 35, NDK 28.2.13676358 and
-CMake 3.22.1. The normal clean CI builds native code from its pinned inputs.
+Pinned JDK 17, Gradle 8.11.1, SDK/build-tools 35, NDK 28.2.13676358 and CMake
+3.22.1. Clean CI rebuilds native code normally from pinned inputs.
 
 ```sh
 bash scripts/fetch-engine.sh
@@ -65,17 +62,29 @@ bash scripts/verify-apk.sh
 python3 scripts/verify-worker-runtime.py
 ```
 
-Runtime execution needs disposable x86 API 26/35 emulators; use the separate
-worker-runtime workflow. [Runtime laboratory](../runtime-worker/README.md).
-Release publication consumes an exact successful source capture; verify both
-source jobs and the separate runtime run, then independently download/audit.
+Actual platform execution uses disposable x86 API 26/35 emulators in the
+separate [worker runtime laboratory](../runtime-worker/README.md). Publication
+consumes an exact successful source capture; audit original sidecars separately
+from APK-verifier output, and independently download/audit public assets.
 
-## Workspace constraints
+## Managed workspace continuation
 
-The managed workspace has about 7.9 GiB total. Current cached toolchains/deps and
-all frozen APKs are retained. Reclaim only documented regenerable build copies
-or independently verified duplicate temporary downloads. No JNI library may be
-overwritten while a test process has it loaded. Serialize native builds/tests.
-Local audited unchanged-native reuse is a disk workaround; clean CI must rebuild
-normally. Full earlier receipts/commands remain in
+The 7.9 GiB workspace retains pinned toolchains/dependencies and immutable APK
+payloads. Fifty older APK paths are losslessly stored at
+`/workspace/work/saved-apks/signed-apks-before-pre-alpha18.tar.xz`, SHA-256
+`7f52a27bc1dc254f2e6e5716779e2ff3e020e95a1dc2936ce7027e5d0a390ca3`.
+Every original payload was decompressed/hashed before loose copies were removed;
+an actual pre-alpha.17 restore matched its frozen identity. List or restore:
+
+```sh
+python3 /workspace/work/saved-apks/restore.py
+python3 /workspace/work/saved-apks/restore.py releases/0.6.0-pre-alpha.17/ci/GlassDigestor-0.6.0-pre-alpha.17-dev.g7c803225ff70-arm64-v8a-debug.apk
+```
+
+Manifest/README record original names/hashes/aliases. Restore refuses an existing
+destination; `--output /new/path.apk` makes a separate copy. Pre-alpha.18 and .19
+stay loose and public releases are unchanged. Historical commands referring to
+older loose paths require restoration first. Reclaim only audited regenerable
+outputs or verified duplicate downloads; local unchanged-native reuse is a disk
+workaround, never a substitute for clean CI. Earlier receipts remain in the
 [historical continuation](history/development-through-pre-alpha18.md).
