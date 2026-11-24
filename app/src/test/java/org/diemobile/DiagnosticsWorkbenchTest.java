@@ -328,7 +328,7 @@ public final class DiagnosticsWorkbenchTest {
         openLog();
         ListView rows = activity.getWindow().getDecorView().findViewWithTag("debug-rows");
         assertEquals(1, rows.getAdapter().getCount());
-        assertTrue(rows.isFastScrollEnabled());
+        // Real overflow/fit thumb gestures are covered in WorkbenchControlsTest.
         button("debug-copy").performClick();
         ClipboardManager clipboard =
                 (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
