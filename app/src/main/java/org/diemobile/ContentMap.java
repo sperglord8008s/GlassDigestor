@@ -386,7 +386,7 @@ final class ContentMap {
                                 : covered == input.size
                                         ? "Reported artifact ranges cover this input · additional"
                                                 + " nested/unknown content remains possible"
-                                        : "Stored artifact evidence plus unassigned bytes · "
+                                        : "Stored artifact ranges plus unassigned bytes · "
                                                 + covered
                                                 + " / "
                                                 + input.size
@@ -412,8 +412,8 @@ final class ContentMap {
         if (Arrays.asList("wav", "flac", "mp3", "ogg", "aif", "aiff", "aac", "m4a", "mid")
                 .contains(f)) return Kind.AUDIO;
         if (Arrays.asList(
-                        "mp4", "mov", "avi", "mkv", "webm", "mpg", "mpeg", "m2ts", "3gp", "asf",
-                        "flv")
+                        "mp4", "mov", "avi", "mkv", "webm", "mpg", "mpeg", "m2ts", "mts", "3gp",
+                        "3g2", "asf", "wmv", "flv")
                 .contains(f)) return Kind.VIDEO;
         if (Arrays.asList(
                         "zip", "7z", "rar", "tar", "gz", "bz2", "xz", "zst", "cab", "iso", "cpio",

@@ -107,7 +107,7 @@ class CarvingBackend extends InvestigationBackend {
       if (photoRec) validatePhotoRecCatalog(response, catalog);
       else validateBinwalkInput(response);
       PhotoRecReport decoded = photoRec ? new PhotoRecReport(response, stop) : null;
-      int limitedDataCandidates = 0, compactRejectedCandidates = 0;
+      int limitedDataCandidates = 0, compactRejectedCandidates = 0, suppressedDataCandidates = 0;
       int fileAttempted = 0, fileExecuted = 0, fileLimited = 0, fileMetadataLimited = 0;
       for (int i = 0; i < rows.length(); i++) {
         EvidenceRows.check(stop);
@@ -116,6 +116,7 @@ class CarvingBackend extends InvestigationBackend {
         if (photoRec && row.optBoolean("dataCheckLimited")) limitedDataCandidates++;
         if (photoRec) {
           PhotoRecFileChecks.validateRow(row, response);
+          if (decoded.validateDataRow(i, row)) suppressedDataCandidates++;
           if (row.optBoolean("fileCheckAttempted")) fileAttempted++;
           if (row.getBoolean("fileCheckExecuted")) fileExecuted++;
           if (row.optBoolean("fileCheckMetadataReadLimited")) fileMetadataLimited++;
@@ -193,6 +194,10 @@ class CarvingBackend extends InvestigationBackend {
       if (photoRec && response.getInt("compactRejectedCandidateCount") != compactRejectedCandidates)
         throw new IOException(
             "PhotoRec compact rejected occurrence count differs from the original" + " rows");
+      if (photoRec
+          && response.getString("adapter").equals("diemobile-photorec-6")
+          && response.getInt("dataCallbacksSuppressedCount") != suppressedDataCandidates)
+        throw new IOException("PhotoRec MPEG suppression count differs from its captured rows");
       photoRecReport = decoded;
       response.remove("rows");
       response.remove("patterns");
@@ -405,7 +410,7 @@ class CarvingBackend extends InvestigationBackend {
         value.put(
             "interpretation",
             photoRec
-                ? rowPdfInterpretation(value)
+                ? rowPhotoRecInterpretation(value)
                 : accepted
                     ? "Upstream parser accepted this candidate. Extent, when"
                         + " supplied, is a parser report bounded to this"
@@ -433,7 +438,15 @@ class CarvingBackend extends InvestigationBackend {
     };
   }
 
-  private String rowPdfInterpretation(JSONObject value) {
+  private String rowPhotoRecInterpretation(JSONObject value) {
+    if (!value.isNull("dataCheckSuppressedByCandidate"))
+      return "This standalone MPEG pack header was accepted inside the positively bounded stream"
+          + " from original candidate ordinal "
+          + value.optInt("dataCheckSuppressedByCandidate")
+          + " (zero-based). The upstream active-stream header check treats it as a continuation,"
+          + " so its optional repeated data scan was not run. This row retains its original header"
+          + " result and unknown independent size; the owner is a separate captured candidate."
+          + " Independent SCR=0 starts are still checked, including overlaps.";
     if (value.optBoolean("fileCheckMetadataReadLimited"))
       return "PhotoRec established this stored PDF footer boundary before optional"
           + " newline/date reading reached a work limit. The original extent, raw time"
@@ -477,13 +490,15 @@ class CarvingBackend extends InvestigationBackend {
         .put(
             "validationLimits",
             photoRec
-                ? "Upstream standalone safe-header/data callbacks and, in adapters 4/5"
-                    + " only, the reviewed PDF file_check through bounded"
+                ? "Upstream standalone safe-header/data callbacks and, in adapters 4/5/6,"
+                    + " the reviewed PDF file_check through bounded"
                     + " read-only relative stdio. No other file checks, rename,"
                     + " fragmented/disk recovery or optional codec libraries. 64"
                     + " KiB windows use explicit zero padding near EOF; a"
                     + " reported range must remain within actual source bytes."
-                    + " Unknown extents remain null."
+                    + " Unknown extents remain null. Adapter 6 can omit repeated optional MPEG"
+                    + " data scans only inside independently bounded owners; every original header"
+                    + " remains visible with its own unknown independent size."
                 : "Format-specific upstream validation varies. Some parsers"
                     + " decompress in memory. A known reported extent enables"
                     + " exact stored-byte export; an unknown extent remains null."
@@ -572,6 +587,12 @@ class CarvingBackend extends InvestigationBackend {
                 + " was limited. "
             : "";
     return (fileChecks
+            + (photoRec && header != null && header.optInt("dataCallbacksSuppressedCount") > 0
+                ? "OPTIONAL MPEG DATA CHECKS: "
+                    + header.optInt("dataCallbacksSuppressedCount")
+                    + " pack headers remain visible inside bounded streams; their repeated data"
+                    + " checks were omitted and independent lengths remain unknown. "
+                : "")
             + (photoRec && header != null && header.optInt("dataCallbacksLimitedCount") > 0
                 ? "PARTIAL DATA CHECKS: "
                     + header.optInt("dataCallbacksLimitedCount")

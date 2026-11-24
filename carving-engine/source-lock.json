@@ -12,9 +12,10 @@
     "src/file_list.c",
     "src/fidentify.c",
     "src/Makefile.am",
-    "src/file_pdf.c"
+    "src/file_pdf.c",
+    "src/file_mpg.c"
   ],
-  "adapter": "diemobile-photorec-5",
+  "adapter": "diemobile-photorec-6",
   "optionalLibraries": [],
   "auxiliarySignatureFiles": false,
   "renameCallbacksExecuted": false,
@@ -25,7 +26,8 @@
     "src/file_list.c": "b4257ba28e1815073c4e952457a82e82f48f98ad24d657d1d1d9a0ecb0b885ad",
     "src/fidentify.c": "bf2ad0b73ded802782ff16698a4a0869c31bef410763000e4ef1dd92efe31177",
     "src/Makefile.am": "1a26b888477facb1d663fdec98a1f84b9f646975dc496b9f9cd5d53c86ee21c7",
-    "src/file_pdf.c": "60b3c43d0c7ab1a50cafcb92b5d80676e235d2b60560d7679156d05a1a1ef220"
+    "src/file_pdf.c": "60b3c43d0c7ab1a50cafcb92b5d80676e235d2b60560d7679156d05a1a1ef220",
+    "src/file_mpg.c": "4634bfbfbacd00bcb759f352435b8797d66ea51673f279d2f603c506bfe67687"
   },
   "nativeSchemaVersion": 2,
   "maximumCandidateOccurrences": 250000,
@@ -41,5 +43,8 @@
   "fileCheckCallbackScope": "pdf-only/read-only-relative-stdio",
   "maximumCandidateFileReadBytes": 8388608,
   "fileCheckReadBufferBytes": 65536,
-  "fileCheckBoundaryPolicy": "native-positive-footer-survives-optional-post-footer-read-limit"
+  "fileCheckBoundaryPolicy": "native-positive-footer-survives-optional-post-footer-read-limit",
+  "maximumCandidateDataBufferBytes": 67108864,
+  "maximumCallbackBufferWorkBytes": 268435456,
+  "mpegContinuationPolicy": "standalone-header-retained/active-mpeg-header-ignored/bounded-owner-only"
 }

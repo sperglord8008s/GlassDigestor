@@ -15,7 +15,8 @@ final class PhotoRecFileChecks {
     }
 
     static boolean partialMetadataSupported(JSONObject report) {
-        return report.optString("adapter").equals("diemobile-photorec-5");
+        return report.optString("adapter").equals("diemobile-photorec-5")
+                || report.optString("adapter").equals("diemobile-photorec-6");
     }
 
     private static boolean partialMetadataResult(JSONObject row, JSONObject report)
@@ -47,7 +48,8 @@ final class PhotoRecFileChecks {
         }
         if (partialMetadataSupported(report)) {
             if (!report.getString("fileCheckBoundaryPolicy")
-                            .equals("native-positive-footer-survives-optional-post-footer-read-limit")
+                            .equals(
+                                    "native-positive-footer-survives-optional-post-footer-read-limit")
                     || report.getInt("fileCheckMetadataReadLimitedCount") != metadataLimited)
                 throw new IOException("PhotoRec footer/optional-metadata policy or counts differ");
         } else if (metadataLimited != 0)

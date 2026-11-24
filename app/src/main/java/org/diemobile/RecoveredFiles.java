@@ -117,6 +117,22 @@ final class RecoveredFiles {
                 return "video/webm";
             case "avi":
                 return "video/x-msvideo";
+            case "mpg":
+            case "mpeg":
+                return "video/mpeg";
+            case "m2ts":
+            case "mts":
+                return "video/mp2t";
+            case "asf":
+                return "video/x-ms-asf";
+            case "wmv":
+                return "video/x-ms-wmv";
+            case "flv":
+                return "video/x-flv";
+            case "3gp":
+                return "video/3gpp";
+            case "3g2":
+                return "video/3gpp2";
             case "zip":
                 return "application/zip";
             case "7z":

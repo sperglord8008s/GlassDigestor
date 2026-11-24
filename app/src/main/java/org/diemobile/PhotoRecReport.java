@@ -14,12 +14,18 @@ import java.util.function.BooleanSupplier;
 final class PhotoRecReport {
     static final int MAX_CANDIDATES = 250000;
     static final long MAX_INPUT_BYTES = 256L * 1024 * 1024;
+    static final long MAX_DATA_BYTES = 64L * 1024 * 1024;
+    static final String MPEG_POLICY =
+            "standalone-header-retained/active-mpeg-header-ignored/bounded-owner-only";
+    static final String MPEG_DATA_MODE =
+            "upstream-active-mpeg-header-ignored/data-callback-suppressed";
 
     static boolean supportedAdapter(String value) {
         return value.equals("diemobile-photorec-2")
                 || value.equals("diemobile-photorec-3")
                 || value.equals("diemobile-photorec-4")
-                || value.equals("diemobile-photorec-5");
+                || value.equals("diemobile-photorec-5")
+                || value.equals("diemobile-photorec-6");
     }
 
     static final String[] REJECTED_FIELDS = {
@@ -42,6 +48,7 @@ final class PhotoRecReport {
     private final JSONArray rows, patterns, states;
     private final JSONObject metadata;
     private final long sourceSize;
+    private final boolean suppressionSupported;
 
     PhotoRecReport(JSONObject report) throws Exception {
         this(report, () -> false);
@@ -53,6 +60,17 @@ final class PhotoRecReport {
                 || !supportedAdapter(report.getString("adapter")))
             throw new IOException("Unsupported PhotoRec compact transport version");
         rows = report.getJSONArray("rows");
+        suppressionSupported = report.getString("adapter").equals("diemobile-photorec-6");
+        if (suppressionSupported) {
+            if (integer(report.get("maximumCandidateDataBufferBytes")) != MAX_DATA_BYTES
+                    || integer(report.get("maximumCallbackBufferWorkBytes")) != 256L * 1024 * 1024
+                    || !report.getString("mpegContinuationPolicy").equals(MPEG_POLICY))
+                throw new IOException(
+                        "PhotoRec streaming work or MPEG continuation policy differs");
+            integer(report.get("dataCallbacksSuppressedCount"));
+        } else if (report.has("maximumCandidateDataBufferBytes")
+                && report.getLong("maximumCandidateDataBufferBytes") != 8L * 1024 * 1024)
+            throw new IOException("Legacy PhotoRec capture changed its data callback work limit");
         metadata = new JSONObject();
         Iterator<String> keys = report.keys();
         while (keys.hasNext()) {
@@ -79,7 +97,8 @@ final class PhotoRecReport {
                         || report.getLong("maximumInputReadBufferBytes")
                                 != ((report.getString("adapter").equals("diemobile-photorec-4")
                                                 || report.getString("adapter")
-                                                        .equals("diemobile-photorec-5"))
+                                                        .equals("diemobile-photorec-5")
+                                                || suppressionSupported)
                                         ? 1376256
                                         : 1310720)
                         || report.getLong("scanReadBufferBytes") != 1048576
@@ -144,6 +163,90 @@ final class PhotoRecReport {
 
     boolean compact(int ordinal) throws Exception {
         return rows.get(ordinal) instanceof JSONArray;
+    }
+
+    /** Optional data work may be omitted only with an earlier, independently bounded MPEG owner. */
+    boolean validateDataRow(int ordinal, JSONObject row) throws Exception {
+        boolean suppressed = !row.isNull("dataCheckSuppressedByCandidate");
+        if (!suppressionSupported) {
+            if (suppressed || row.optString("dataCheckMode").equals(MPEG_DATA_MODE))
+                throw new IOException(
+                        "Legacy PhotoRec capture cannot suppress MPEG data callbacks");
+            return false;
+        }
+        if (!row.getBoolean("headerAccepted")) {
+            if (suppressed || row.optString("dataCheckMode").equals(MPEG_DATA_MODE))
+                throw new IOException("Rejected PhotoRec header cannot claim a MPEG owner");
+            return false;
+        }
+        if (integer(row.get("dataCheckSourceBytesProcessed")) > MAX_DATA_BYTES)
+            throw new IOException("PhotoRec data callback work differs from its budget");
+        if (!suppressed) {
+            if (row.getString("dataCheckMode").equals(MPEG_DATA_MODE))
+                throw new IOException("Un-suppressed PhotoRec row cannot claim a MPEG owner");
+            if (!row.getBoolean("dataCheckExecuted")) {
+                if (!row.isNull("dataCheckStatus")
+                        || row.getLong("dataCheckSourceBytesProcessed") != 0
+                        || row.getBoolean("dataCheckAvailable")
+                                && !row.getBoolean("dataCheckLimited")
+                                && !outsideDataContract(row))
+                    throw new IOException(
+                            "PhotoRec available data work was omitted without a bounded owner or"
+                                + " explicit limit");
+            }
+            return false;
+        }
+        int ownerIndex = integer(row.get("dataCheckSuppressedByCandidate"));
+        if (ownerIndex >= ordinal)
+            throw new IOException("PhotoRec MPEG owner must be an earlier captured candidate");
+        JSONObject owner = row(ownerIndex);
+        JSONObject pattern = patterns.getJSONObject(integer(row.get("patternIndex")));
+        long start = row.getLong("physicalOffset"), ownerStart = owner.getLong("physicalOffset");
+        long ownerSize = owner.isNull("reportedSizeBytes") ? 0 : owner.getLong("reportedSizeBytes");
+        if (!row.getString("name").equals("mpg")
+                || !row.getString("dataCheckMode").equals(MPEG_DATA_MODE)
+                || !pattern.getString("magicHex").equals("000001ba")
+                || pattern.getLong("magicRelativeOffset") != 0
+                || row.getLong("magicOffset") != start
+                || !row.getBoolean("dataCheckAvailable")
+                || row.getBoolean("dataCheckExecuted")
+                || row.getBoolean("dataCheckLimited")
+                || !row.isNull("dataCheckLimitReason")
+                || !row.isNull("dataCheckStatus")
+                || !row.isNull("reportedSizeBytes")
+                || row.getLong("dataCheckSourceBytesProcessed") != 0
+                || row.getLong("dataCheckFileSizeCounterBytes") != 0
+                || row.getLong("finalCalculatedSizeBytes")
+                        != row.getLong("headerCalculatedSizeBytes")
+                || !owner.getString("name").equals("mpg")
+                || !owner.getBoolean("headerAccepted")
+                || !owner.getBoolean("dataCheckExecuted")
+                || owner.getBoolean("dataCheckLimited")
+                || owner.getInt("dataCheckStatus") != 2
+                || owner.getLong("upstreamOffsetError") != 0
+                || owner.getLong("finalCalculatedSizeBytes") != ownerSize
+                || ownerStart < 0
+                || ownerSize < 4
+                || ownerSize > sourceSize - ownerStart
+                || start <= ownerStart
+                || start - ownerStart > ownerSize - 4)
+            throw new IOException("PhotoRec MPEG suppression lacks an independent bounded owner");
+        return true;
+    }
+
+    private static boolean outsideDataContract(JSONObject row) throws Exception {
+        Object value = row.get("headerCalculatedSizeBytes");
+        if (!(value instanceof String)) return false;
+        String text = (String) value;
+        if (text.length() > 20 || !text.matches("0|[1-9][0-9]*")) return false;
+        BigInteger size = new BigInteger(text);
+        // Pinned filegen.h, POSIX/non-DJGPP PHOTOREC_MAX_FILE_SIZE; probe.cpp
+        // preserves oversized header state without invoking an invalid callback.
+        return size.compareTo(BigInteger.ONE.shiftLeft(41).subtract(BigInteger.ONE)) >= 0
+                && size.compareTo(UINT64_MAX) <= 0
+                && row.getString("dataCheckMode").equals("not-run")
+                && row.getString("parserStatus")
+                        .equals("header-accepted/calculated-size-outside-upstream-data-contract");
     }
 
     /** Complete original indexed evidence plus the parent's owned-input identity. */
