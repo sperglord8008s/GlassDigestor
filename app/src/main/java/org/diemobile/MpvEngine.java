@@ -16,8 +16,13 @@ final class MpvEngine {
         ERROR = error;
     }
     private static native byte[] probeFd(int descriptor);
+    private static native byte[] frameFd(int descriptor, int output, int maximum);
     static String scanFd(int descriptor) {
         byte[] bytes = probeFd(descriptor);
+        return bytes == null ? null : new String(bytes, StandardCharsets.UTF_8);
+    }
+    static String captureFd(int descriptor, int output, int maximumDimensionPixels) {
+        byte[] bytes = frameFd(descriptor, output, maximumDimensionPixels);
         return bytes == null ? null : new String(bytes, StandardCharsets.UTF_8);
     }
     private MpvEngine() {}

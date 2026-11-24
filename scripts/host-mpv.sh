@@ -1,6 +1,20 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-only
 # Source this helper. The retained mpv headers do not require a development package.
+die_host_mpv_fortify_level() {
+  # Level 3 needs both compiler support and glibc headers that enable it.
+  # The syntax-only probe writes no objects or libraries. Older hosts use 2.
+  if printf '%s\n' '#include <features.h>' \
+      '#if !defined(__GLIBC__) || !defined(__USE_FORTIFY_LEVEL) || __USE_FORTIFY_LEVEL != 3' \
+      '#error Fortification level 3 is unavailable' '#endif' 'int main(void) { return 0; }' |
+      "${CC:-cc}" -std=c11 -O2 -Wall -Wextra -Werror -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3 \
+        -x c -fsyntax-only - >/dev/null 2>&1; then
+    printf '%s\n' 3
+  else
+    printf '%s\n' 2
+  fi
+}
+
 die_host_mpv_library() {
   local candidate="${MPV_HOST_LIBRARY:-}" libdir
   if [[ -n "$candidate" ]]; then

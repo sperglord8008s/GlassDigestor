@@ -11,6 +11,8 @@ import android.text.*;
 import android.view.*;
 import android.widget.*;
 
+import org.json.JSONObject;
+
 import java.io.*;
 import java.nio.charset.*;
 import java.util.*;
@@ -21,7 +23,7 @@ import java.util.function.BooleanSupplier;
 /** In-app viewing of a separately owned exact range. No file name becomes an executable or URL. */
 public final class ContentPreviewActivity extends Activity {
     private static final String[] MODES = {
-        "Automatic", "Image", "Audio / video", "UTF-8 text", "PDF", "Hex"
+        "Automatic", "Image", "Audio / video", "UTF-8 text", "PDF", "Hex", "MPV still image"
     };
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private final AtomicBoolean cancellation = new AtomicBoolean();
@@ -43,6 +45,11 @@ public final class ContentPreviewActivity extends Activity {
     private MediaPlayer player;
     private SurfaceView surface;
     private boolean prepared, paused = true;
+    private boolean platformVideo;
+    private String decoderNotice = "";
+    private JSONObject platformPreview, mpvPreview, mediaFailure;
+    private ImageView stillView;
+    private Bitmap stillBitmap;
     private volatile int generation;
     private int pdfPage, seekPosition, pdfScrollX, pdfScrollY;
     private boolean pdfActualPixels;
@@ -90,6 +97,10 @@ public final class ContentPreviewActivity extends Activity {
         if (name == null) name = "Selected bytes";
         if (saved != null) {
             mode = saved.getString("mode", "Automatic");
+            decoderNotice = saved.getString("decoderNotice", "");
+            String failedMedia = saved.getString("mediaFailure");
+            if (failedMedia != null) try { mediaFailure = new JSONObject(failedMedia); }
+            catch (Exception expired) { decoderNotice = "Earlier platform decoder details expired"; }
             pdfPage = Math.max(0, saved.getInt("pdfPage"));
             pdfActualPixels = saved.getBoolean("pdfActualPixels", false);
             pdfScrollX =
@@ -270,6 +281,8 @@ public final class ContentPreviewActivity extends Activity {
                         MODES,
                         (dialog, which) -> {
                             mode = MODES[which];
+                            decoderNotice = "";
+                            mediaFailure = null;
                             render();
                         })
                 .show();
@@ -513,6 +526,14 @@ public final class ContentPreviewActivity extends Activity {
         }
         prepared = false;
         paused = true;
+        platformVideo = false;
+    }
+
+    private void releaseStill() {
+        if (stillView != null) stillView.setImageDrawable(null);
+        stillView = null;
+        if (stillBitmap != null) stillBitmap.recycle();
+        stillBitmap = null;
     }
 
     private void render() {
@@ -523,6 +544,12 @@ public final class ContentPreviewActivity extends Activity {
         pdfPan = null;
         pdfScroll = null;
         releasePlayer();
+        releaseStill();
+        platformPreview = mpvPreview = null;
+        if (!mode.equals("MPV still image")) {
+            decoderNotice = "";
+            mediaFailure = null;
+        }
         int ticket = ++generation;
         long wantedText = requestedTextOffset == null ? textCursor.offset : requestedTextOffset;
         boolean lastText = requestedTextTail, backText = requestedTextBack;
@@ -540,7 +567,7 @@ public final class ContentPreviewActivity extends Activity {
             controls.removeAllViews();
         }
         status.setText(
-                "Rendering "
+                (decoderNotice.isEmpty() ? "" : decoderNotice + "\n") + "Rendering "
                         + mode
                         + " · decoder success is separate from complete-file integrity");
         worker.execute(
@@ -574,34 +601,39 @@ public final class ContentPreviewActivity extends Activity {
                                             head, head.length == input.size)) chosen = "UTF-8 text";
                             else chosen = "Hex";
                         }
-                        String renderer = chosen;
                         if (chosen.equals("Image")) {
-                            Bitmap bitmap =
-                                    ContentPreview.image(
-                                            input.file,
-                                            new FileRange(input.size, 0, input.size),
-                                            2048);
+                            StillImagePreview.Result observation = StillImagePreview.image(
+                                    this, input, new FileRange(input.size, 0, input.size),
+                                    StillImagePreview.MAX_DIMENSION, false, stop);
+                            Bitmap bitmap = observation.bitmap;
+                            if (bitmap == null) throw new IOException(observation.description());
+                            JSONObject mpv = observation.mpv == null ? null : observation.mpv.json();
+                            JSONObject platform = observation.platformFailure.isEmpty() ? null
+                                    : new JSONObject().put("decoder", "Android BitmapFactory")
+                                            .put("failure", observation.platformFailure);
                             runOnUiThread(
                                     () -> {
-                                        if (isDestroyed() || ticket != generation) {
+                                        if (isDestroyed() || ticket != generation || stop.getAsBoolean()) {
                                             bitmap.recycle();
                                             return;
                                         }
-                                        ImageView image = new ImageView(this);
-                                        image.setTag("content-image");
-                                        image.setContentDescription(name);
-                                        image.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                                        image.setImageBitmap(bitmap);
-                                        content.addView(
-                                                image, new LinearLayout.LayoutParams(-1, -1));
-                                        status.setText(
-                                                type
-                                                        + " · platform decoded first frame "
-                                                        + bitmap.getWidth()
-                                                        + " × "
-                                                        + bitmap.getHeight()
-                                                        + " (bounded to 2048 × 2048)");
+                                        showStill(bitmap, type + " · " + observation.description()
+                                                + " (bounded to 1536 × 1536)", platform, mpv);
                                     });
+                        } else if (chosen.equals("MPV still image")) {
+                            MpvFrame.Result observation = MpvFrame.capture(this, input,
+                                    new FileRange(input.size, 0, input.size),
+                                    StillImagePreview.MAX_DIMENSION, false, stop);
+                            JSONObject report = observation.json();
+                            runOnUiThread(() -> {
+                                if (isDestroyed() || ticket != generation || stop.getAsBoolean()) {
+                                    observation.bitmap.recycle();
+                                    return;
+                                }
+                                showStill(observation.bitmap,
+                                        (decoderNotice.isEmpty() ? "" : decoderNotice + "\n")
+                                                + observation.description(), mediaFailure, report);
+                            });
                         } else if (chosen.equals("UTF-8 text")) {
                             Utf8Pages.Page page =
                                     lastText
@@ -681,12 +713,51 @@ public final class ContentPreviewActivity extends Activity {
                         else
                             runOnUiThread(
                                     () -> {
-                                        if (!isDestroyed() && ticket == generation) media(ticket);
+                                        if (!isDestroyed() && ticket == generation)
+                                            media(ticket, "VIDEO".equals(getIntent().getStringExtra("preferred"))
+                                                    || !"AUDIO".equals(getIntent().getStringExtra("preferred"))
+                                                            && (type.startsWith("AVI ") || type.startsWith("MP4 ")));
                                     });
                     } catch (Exception error) {
                         failed(ticket, error);
                     }
                 });
+    }
+
+    private void showStill(Bitmap bitmap, String description, JSONObject platform, JSONObject mpv) {
+        releaseStill();
+        content.removeAllViews();
+        controls.removeAllViews();
+        platformPreview = platform;
+        mpvPreview = mpv;
+        stillBitmap = bitmap;
+        stillView = new ImageView(this);
+        stillView.setTag("content-image");
+        stillView.setContentDescription(name + (mpv == null ? "" : " · MPV still image"));
+        stillView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        stillView.setImageBitmap(bitmap);
+        stillView.setTooltipText("Hold for decoder information; this is a still image");
+        stillView.setOnLongClickListener(view -> { previewInformation(); return true; });
+        content.addView(stillView, new LinearLayout.LayoutParams(-1, -1));
+        status.setText(description);
+    }
+
+    private void previewInformation() {
+        try {
+            JSONObject information = new JSONObject()
+                    .put("sourceSha256", input.sha256).put("sourceSizeBytes", input.size)
+                    .put("meaning", "Still image observation; playback, an exact timestamp and"
+                            + " complete-file/frame integrity are not established.");
+            if (platformPreview != null) information.put("platform", platformPreview);
+            else if (mediaFailure != null) information.put("platform", mediaFailure);
+            if (mpvPreview != null) information.put("mpvStill", mpvPreview);
+            TextView value = text(information.toString(2), 12);
+            value.setTextIsSelectable(true);
+            ScrollView scroll = WorkbenchUi.scroll(this);
+            scroll.addView(value);
+            new AlertDialog.Builder(this).setTitle("Preview decoder information").setView(scroll)
+                    .setPositiveButton("Close", null).show();
+        } catch (Exception error) { status.setText("Preview information unavailable: " + error); }
     }
 
     private void showTextBody(String value, boolean mono) {
@@ -928,7 +999,7 @@ public final class ContentPreviewActivity extends Activity {
                                 : "\nFit page · choose Actual pixels for small text"));
     }
 
-    private void media(int ticket) {
+    private void media(int ticket, boolean videoCandidate) {
         try {
             surface = new SurfaceView(this);
             surface.setTag("content-media");
@@ -937,21 +1008,14 @@ public final class ContentPreviewActivity extends Activity {
             MediaPlayer captured = player;
             player.setOnErrorListener(
                     (value, what, extra) -> {
-                        if (ticket == generation && value == player) {
-                            status.setText(
-                                    "Platform media decoder failed · what="
-                                            + what
-                                            + " extra="
-                                            + extra
-                                            + ". MPV probing and original bytes remain available.");
-                            releasePlayer();
-                        }
+                        runOnUiThread(() -> mediaFailed(ticket, value, what, extra, videoCandidate));
                         return true;
                     });
             player.setOnPreparedListener(
                     value -> {
                         if (isDestroyed() || ticket != generation || value != player) return;
                         prepared = true;
+                        platformVideo = value.getVideoWidth() > 0 && value.getVideoHeight() > 0;
                         if (seekPosition > 0) value.seekTo(seekPosition);
                         paused = true;
                         status.setText(
@@ -1052,6 +1116,29 @@ public final class ContentPreviewActivity extends Activity {
         }
     }
 
+    private void mediaFailed(int ticket, MediaPlayer value, int what, int extra,
+            boolean videoCandidate) {
+        if (isDestroyed() || cancellation.get() || ticket != generation || value != player) return;
+        boolean video = videoCandidate || platformVideo;
+        releasePlayer();
+        decoderNotice = "Platform media decoder failed · what=" + what + " extra=" + extra;
+        status.setText(decoderNotice);
+        // OnError's what is the error category; extra supplies the format/codec detail.
+        // IO, timeout, server death and undocumented codes do not establish a decoder refusal.
+        boolean decoderRefusal = what == MediaPlayer.MEDIA_ERROR_UNKNOWN
+                && (extra == MediaPlayer.MEDIA_ERROR_UNSUPPORTED
+                        || extra == MediaPlayer.MEDIA_ERROR_MALFORMED);
+        if (!video || !decoderRefusal) return;
+        try {
+            mediaFailure = new JSONObject().put("decoder", "Android MediaPlayer")
+                    .put("phase", "OnError").put("what", what).put("extra", extra);
+        } catch (Exception ignored) { mediaFailure = null; }
+        mode = "MPV still image";
+        // render enqueues all FD/native work. Platform callbacks do not hash, stage bytes or
+        // invoke MPV on the UI thread, and a later view change invalidates the queued request.
+        render();
+    }
+
     private void gallerize() {
         if (input == null || gallerizeBusy) return;
         final InputSnapshot captured = input;
@@ -1121,9 +1208,11 @@ public final class ContentPreviewActivity extends Activity {
                             "Classified strings",
                             "Archive hierarchy",
                             "Gallerize this range",
-                            "All native tools"
+                            "All native tools",
+                            "Preview decoder information"
                         },
                         (dialog, which) -> {
+                            if (which == 6) { previewInformation(); return; }
                             if (which == 4) {
                                 gallerize();
                                 return;
@@ -1201,7 +1290,8 @@ public final class ContentPreviewActivity extends Activity {
                                             + ") remains displayed");
                         } else
                             status.setText(
-                                    "Preview unavailable: "
+                                    (decoderNotice.isEmpty() ? "" : decoderNotice + "\n")
+                                            + "Preview unavailable: "
                                             + error
                                             + ". Use View as… or Inspect / metadata to continue.");
                     }
@@ -1222,6 +1312,8 @@ public final class ContentPreviewActivity extends Activity {
     protected void onSaveInstanceState(Bundle saved) {
         super.onSaveInstanceState(saved);
         saved.putString("mode", mode);
+        saved.putString("decoderNotice", decoderNotice);
+        if (mediaFailure != null) saved.putString("mediaFailure", mediaFailure.toString());
         saved.putInt("pdfPage", pdfPage);
         capturePdfScroll();
         saved.putBoolean("pdfActualPixels", pdfActualPixels);
@@ -1248,6 +1340,7 @@ public final class ContentPreviewActivity extends Activity {
         exportGeneration++;
         if (contentExport != null && (!exportPickerOpen || isFinishing())) contentExport.discard();
         releasePlayer();
+        releaseStill();
         boolean retain = isChangingConfigurations();
         worker.execute(
                 () -> {

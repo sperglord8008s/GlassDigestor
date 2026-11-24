@@ -132,7 +132,7 @@ final class AndroidResourceDocument {
             case "resource-map": return "Maps XML name-string indices to attribute resource identifiers. These IDs describe the attribute definition, separately from the attribute's typed value and file byte position.";
             case "type-spec-flags": return "Per-entry configuration/public/staged flags describe resource table metadata. They are not runtime component export or security policy decisions.";
             case "libraries": return "Build-time shared-library package IDs/names require runtime remapping for dynamic resource references; no library is loaded by this investigation.";
-            default: return "Complete bounded chunk/pool evidence with exact source coordinates. Opaque layouts are labeled; original source bytes remain authoritative for unused/padding and unknown data.";
+            default: return "Complete bounded chunk/pool information with exact source coordinates. Opaque layouts are labeled; original source bytes remain authoritative for unused/padding and unknown data.";
         }
     }
 }

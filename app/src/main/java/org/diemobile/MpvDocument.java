@@ -2,7 +2,6 @@
 package org.diemobile;
 
 import java.io.*;
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.BooleanSupplier;
 import org.json.*;
@@ -15,7 +14,7 @@ final class MpvDocument implements AutoCloseable {
     final String name;
     final JSONObject header, catalog;
     final JSONArray properties, diagnostics, options;
-    private int visited;
+    private final MpvNodeValidator nodeValidator = new MpvNodeValidator();
 
     private MpvDocument(InputSnapshot snapshot, String name, JSONObject response, BooleanSupplier stop) throws Exception {
         this.snapshot = snapshot;
@@ -53,7 +52,7 @@ final class MpvDocument implements AutoCloseable {
             } else if (!property.getString("status").equals("unavailable") || property.getInt("errorCode") >= 0 || !property.has("error") || property.has("node"))
                 throw new IOException("MPV property has an ambiguous capture status");
         }
-        if (visited != response.getInt("nodeCount")) throw new IOException("MPV node capture is incomplete or inconsistent");
+        if (nodeValidator.count() != response.getInt("nodeCount")) throw new IOException("MPV node capture is incomplete or inconsistent");
         response.remove("properties"); response.remove("diagnostics"); response.remove("options"); response.remove("propertyCatalog");
         header = response;
     }
@@ -70,51 +69,7 @@ final class MpvDocument implements AutoCloseable {
         } finally { if (!success) snapshot.close(); }
     }
     private void validateNode(JSONObject node, int depth, BooleanSupplier stop) throws Exception {
-        EvidenceRows.check(stop);
-        if (depth > 64 || ++visited > 100000) throw new IOException("MPV node tree exceeds its depth/count budget");
-        String type = node.getString("type");
-        int format = node.getInt("format");
-        switch (type) {
-            case "none":
-                if (format != 0 || !node.isNull("value")) throw new IOException("Invalid empty MPV value");
-                break;
-            case "string":
-                if (format != 1 || !(node.get("value") instanceof String)) throw new IOException("Invalid MPV string");
-                validateHex(node.getString("utf8Hex"),node.getInt("byteLength"),stop);
-                break;
-            case "flag":
-                if (format != 3 || !(node.get("value") instanceof Boolean)) throw new IOException("Invalid MPV flag");
-                break;
-            case "int64":
-                if (format != 4 || !(node.get("value") instanceof Number)
-                    || new BigDecimal(node.get("value").toString()).longValueExact() != Long.parseLong(node.getString("decimal"))) throw new IOException("Invalid exact MPV int64");
-                break;
-            case "double":
-                if (format != 5 || !node.isNull("value") && !(node.get("value") instanceof Number)) throw new IOException("Invalid MPV floating value");
-                validateHex(node.getString("ieee754Bits"),8,stop);
-                break;
-            case "bytes":
-                if (format != 9) throw new IOException("Invalid MPV byte-array format");
-                validateHex(node.getString("dataHex"),node.getInt("byteLength"),stop);
-                break;
-            case "array":
-            case "map":
-                if (format != (type.equals("map") ? 8 : 7)) throw new IOException("Invalid MPV container format");
-                JSONArray children = node.getJSONArray("children");
-                if (children.length() > 100000) throw new IOException("MPV child count exceeds its budget");
-                for (int i = 0; i < children.length(); i++) {
-                    JSONObject child = children.getJSONObject(i);
-                    if (type.equals("map")) {
-                        if (!(child.get("key") instanceof String)) throw new IOException("MPV map contains a non-string key");
-                        String encoded = child.getString("keyUtf8Hex");
-                        validateHex(encoded,encoded.length()/2,stop);
-                        child = child.getJSONObject("node");
-                    }
-                    validateNode(child,depth+1,stop);
-                }
-                break;
-            default: throw new IOException("Unknown MPV value type: "+type);
-        }
+        nodeValidator.validate(node, depth, stop);
     }
     static void validateHex(String encoded, int bytes, BooleanSupplier stop) throws Exception {
         if (bytes < 0 || bytes > 8*1024*1024 || encoded.length() != 2L*bytes) throw new IOException("MPV binary/string length mismatch");
@@ -138,7 +93,7 @@ final class MpvDocument implements AutoCloseable {
     }
     JSONObject provenance() throws Exception {
         return new JSONObject(header.toString()).put("input",new JSONObject().put("name",name).put("sizeBytes",snapshot.size).put("sha256",snapshot.sha256))
-            .put("scope","Actual libmpv file/stream metadata, engine capabilities and unavailable property evidence from an audited getter set. Full property names are cataloged without invoking unrelated device/system/clipboard getters.")
+            .put("scope","Actual libmpv file/stream metadata, engine capabilities and unavailable property information from an audited getter set. Full property names are cataloged without invoking unrelated device/system/clipboard getters.")
             .put("interpretation","Container/codec facts are library observations, not proof of authenticity, file safety, complete decoding or playback support on this device. Some properties are runtime state rather than stored metadata; initialization can decode initial media packets into null outputs.")
             .put("locationPolicy","MPV nodes supply decoded values, not physical file offsets. No tag, stream, chapter or attachment offset is inferred.")
             .put("stringPolicy","Values/keys retain exact engine-supplied UTF-8 hex. Invalid UTF-8 is displayed with replacements; libmpv C strings cannot expose bytes beyond an embedded NUL. These bytes are decoded engine values, not original stored file ranges.");

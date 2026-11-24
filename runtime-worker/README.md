@@ -31,6 +31,26 @@ rendering. [Download-verified summary](../docs/verification/android-worker-runti
 Pre-alpha.17 source `7c80322` passes all ten contracts in run `45387599711`.
 [Download-verified clipboard/URI and native evidence](../docs/verification/android-worker-runtime-7c80322.json).
 
+## Current baseline and next contract
+
+Published pre-alpha.20, source `691a4b1`, passes **13 actual contracts on both
+x86 API 26 and 35**, including large-archive acquisition, captured preferences
+and private diagnostics, and exact 9 MiB MPEG recovery. Independently downloaded
+source/APK/library/report/transfer identities are retained in the
+[current receipt](../docs/verification/android-worker-runtime-691a4b1.json).
+The per-slice pending statements below describe their original development
+points; this baseline supersedes them.
+
+Pre-alpha.21 adds `isolated-report-source-alias-refusal-and-recovery` as a
+fourteenth contract. Valid, unsupported-engine and empty-source requests pass
+independent read-only input/writable report descriptors for the same inode.
+Each must preserve every source byte, size, identity and open-description
+offset, produce no envelope, and allow a subsequent native hash on the same
+live connection/isolated UID. Report reads use a 30-second monotonic deadline
+and a 1 MiB cap. Host protocol tests and instrumentation compilation pass;
+fresh API 26/35 execution remains required. MPV native execution is a separate
+pending target; this x86 laboratory does not package the ARM64 media runtime.
+
 ## Reproduce
 
 Use JDK 17, Gradle 8.11.1, SDK/build-tools 35, NDK 28.2.13676358 and CMake

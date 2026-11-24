@@ -24,6 +24,7 @@ CHECKS = {
     "aliased-cache-bzip2-session-and-exact-large-file",
     "captured-analysis-limits-and-private-diagnostics",
     "isolated-photorec-large-mpeg-pack-retention",
+    "isolated-report-source-alias-refusal-and-recovery",
 }
 MAX_REPORT_BYTES = 64 * 1024 * 1024
 REPORT_READ_ATTEMPTS = 3
@@ -210,7 +211,8 @@ def main():
     finally:
         for name, command in [
             ("emulator-properties.txt", ["shell", "getprop"]),
-            ("android-process-log.txt", ["logcat", "-d", "-s", "AndroidRuntime", "ActivityManager", "libc"]),
+            ("android-process-log.txt", ["logcat", "-d", "-s", "AndroidRuntime", "ActivityManager",
+                                         "ActivityTaskManager", "WindowManager", "InputDispatcher", "libc"]),
         ]:
             try:
                 result = run(command)

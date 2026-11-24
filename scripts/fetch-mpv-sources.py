@@ -65,7 +65,8 @@ if args.bundle:
         with ZipFile(temporary_path, 'w', compression=ZIP_DEFLATED, compresslevel=1) as bundle:
             for item in lock['sources']:
                 bundle.write(cache / item['file'], 'sources/' + item['file'])
-            for name in ('source-lock.json', 'runtime-lock.json', 'README.md', 'probe.c'):
+            integration_files = ('source-lock.json', 'runtime-lock.json', 'README.md', 'probe.c', 'frame.c', 'mpv_support.h')
+            for name in integration_files:
                 bundle.write(root / 'media-engine' / name, 'integration/' + name)
             for source_path in sorted((root / 'media-engine/include').rglob('*')):
                 if source_path.is_file():
@@ -91,6 +92,9 @@ if args.bundle:
                     raise ValueError('Staged source bundle payload differs: ' + item['name'])
             if bundle.read('integration/licenses/llvm-license-lock.json') != (root / 'media-engine/licenses/llvm-license-lock.json').read_bytes():
                 raise ValueError('Staged source bundle lost its NDK runtime license identity')
+            for name in integration_files:
+                if bundle.read('integration/' + name) != (root / 'media-engine' / name).read_bytes():
+                    raise ValueError('Staged MPV adapter source differs: ' + name)
         target = output / 'mpv-android-2026-09-17-component-sources.zip'
         temporary_path.replace(target)
         target.with_suffix(target.suffix + '.sha256').write_text(digest(target) + '  ' + target.name + '\n')

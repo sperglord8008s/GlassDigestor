@@ -36,7 +36,9 @@ final class NativeArchiveGalleryAdapter extends BaseAdapter implements AutoClose
     private static final class Observation {
         Bitmap bitmap;
         String text = "", status;
+        String platformFailure = "", mpvFailure = "";
         boolean archive;
+        org.json.JSONObject platform, mpv;
 
         Observation(String status) {
             this.status = status;
@@ -189,13 +191,24 @@ final class NativeArchiveGalleryAdapter extends BaseAdapter implements AutoClose
                                             || lower.contains("compressed")
                                             || lower.contains("zip container");
                             if (lower.contains("image") || type.equals("PNG")) {
-                                result.bitmap = ContentPreview.image(input.file, range, 256);
-                                result.status += "\nPlatform decoded first frame";
+                                StillImagePreview.Result still = StillImagePreview.image(
+                                        context, input, range, 256, true, () -> closed);
+                                result.bitmap = still.bitmap;
+                                result.platformFailure = still.platformFailure;
+                                result.mpvFailure = still.mpvFailure;
+                                if (still.mpv != null) result.mpv = still.mpv.json();
+                                result.status += "\n" + still.description();
                             } else if (lower.contains("audio") || lower.contains("media")) {
-                                MediaFrame.Result media =
-                                        MediaFrame.read(input, range, 256, () -> closed);
-                                result.bitmap = media.bitmap;
-                                result.status += "\n" + media.description();
+                                StillImagePreview.Result still = StillImagePreview.media(
+                                        context, input, range, 256, true,
+                                        type.startsWith("AVI ") || type.startsWith("MP4 "),
+                                        () -> closed);
+                                result.bitmap = still.bitmap;
+                                result.platformFailure = still.platformFailure;
+                                result.mpvFailure = still.mpvFailure;
+                                if (still.platform != null) result.platform = still.platform.report();
+                                if (still.mpv != null) result.mpv = still.mpv.json();
+                                result.status += "\n" + still.description();
                             } else if (type.equals("PDF")) {
                                 PdfPagePreview.Result document =
                                         PdfPagePreview.read(input, 0, 256, () -> closed);
@@ -231,6 +244,23 @@ final class NativeArchiveGalleryAdapter extends BaseAdapter implements AutoClose
                                 notifyDataSetChanged();
                             });
                 });
+    }
+
+    /** Transient decoders remain distinct from the archive's original acquisition information. */
+    org.json.JSONObject previewInformation(NativeArchiveStore.Member member) throws Exception {
+        for (int index = 0; index < entries.size(); index++) {
+            if (entries.get(index).member != member) continue;
+            Observation result = observations.get(index);
+            if (result == null) return null;
+            org.json.JSONObject information = new org.json.JSONObject();
+            if (result.platform != null) information.put("platform", result.platform);
+            if (result.mpv != null) information.put("mpvStill", result.mpv);
+            if (!result.platformFailure.isEmpty())
+                information.put("platformDecoderFailure", result.platformFailure);
+            if (!result.mpvFailure.isEmpty()) information.put("mpvFailure", result.mpvFailure);
+            return new org.json.JSONObject(information.toString());
+        }
+        return null;
     }
 
     @Override

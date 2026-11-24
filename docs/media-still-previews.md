@@ -9,6 +9,8 @@ MPV only for a decoder refusal or metadata-only video, after checking exact
 source identity, cancellation and policy. Unknown, empty, changed, foreign or
 over-budget ranges are refused. Explicit mode is **MPV still image**, not
 playback; asynchronous video errors cannot replace a newer viewer generation.
+MediaPlayer fallback requires a documented unsupported/malformed decoder error;
+IO, timeout, server death and unknown errors retain their original failure.
 
 The parent independently stages selected bytes and supplies a fresh raster
 descriptor plus a validated maximum edge. The private `mpv-frame` worker uses
@@ -39,3 +41,31 @@ JNI compilation also pass. Review corrections, final assembly/static/CI, actual 
 handset/full UI/SAF/playback and arbitrary codecs remain separate gates. The
 x86 runtime laboratory has no MPV runtime; its existing contracts do not
 verify this path.
+
+
+The report channel is guarded before dispatch and again before any serialization,
+including error replies. Kernel device/inode identities must prove it distinct
+from every supplied input, payload and raster descriptor. Unsafe or unverifiable
+channels close without a write or mutation of an active request. Eight new host
+regressions cover aliases, rejection paths, empty inputs, descriptor closure,
+malformed requests and late inspection failures; an added decoder-error case
+covers eight ineligible error pairs. All 29 focused host cases pass after these
+review corrections. The complete integrated suite and new actual alias-refusal
+contract remain to be verified on fresh sources.
+
+
+The complete 274-case host suite passes at the earlier integrated source
+`3976f94`. All 31 focused cases pass after `512f032`, including deterministic
+release-before-EOF, blocked-write ownership, same-token busy rejection and
+immediate next admission. Data descriptors close first; a strongly retained
+report closer releases accepted ownership on main before signalling EOF.
+Rejected requests never own that release. Fortified host builds now check failed
+raster rollback, preserving the principal error if cleanup also fails. Real
+rollback/offset cases and MPV JNI/model tests pass after that correction.
+
+The actual runtime harness retains bounded raw replies and parsed failure fields
+before assertions. Current focus replaces stale latch success; failure-only
+window diagnostics preserve the real foreground prerequisite. Neither changes
+the success assertions or retries the inspected operation. Fresh complete CI
+and actual API 26/35 acceptance remain required; prior positive and failed
+captures are retained separately.

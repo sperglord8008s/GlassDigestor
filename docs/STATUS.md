@@ -38,14 +38,27 @@ Previous release assets remain immutable fallbacks.
 
 ## Active pass: MPV still-image fallback
 
-The next pass uses platform decoders first, then bounded isolated MPV stills for
-eligible refusals, with separate source-bound platform/MPV information. Host
-native video/SAR/pixel checks, 61 independent model/raster cases, 24 new host
-Android cases, ARM64 JNI compilation and source-bundle verification pass.
-The full 265-case host suite passes at `b839189`; review corrections and final
-build/CI remain in progress. Actual
-ARM64 MPV, isolated native execution, full UI/SAF/playback remain unverified;
-the x86 laboratory does not package MPV. [Contract](media-still-previews.md).
+Pre-alpha.21 / code 27 is under integration on `codex/mpv-image-fallback`.
+Platform decoders run first; bounded isolated MPV stills and an explicit mode
+extend image/video/archive previews while keeping observations separate.
+Actual host FFV1/TIFF/PPM pixels, display/sample-aspect bounds, 61 independent
+model/raster checks, ARM64 JNI and corresponding-source checks pass. All 274
+host Android cases passed at `3976f94`; all 31 focused cases pass after the
+worker completion fix at `512f032`. Fresh full CI remains required.
+
+Review corrections reject non-decoder media errors and unsafe report aliases.
+Fortified host compilation exposed an ignored rollback result; checked cleanup
+and real-file failure tests now pass at both fortification levels. Worker report
+EOF is now ordered after main-thread ownership release and data cleanup, with
+deterministic blocked-write/same-token/cancellation tests. Runtime failures retain
+bounded replies and current focus snapshots without retrying the operation.
+
+Both API 26/35 PR captures pass all 14 contracts at an exact-tree-equivalent
+source, but a separate API 26 push fails immediate recovery and a main API 35
+capture fails its real-focus prerequisite. Both failed artifacts are retained;
+release acceptance requires fresh gates after the corrections. Actual Android
+MPV, ARM64 handset/full UI/SAF/playback remain unverified. The x86 laboratory
+contains no native MPV. [Contract](media-still-previews.md).
 
 Main is integrated; the completed recovery branch is removed after ancestry
 verification. MPV work is isolated from the released capture. Earlier merged

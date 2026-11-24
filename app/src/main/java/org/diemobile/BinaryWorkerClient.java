@@ -15,7 +15,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 /** Pipe reports avoid Binder's transaction-size limit; cancellation targets one job token. */
-final class BinaryWorkerClient implements BinaryRunner, ArchiveRunner {
+final class BinaryWorkerClient implements BinaryRunner, ArchiveRunner, MpvFrameRunner {
     private final Context context;
     private final String engine;
     private final Handler main = new Handler(Looper.getMainLooper());
@@ -29,6 +29,7 @@ final class BinaryWorkerClient implements BinaryRunner, ArchiveRunner {
         if (!engine.equals("binwalk")
                 && !engine.equals("photorec")
                 && !engine.equals("mpv")
+                && !engine.equals("mpv-frame")
                 && !engine.equals("resources")
                 && !engine.equals("hashes")
                 && !engine.equals("archive"))
@@ -39,14 +40,16 @@ final class BinaryWorkerClient implements BinaryRunner, ArchiveRunner {
 
     @Override
     public String scan(File input, BooleanSupplier stop) throws Exception {
-        return request(input, null, 0, input.length(), -1, stop);
+        if (engine.equals("mpv-frame"))
+            throw new IOException("MPV frame requests require a separate raster output");
+        return request(input, null, 0, input.length(), -1, 0, stop);
     }
 
     @Override
     public String inspect(File input, long offset, long length, BooleanSupplier stop)
             throws Exception {
         requireArchive();
-        return request(input, null, offset, length, -1, stop);
+        return request(input, null, offset, length, -1, 0, stop);
     }
 
     @Override
@@ -59,7 +62,28 @@ final class BinaryWorkerClient implements BinaryRunner, ArchiveRunner {
                 || output.length() != 0
                 || input.getCanonicalFile().equals(output.getCanonicalFile()))
             throw new IOException("Archive output must be a separate empty private file");
-        return request(input, output, offset, length, member, stop);
+        return request(input, output, offset, length, member, 0, stop);
+    }
+
+    @Override
+    public String capture(File input, File output, int maximumDimensionPixels, BooleanSupplier stop)
+            throws Exception {
+        if (!engine.equals("mpv-frame"))
+            throw new IOException("MPV capture requires the mpv-frame worker engine");
+        MpvFrameRunner.requireMaximum(maximumDimensionPixels);
+        if (!input.isFile()
+                || input.length() <= 0
+                || input.length() > MpvFrameRunner.MAXIMUM_INPUT_BYTES
+                || !output.isFile()
+                || output.length() != 0
+                || input.getCanonicalFile().equals(output.getCanonicalFile())
+                || !output.getCanonicalFile()
+                        .equals(
+                                new File(
+                                        output.getAbsoluteFile().getParentFile().getCanonicalFile(),
+                                        output.getName())))
+            throw new IOException("MPV frame needs a bounded input and separate fresh raster file");
+        return request(input, output, 0, input.length(), -1, maximumDimensionPixels, stop);
     }
 
     private void requireArchive() throws IOException {
@@ -73,6 +97,7 @@ final class BinaryWorkerClient implements BinaryRunner, ArchiveRunner {
             long offset,
             long length,
             int member,
+            int maximumDimensionPixels,
             BooleanSupplier stop)
             throws Exception {
         if (Looper.myLooper() == Looper.getMainLooper())
@@ -186,7 +211,12 @@ final class BinaryWorkerClient implements BinaryRunner, ArchiveRunner {
             try (ParcelFileDescriptor source =
                             ParcelFileDescriptor.open(input, ParcelFileDescriptor.MODE_READ_ONLY);
                     ParcelFileDescriptor payload =
-                            destination == null
+                            destination == null || !engine.equals("archive")
+                                    ? null
+                                    : ParcelFileDescriptor.open(
+                                            destination, ParcelFileDescriptor.MODE_WRITE_ONLY);
+                    ParcelFileDescriptor raster =
+                            destination == null || !engine.equals("mpv-frame")
                                     ? null
                                     : ParcelFileDescriptor.open(
                                             destination, ParcelFileDescriptor.MODE_WRITE_ONLY)) {
@@ -198,6 +228,10 @@ final class BinaryWorkerClient implements BinaryRunner, ArchiveRunner {
                 arguments.putParcelable("input", source);
                 arguments.putParcelable("output", pipe[1]);
                 arguments.putParcelable("payload", payload);
+                if (engine.equals("mpv-frame")) {
+                    arguments.putParcelable("raster", raster);
+                    arguments.putInt("maximumDimensionPixels", maximumDimensionPixels);
+                }
                 arguments.putLong("offset", offset);
                 arguments.putLong("length", length);
                 arguments.putInt("member", member);
@@ -232,6 +266,8 @@ final class BinaryWorkerClient implements BinaryRunner, ArchiveRunner {
                 throw new IOException("Worker did not confirm UID isolation");
             if (!engine.equals(envelope.getString("engine")))
                 throw new IOException("Worker response belongs to a different engine");
+            if (engine.equals("mpv-frame"))
+                validateFrameEnvelope(envelope, token, maximumDimensionPixels);
             JSONObject report = envelope.getJSONObject("report");
             limits.validateEnvelope(envelope, report);
             envelope.remove("report");
@@ -288,6 +324,16 @@ final class BinaryWorkerClient implements BinaryRunner, ArchiveRunner {
         Exception stopped = terminalFailure.get();
         if (stopped != null) throw stopped;
         return encoded;
+    }
+
+    static void validateFrameEnvelope(JSONObject envelope, String token, int maximumDimensionPixels)
+            throws Exception {
+        Object maximum = envelope.get("maximumDimensionPixels");
+        if (!"mpv-frame".equals(envelope.getString("engine"))
+                || !token.equals(envelope.getString("requestToken"))
+                || (!(maximum instanceof Integer) && !(maximum instanceof Long))
+                || ((Number) maximum).longValue() != maximumDimensionPixels)
+            throw new IOException("MPV worker response differs from its captured frame request");
     }
 
     @Override

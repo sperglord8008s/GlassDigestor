@@ -13,7 +13,7 @@ def runtimePhotoRecJni = layout.buildDirectory.dir('generated-photorec-jni')
 def stageWorkerSources = tasks.register('stageWorkerSources', Sync) {
     from(rootProject.file('app/src/main/java')) {
         include 'org/diemobile/BinaryWorkerService.java', 'org/diemobile/BinaryWorkerClient.java',
-                'org/diemobile/BinaryRunner.java', 'org/diemobile/ArchiveRunner.java',
+                'org/diemobile/BinaryRunner.java', 'org/diemobile/ArchiveRunner.java', 'org/diemobile/MpvFrameRunner.java',
                 'org/diemobile/ArchiveEngine.java', 'org/diemobile/HashEngine.java',
                 'org/diemobile/BinwalkEngine.java', 'org/diemobile/PhotoRecEngine.java', 'org/diemobile/MpvEngine.java',
                 'org/diemobile/AndroidResourceProbe.java', 'org/diemobile/AndroidResourceDocument.java',

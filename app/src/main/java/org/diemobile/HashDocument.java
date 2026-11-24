@@ -100,7 +100,7 @@ final class HashDocument implements AutoCloseable {
     private static String security(int index) {
         if(index==0) return "Accidental-corruption detection; CRC is not cryptographic and can be deliberately preserved by modified content.";
         if(index<=3) return "Legacy identification/interoperability only. Practical collision weaknesses make this unsuitable as an adversarial authenticity or signature check; prefer SHA-256 or stronger corroboration.";
-        return "Content identity evidence when compared with a trusted expected value. A plain digest supplies no publisher authentication, trust or malware verdict.";
+        return "Content identity comparison against a trusted expected value. A plain digest supplies no publisher authentication, trust or malware verdict.";
     }
     @Override public void close() { snapshot.close(); }
 }

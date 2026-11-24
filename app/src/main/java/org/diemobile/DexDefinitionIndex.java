@@ -187,7 +187,7 @@ final class DexDefinitionIndex implements AutoCloseable {
             .put("reservedDexBytes",reservedBytes).put("sources",inputs)
             .put("limits",new JSONObject().put("parentBytes",MAX_PARENT_BYTES).put("sourceBytes",DexDocument.MAX_BYTES).put("aggregateReservedBytes",MAX_DEX_BYTES)
                 .put("sources",MAX_SOURCES).put("classDefinitions",MAX_CLASSES).put("classDescriptorUtf16Units",MAX_CLASS_UNITS).put("cooperativeDeadlineSeconds",30))
-            .put("interpretation","Exact declared-owner/signature evidence only. Duplicates remain separate; no class loading, inheritance/dispatch/reflection/framework resolution, ART acceptance, SDK invocation or runtime reachability is established. Failed/skipped sources make absence/uniqueness unknown.")
+            .put("interpretation","Exact declared-owner/signature information only. Duplicates remain separate; no class loading, inheritance/dispatch/reflection/framework resolution, ART acceptance, SDK invocation or runtime reachability is established. Failed/skipped sources make absence/uniqueness unknown.")
             .put("networkUsed",false).put("executionObserved",false);
     }
     private void writeManifest(Deadline budget) throws Exception {
