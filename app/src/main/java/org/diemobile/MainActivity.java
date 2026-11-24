@@ -212,7 +212,55 @@ public class MainActivity extends Activity {
  }
  private void openDesktopScan(){if(retainedFile==null||!Engine.AVAILABLE)return;Intent i=new Intent(this,DesktopScanActivity.class);i.putExtra("path",retainedFile.getAbsolutePath());i.putExtra("name",name);startActivity(i);}
  private void openGallerize(){if(busy||retainedFile==null||result==null)return;startActivity(new Intent(this,GallerizeActivity.class).putExtra("path",retainedFile.getAbsolutePath()).putExtra("name",name).putExtra("sha256",result.sha256).putExtra("sourceSize",result.size));}
- private void openArchive(){if(retainedFile==null)return;Intent i=new Intent(this,NativeArchiveExplorerActivity.class);i.putExtra("path",retainedFile.getAbsolutePath());i.putExtra("name",name);if(result!=null){i.putExtra("sha256",result.sha256);i.putExtra("sourceSize",result.size);}startActivityForResult(i,5);}
+    private Intent archiveRequest() {
+        if (retainedFile == null) return null;
+        Intent i = new Intent(this, NativeArchiveExplorerActivity.class);
+        i.putExtra("path", retainedFile.getAbsolutePath());
+        i.putExtra("name", name);
+        if (result != null) {
+            i.putExtra("sha256", result.sha256);
+            i.putExtra("sourceSize", result.size);
+        }
+        return i;
+    }
+    private void openArchive() {
+        Intent request = archiveRequest();
+        if (request != null) startActivityForResult(request, 5);
+    }
+    private String archiveIdentification() {
+        if (result == null) return null;
+        String lower = result.type.toLowerCase(Locale.ROOT);
+        if (lower.contains("zip")
+                || lower.contains("archive")
+                || lower.contains("compressed stream")) return result.type;
+        if (evidence != null && evidence.ok)
+            for (ScanEvidence.Row row : evidence.rows)
+                if ("Archive".equalsIgnoreCase(row.category))
+                    return row.name + " • CDiE indication";
+        return null;
+    }
+    private void archiveSummary() {
+        String identified = archiveIdentification();
+        Intent request = archiveRequest();
+        if (identified == null || request == null) return;
+        heading("Archive / compressed contents");
+        TextView format = txt(WorkbenchUi.visible(WorkbenchUi.preview(identified, 180)), 18);
+        format.setTextIsSelectable(true);
+        pane.addView(format);
+        Button browse =
+                btn(
+                        "Browse contents / decompress / save files",
+                        () -> startActivityForResult(request, 5));
+        browse.setTag("main-open-archive-contents");
+        pane.addView(browse);
+        pane.addView(
+                WorkbenchUi.prose(
+                        this,
+                        "Open the captured file with the content-based archive reader. A compressed"
+                            + " stream can contain one decoded file rather than a folder. Select a"
+                            + " file to preview or save it; original evidence remains available."
+                            + " Embedded findings need their own observed scope in Gallerize."));
+    }
  private void openNativeTools(){if(retainedFile==null)return;Intent i=new Intent(this,NativeToolsActivity.class);i.putExtra("path",retainedFile.getAbsolutePath());i.putExtra("name",name);if(result!=null){i.putExtra("sha256",result.sha256);i.putExtra("sourceSize",result.size);}startActivity(i);}
  private void openInvestigation(String provider){if(retainedFile==null)return;Intent i=new Intent(this,InvestigationActivity.class).putExtra("provider",provider).putExtra("path",retainedFile.getAbsolutePath()).putExtra("name",name);if(result!=null){i.putExtra("sha256",result.sha256);i.putExtra("sourceSize",result.size);}startActivity(i);}
  private void openNativeToolAt(int tool,long offset){if(retainedFile==null)return;Intent i=new Intent(this,NativeToolsActivity.class);i.putExtra("path",retainedFile.getAbsolutePath());i.putExtra("name",name);i.putExtra("tool",tool);i.putExtra("offset",offset);if(result!=null){i.putExtra("sha256",result.sha256);i.putExtra("sourceSize",result.size);}startActivity(i);}
@@ -238,7 +286,7 @@ public class MainActivity extends Activity {
   if(page==2)page=1;explanations.clearBindings();pane.removeAllViews();reportFormatButtons.clear();for(int i=0;i<tabs.getChildCount();i++){Button b=(Button)tabs.getChildAt(i);boolean selected=((Integer)b.getTag())==page;b.setEnabled(!selected);b.setTextColor(selected?0xff80cbc4:0xffe5eaf0);}
   if(result==null){pane.addView(txt(busy?"Scan running on worker thread.":"Open or share a file to inspect it. No root or internet access required.",16));return;}
   switch(page){
-   case 0:pane.addView(btn("Next scan interpretation: "+scanTarget.label()+" • choose…",this::chooseInterpretation));if(scannedTarget!=null)field("Requested interpretation",scannedTarget.request.label()+" • backend selector "+(scannedTarget.nativeTypeId==null?"unresolved":scannedTarget.nativeTypeId),"Captured selection for the displayed scan. Explicit choices are compatible native scan passes, not validation of every format structure. Draft selection changes apply only after Rescan.");field("Type",evidence!=null&&evidence.ok?evidence.type:result.type,"Desktop parser interpretation when available; the local header identification is retained in File info and exported reports. Recognition does not validate every structure.");showNativeFacts();field("Size",String.format(Locale.ROOT,"%,d bytes (0x%X)",result.size,result.size),"Exact input length in decimal and hexadecimal. Offsets refer to byte positions within that length.");field("Entropy",String.format(Locale.ROOT,"%.4f / 8",result.entropy),"Shannon entropy of the observed byte histogram, from 0 to 8 bits per byte. Compression, encryption and ordinary media can all produce high entropy; this is not a packing or malware verdict.");heading("Detection results • desktop CDiE");pane.addView(btn("Desktop scan laboratory / signature editor",()->openDesktopScan()));showDetections();heading("Content identity");field("SHA-256",result.sha256,"A 256-bit digest of the exact bytes analyzed. Compare against a trusted digest to identify matching content; it is not a publisher signature.");field("Flags",String.format(Locale.ROOT,"0x%04X",scannedFlags),"Actual desktop-backend flags captured when the scan began. Laboratory options and tag filters apply here too. The export preserves their names and values.");field("Time",elapsedMs+" ms","Elapsed wall-clock time including local copying, file inspection, knowledge lookup and signature scanning.");heading("Technical interpretation");pane.addView(btn("File structure and interpretation",()->{page=1;show();}));if(result.type.contains("ZIP")||result.type.contains("DEX"))pane.addView(btn("APK / DEX evidence and SDK details",()->{page=3;show();}));break;
+   case 0:archiveSummary();pane.addView(btn("Next scan interpretation: "+scanTarget.label()+" • choose…",this::chooseInterpretation));if(scannedTarget!=null)field("Requested interpretation",scannedTarget.request.label()+" • backend selector "+(scannedTarget.nativeTypeId==null?"unresolved":scannedTarget.nativeTypeId),"Captured selection for the displayed scan. Explicit choices are compatible native scan passes, not validation of every format structure. Draft selection changes apply only after Rescan.");field("Desktop parser view",evidence!=null&&evidence.ok?evidence.type:result.type,"The desktop parsing context can be Binary even when signatures identify an archive or compressed stream. Byte-based header identification and archive actions are shown separately. Recognition does not validate every structure.");showNativeFacts();field("Size",String.format(Locale.ROOT,"%,d bytes (0x%X)",result.size,result.size),"Exact input length in decimal and hexadecimal. Offsets refer to byte positions within that length.");field("Entropy",String.format(Locale.ROOT,"%.4f / 8",result.entropy),"Shannon entropy of the observed byte histogram, from 0 to 8 bits per byte. Compression, encryption and ordinary media can all produce high entropy; this is not a packing or malware verdict.");heading("Detection results • desktop CDiE");pane.addView(btn("Desktop scan laboratory / signature editor",()->openDesktopScan()));showDetections();heading("Content identity");field("SHA-256",result.sha256,"A 256-bit digest of the exact bytes analyzed. Compare against a trusted digest to identify matching content; it is not a publisher signature.");field("Flags",String.format(Locale.ROOT,"0x%04X",scannedFlags),"Actual desktop-backend flags captured when the scan began. Laboratory options and tag filters apply here too. The export preserves their names and values.");field("Time",elapsedMs+" ms","Elapsed wall-clock time including local copying, file inspection, knowledge lookup and signature scanning.");heading("Technical interpretation");pane.addView(btn("File structure and interpretation",()->{page=1;show();}));if(result.type.contains("ZIP")||result.type.contains("DEX"))pane.addView(btn("APK / DEX evidence and SDK details",()->{page=3;show();}));break;
    case 1:showFileInfo();break;
    case 3: {
     heading("APK / SDKs • static evidence");
@@ -271,7 +319,40 @@ public class MainActivity extends Activity {
   if(explanation!=null){toggle=btn("Explain",()->{});row.addView(toggle,new LinearLayout.LayoutParams(dp(78),-2));why=txt(explanation,13);why.setTextIsSelectable(true);why.setPadding(dp(8),dp(4),dp(8),dp(8));why.setTag("explanation:main."+page+"."+key);}
   pane.addView(row);if(why!=null){pane.addView(why);explanations.bind("main."+page+"."+key,"Explain "+key,toggle,why,true,false);}rule(pane);
  }
- private void explain(String title,String value,String explanation){LinearLayout body=vertical();body.setPadding(dp(18),dp(12),dp(18),dp(12));body.addView(mono(value));body.addView(explanations.controls(this));explanations.paragraph(this,body,"dialog."+title,"Definition / interpretation",explanation,true,false);ScrollView sc=new ScrollView(this);sc.addView(body);new AlertDialog.Builder(this).setTitle(title).setView(sc).setPositiveButton("Close",null).show();}
+    private void explain(String title, String value, String explanation) {
+        LinearLayout body = vertical();
+        body.setPadding(dp(18), dp(12), dp(18), dp(12));
+        body.addView(mono(value));
+        body.addView(explanations.controls(this));
+        explanations.paragraph(
+                this,
+                body,
+                "dialog." + title,
+                "Definition / interpretation",
+                explanation,
+                true,
+                false);
+        ScrollView sc = new ScrollView(this);
+        sc.addView(body);
+        AlertDialog.Builder dialog =
+                new AlertDialog.Builder(this)
+                        .setTitle(title)
+                        .setView(sc)
+                        .setPositiveButton("Close", null);
+        if ("Archive".equalsIgnoreCase(title)) {
+            Intent request = archiveRequest();
+            if (request != null) {
+                body.addView(
+                        WorkbenchUi.prose(
+                                this,
+                                "Browse the complete captured input. This detection does not supply"
+                                    + " a verified physical extent for an embedded archive."));
+                dialog.setNeutralButton(
+                        "Browse / extract", (d, which) -> startActivityForResult(request, 5));
+            }
+        }
+        dialog.show();
+    }
  private void showFileInfo(){
   heading("File type");TextView type=txt(result.type,21);type.setTypeface(null,Typeface.BOLD);type.setPadding(dp(6),dp(8),dp(6),dp(8));pane.addView(type);
   String lower=result.type.toLowerCase(Locale.ROOT);
@@ -342,7 +423,7 @@ public class MainActivity extends Activity {
    Button record=btn(label,()->explain(row.category.isEmpty()?"Detection evidence":row.category,
     row.text+"\nCategory: "+row.category+"\nName: "+row.name+"\nRule source: "+(row.signature.isEmpty()?"No script source attached to this group":row.signature)+"\nTree row: "+row.index+"; parent: "+row.parent,
     DetectionReference.describe(row.category)+"\n\nThe path is the exact upstream rule provenance, not a byte-match location. Use the laboratory to read or test the source. Group offsets may describe decompressed archive members rather than bytes in this input; do not treat them as physical offsets without checking their address basis."));
-   record.setGravity(Gravity.START|Gravity.CENTER_VERTICAL);record.setPadding(dp(8),dp(8),dp(8),dp(8));target.addView(record,new LinearLayout.LayoutParams(-1,-2));
+   record.setTag("detection-evidence-"+row.index);record.setGravity(Gravity.START|Gravity.CENTER_VERTICAL);record.setPadding(dp(8),dp(8),dp(8),dp(8));target.addView(record,new LinearLayout.LayoutParams(-1,-2));
   }
   LinearLayout navigation=new LinearLayout(this);
   Button previous=btn("Previous 50",()->renderEvidence(target,query,page-1));previous.setEnabled(page>0);navigation.addView(previous);

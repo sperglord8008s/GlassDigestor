@@ -41,6 +41,19 @@ public final class NativeArchiveWorkbenchTest {
 
     @Implements(value = BinaryWorkerClient.class, isInAndroidSdk = false)
     public static final class HostTransport {
+        @org.robolectric.annotation.RealObject private BinaryWorkerClient client;
+
+        @Implementation
+        public String scan(File input, BooleanSupplier stop) throws Exception {
+            EvidenceRows.check(stop);
+            String engine = ReflectionHelpers.getField(client, "engine");
+            try (FileInputStream source = new FileInputStream(input)) {
+                if ("binwalk".equals(engine)) return BinwalkEngine.scanFd(fd(source.getFD()));
+                if ("photorec".equals(engine)) return PhotoRecEngine.scanFd(fd(source.getFD()));
+                throw new IOException("Unexpected host discovery engine " + engine);
+            }
+        }
+
         private int fd(FileDescriptor value) throws Exception {
             Field field = FileDescriptor.class.getDeclaredField("fd");
             field.setAccessible(true);
@@ -213,6 +226,96 @@ public final class NativeArchiveWorkbenchTest {
     }
 
     @Test
+    public void singleDecodedFileOpensGallerizeWithIndependentBytesAfterPreviewCloses()
+            throws Exception {
+        ByteArrayOutputStream blob = new ByteArrayOutputStream();
+        blob.write("prefix bytes ".getBytes(StandardCharsets.UTF_8));
+        blob.write(MetadataFixtureFactory.png());
+        blob.write(new byte[19]);
+        byte[] decoded = blob.toByteArray();
+        open(zip("disk.dd", decoded), null);
+        Button quickOpen =
+                activity.getWindow().getDecorView().findViewWithTag("archive-open-single");
+        assertNotNull(quickOpen);
+        assertTrue(quickOpen.isShown());
+        assertTrue(quickOpen.isEnabled());
+        quickOpen.performClick();
+        settle(activity);
+        Intent previewIntent = Shadows.shadowOf(activity).getNextStartedActivity();
+        assertNotNull(status(activity), previewIntent);
+        previewController =
+                Robolectric.buildActivity(ContentPreviewActivity.class, previewIntent)
+                        .setup()
+                        .visible();
+        preview = previewController.get();
+        settle(preview);
+        InputSnapshot previewBytes = ReflectionHelpers.getField(preview, "input");
+        Button discover = preview.getWindow().getDecorView().findViewWithTag("content-gallerize");
+        assertNotNull(discover);
+        assertTrue(discover.isEnabled());
+        discover.performClick();
+        settle(preview);
+        Intent handoff = Shadows.shadowOf(preview).getNextStartedActivity();
+        assertNotNull(status(preview), handoff);
+        assertEquals(GallerizeActivity.class.getName(), handoff.getComponent().getClassName());
+        assertTrue(handoff.getBooleanExtra("ownedInputHandoff", false));
+        File independent = new File(handoff.getStringExtra("path"));
+        assertNotEquals(previewBytes.file, independent);
+        assertArrayEquals(decoded, Files.readAllBytes(independent.toPath()));
+        preview.finish();
+        close(previewController);
+        previewController = null;
+        assertFalse(previewBytes.file.exists());
+        ActivityController<GallerizeActivity> child =
+                Robolectric.buildActivity(GallerizeActivity.class, handoff).setup().visible();
+        try {
+            settle(child.get());
+            GallerizeSession loaded = ReflectionHelpers.getField(child.get(), "session");
+            assertNotNull(status(child.get()), loaded);
+            assertArrayEquals(decoded, Files.readAllBytes(loaded.input.file.toPath()));
+            ContentMap map = loaded.digest(() -> false);
+            assertTrue(
+                    "Embedded PNG was not recovered from decoded archive bytes",
+                    map.boundedCount > 0);
+            assertFalse("Consumed handoff was not cleaned", independent.exists());
+        } finally {
+            child.get().finish();
+            close(child);
+        }
+    }
+
+    @Test
+    public void compressedStreamOffersDirectOpenAndSaveBeforeEvidence() throws Exception {
+        open("raw.bz2");
+        assertTrue(status(activity), session().current().inventory.complete);
+        assertEquals(1, session().current().inventory.members.size());
+        row("data");
+        AlertDialog dialog = ShadowAlertDialog.getLatestAlertDialog();
+        Button open = button(dialog.getWindow().getDecorView(), "Open decoded file / preview");
+        Button save = button(dialog.getWindow().getDecorView(), "Save decoded file…");
+        Button raw =
+                button(
+                        dialog.getWindow().getDecorView(),
+                        "Full entry metadata / raw returned fields");
+        assertNotNull(open);
+        assertNotNull(save);
+        assertNotNull(raw);
+        ViewGroup contents = (ViewGroup) open.getParent();
+        assertTrue(contents.indexOfChild(open) < contents.indexOfChild(raw));
+        assertTrue(contents.indexOfChild(save) < contents.indexOfChild(raw));
+        action("Save decoded file…");
+        Intent picker = Shadows.shadowOf(activity).getNextStartedActivity();
+        assertNotNull(status(activity), picker);
+        assertEquals(Intent.ACTION_CREATE_DOCUMENT, picker.getAction());
+        PreparedExport staged = ReflectionHelpers.getField(activity, "pendingExport");
+        assertNotNull(staged);
+        assertArrayEquals(
+                "Exact archive member 世界 🔬 with embedded NUL\0 and end.\n"
+                        .getBytes(java.nio.charset.StandardCharsets.UTF_8),
+                Files.readAllBytes(staged.file.toPath()));
+    }
+
+    @Test
     public void duplicateIndexOpensExactIndependentPreviewAndByteExportAfterParentExpiry()
             throws Exception {
         File original = open("mislabeled.apk");
@@ -221,7 +324,7 @@ public final class NativeArchiveWorkbenchTest {
         assertFalse(session().current().inventory.members.get(0).treeName());
         click("All entries");
         row("#2 duplicate");
-        action("Open preview / media / export bytes");
+        action("Open decoded file / preview");
         Intent intent = Shadows.shadowOf(activity).getNextStartedActivity();
         assertNotNull(status(activity), intent);
         assertEquals(ContentPreviewActivity.class.getName(), intent.getComponent().getClassName());
@@ -318,7 +421,7 @@ public final class NativeArchiveWorkbenchTest {
         String childSha = session().current().input.sha256;
         click("All entries");
         row("#0 ");
-        action("Open preview / media / export bytes");
+        action("Open decoded file / preview");
         Intent target = Shadows.shadowOf(activity).getNextStartedActivity();
         assertNotNull(status(activity), target);
         String descriptor = target.getStringExtra("contentOrigin");
@@ -385,7 +488,7 @@ public final class NativeArchiveWorkbenchTest {
         File original = open("bad-crc.zip");
         click("All entries");
         row("#0 ");
-        action("Open preview / media / export bytes");
+        action("Open decoded file / preview");
         assertTrue(status(activity), status(activity).contains("failed"));
         assertNull(Shadows.shadowOf(activity).getNextStartedActivity());
         JSONObject evidence = session().evidence();
@@ -458,7 +561,7 @@ public final class NativeArchiveWorkbenchTest {
         }
         click("All entries");
         row("#0 ");
-        action("Open preview / media / export bytes");
+        action("Open decoded file / preview");
         assertTrue(status(activity), status(activity).contains("SHA-256 changed"));
         assertEquals(calls, nativeCalls.get());
         assertNull(Shadows.shadowOf(activity).getNextStartedActivity());

@@ -1591,3 +1591,49 @@ original CI APKs/sidecars, public metadata, runtime ZIPs and all existing pinned
 build inputs remain. About 183 MiB is free. The following commit changes only
 public documentation/images/receipts; it records source 7c80322's acceptance,
 not a new application feature. Inspect main's newest workflows before continuing.
+
+
+## Current archive failure and NIST acceptance work (pre-alpha.18 / code 24)
+
+Source commit `308d89f` fixes the exact reported non-regular-cache exception:
+canonicalize trusted session/origin/staging roots while preserving strict leaf
+symlink and escape refusal. Host alias/sentinel/retention regressions pass.
+The current uncommitted slice adds prominent source-bound archive actions,
+direct single decoded-file Open/Save and an independently owned preview →
+Gallerize handoff. A gallery viewport regression from the new shortcut row was
+caught and fixed by hiding the redundant row in Gallery mode. Full host and
+clean CI results must be recorded below before publication.
+
+The exact public NIST L0_Video input matches the screenshot's 19,741,341-byte
+SHA-256 identity. Python bz2 and actual aliased-cache/libarchive JNI agree on
+all 62,578,688 decoded bytes. Real Binwalk and PhotoRec discovery reports are
+retained losslessly outside the repo; header/row counts are not file-recovery
+acceptance. The optional `scripts/test-nist-archive.sh` reproduces exact decoding
+from an externally supplied pinned image. The test-only 30-image catalog
+retains all 534 layout rows and seven reference size/span inconsistencies.
+Only L0_Video is acquired/hash-pinned. The next carving priority is a strict
+six-file export evaluator and the currently unresolved MPEG program-stream
+extent, then the remaining contiguous/fragmented/missing-data corpus. Never
+feed layout offsets or expected hashes into production discovery.
+
+The actual Android lab's eleventh alias/BZip2/20 MiB decoded-file/origin contract
+compiles locally; actual API 26/35 execution is pending. Pre-alpha.17 remains
+the published fallback with all five source jobs and ten actual Android
+contracts verified. The MPV raw-frame foundation is safely paused on local
+branch `codex/mpv-decoded-frame-previews`, commit `0ef94d3`, with host native
+pixel/ownership checks passing but worker/UI/Android integration incomplete.
+Resume/rebase it after the urgent archive checkpoint, assigning the next
+unused numbered version. Preserve application ID, signing and all fallback APKs.
+
+
+Pre-alpha.18 local validation now passes: **213 host Android tests, zero
+failures/errors/skips**, required `scripts/test.sh` and `scripts/test-native.sh`,
+and the newly committed optional exact-NIST-image archive regression. The
+original four infrastructure failures were insufficient temporary disk space;
+a separate genuine gallery viewport regression was fixed without relaxing its
+assertion. Audited regenerable objects/download wrappers and one restorable
+historical source bundle were reclaimed; all immutable APKs and current offline
+inputs remain byte-identical. Full [host NIST decoding receipt](verification/nist-L0-video-archive-host.json).
+Both rebuilt CDiE/hash host libraries match the libraries used by the passing
+UI suite byte-for-byte. Clean source CI and actual eleventh Android contract
+execution remain required before publication.

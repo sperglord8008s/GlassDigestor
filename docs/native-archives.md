@@ -48,6 +48,33 @@ interval](archive-launches.md), including findings with unknown extents. The
 original finding/provenance remains in the resulting archive packet, and caller
 SHA-256/size expectations are verified before parsing.
 
+## Direct archive actions and Android cache aliases
+
+The main scan puts byte-based archive/compression identification and **Browse
+contents / decompress / save files** before the desktop parser facts. A generic
+`Binary` parsing context does not hide an Archive-category signature. Archive
+detection details also offer **Browse / extract**, bound to the captured input;
+a signature alone does not supply a verified embedded physical extent.
+
+A completely inventoried single regular member exposes **Open decoded file**
+and **Save decoded file…** directly in list mode. Member details put these
+actions before raw evidence. Gallery cards retain their direct file actions;
+the extra single-file row is hidden there to preserve preview space.
+Decoded previews can hand an independently owned byte-for-byte copy to
+**Gallerize**, including a compressed disk image containing several media files.
+Closing the preview does not invalidate that handoff. These actions add no
+network access or inspected-code execution.
+
+The reported `Unexpected non-regular archive cache entry` failure was
+reproduced when a trusted cache ancestor had an operating-system path alias.
+Session, origin and staging roots now anchor the canonical trusted directory
+before generating direct child leaves. A symlink in a generated leaf is still
+refused, including before native reanalysis; outside sentinel bytes remain
+unchanged. The exact public NIST `L0_Video.dd.bz2` identity now decodes through
+actual host JNI to the independently pinned 62,578,688-byte result. This does
+not establish full NIST media recovery or handset UI acceptance; see the
+[acceptance corpus](../tests/fixtures/nist/README.md).
+
 ## Formats, filters and evidence
 
 The adapter registers reviewed readers for 7z, ar, CAB, cpio, empty input,

@@ -29,3 +29,10 @@ center pixel; an asset's presence or a host codec shadow does not prove Android
 platform decoding. Every test embeds the clip behind a prefix and before a
 trailer, exercising the production descriptor interval rather than filename-based
 playback. API 26 must retain metadata without unbounded frame decoding.
+
+
+The generator also writes an owned `archive-session-20m.bz2` runtime-lab fixture:
+20 MiB of deterministic SHA-256 blocks, BZip2-compressed to more than 20 MiB,
+with a fixed independent decoded digest. This full, non-sparse large input
+exercises archive sessions/cache aliases through the actual worker. It is
+included only in the separate runtime laboratory assets, not the production APK.

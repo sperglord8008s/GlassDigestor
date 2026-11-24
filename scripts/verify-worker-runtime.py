@@ -87,7 +87,7 @@ def verify(sdk):
         original = ROOT / "app/src/main/java" / relative
         assert original.read_bytes() == file.read_bytes(), f"Shared production source changed: {relative}"
         sources[str(relative)] = sha256(file)
-    for name in ["BinaryWorkerClient", "BinaryWorkerService", "ArchiveEngine", "HashEngine", "AndroidResourceProbe", "PackageManifest", "PdfPagePreview", "OwnedContent", "PreparedExport", "TextActions", "WorkbenchUi"]:
+    for name in ["BinaryWorkerClient", "BinaryWorkerService", "ArchiveEngine", "HashEngine", "AndroidResourceProbe", "PackageManifest", "PdfPagePreview", "OwnedContent", "PreparedExport", "TextActions", "WorkbenchUi", "NativeArchiveSession", "ArchiveLaunch", "ContentOrigin"]:
         assert "org/diemobile/" + name + ".java" in sources
     text_resources = {}
     for name in ["values/colors.xml", "values/text_action_ids.xml"]:
@@ -124,12 +124,18 @@ def verify(sdk):
         assert archive.read("assets/test-fixtures/green-64x48.mp4") == (
             ROOT / "tests/fixtures/media/green-64x48.mp4"
         ).read_bytes()
+        large_archive = archive.read("assets/test-fixtures/archive-session-20m.bz2")
+        assert 19 * 1024 * 1024 < len(large_archive) < 22 * 1024 * 1024
+        assert large_archive == (
+            ROOT / "runtime-worker/build/generated-runtime-assets/test-fixtures/archive-session-20m.bz2"
+        ).read_bytes()
     native_pdf_inputs = [
         "carving-engine/CMakeLists.txt", "carving-engine/config.h", "carving-engine/probe.cpp",
         "carving-engine/blob_input.h", "carving-engine/read_only_file.h", "carving-engine/deny-files.c",
         "carving-engine/exports.map", "carving-engine/source-lock.json", "scripts/build-photorec.sh",
         "scripts/fetch-photorec.sh", "scripts/prepare-photorec.py", "scripts/photorec-notices.py",
         "tests/fixtures/metadata/MetadataFixtureFactory.java",
+        "tests/fixtures/media/generate-preview.py",
     ]
     return {
         "schema": "org.diemobile.worker-runtime-build", "schemaVersion": 1,

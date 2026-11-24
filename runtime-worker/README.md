@@ -188,3 +188,24 @@ APKs, native PhotoRec library, full report and bounded completion identities,
 plus expected page colors/geometry, were independently verified;
 [evidence](../docs/verification/android-worker-runtime-04e93c0.json). This tests the rendering
 helper, not a full gallery/SAF/handset UI.
+
+
+## Trusted cache alias and larger compressed-stream regression
+
+An eleventh `aliased-cache-bzip2-session-and-exact-large-file` contract stages
+unchanged production `NativeArchiveSession`, `ArchiveLaunch` and `ContentOrigin`
+classes. A deterministic, fully written >20 MiB BZip2 input with a misleading
+`.jpeg` name must yield one complete member through the actual isolated worker.
+All 20,971,520 decoded bytes must match an independent fixed SHA-256 oracle.
+The normal target UID supplies a symlinked trusted cache ancestor: opening and
+restoration must accept that alias, while a generated linked leaf must be
+refused before native work and leave an outside sentinel unchanged. Retained
+restoration after original-source expiry must not rerun analysis. The actual
+member origin must also create/restore through the alias. Original inspection
+and acquisition reports remain in the complete captured evidence.
+
+Local Java compilation has passed. Actual API 26/35 execution of this eleventh
+contract is pending; the ten published pre-alpha.17 contracts above retain
+their separate verified status. This laboratory does not execute the full
+archive UI, a real SAF destination or the production ARM64 build. Fixtures are
+owned Python-standard-library output; external NIST media are not packaged.

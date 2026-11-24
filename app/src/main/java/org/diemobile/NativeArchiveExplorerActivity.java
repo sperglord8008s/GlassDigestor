@@ -42,6 +42,9 @@ public final class NativeArchiveExplorerActivity extends Activity {
     private NativeArchiveGalleryAdapter galleryAdapter;
     private Button galleryToggle;
     private Button parent, back, viewMode, previous, next, cancel;
+    private LinearLayout singleFileActions;
+    private Button openSingle, saveSingle;
+    private NativeArchiveStore.Member singleMember;
     private final List<View> actions = new ArrayList<>();
     private List<ArchiveListing.Entry> visible = new ArrayList<>();
 
@@ -118,6 +121,25 @@ public final class NativeArchiveExplorerActivity extends Activity {
         title.setMaxLines(2);
         title.setEllipsize(android.text.TextUtils.TruncateAt.END);
         root.addView(title);
+        singleFileActions = new LinearLayout(this);
+        openSingle =
+                button(
+                        singleFileActions,
+                        "Open decoded file",
+                        () -> {
+                            if (singleMember != null) select(singleMember, 0);
+                        });
+        saveSingle =
+                button(
+                        singleFileActions,
+                        "Save decoded file…",
+                        () -> {
+                            if (singleMember != null) stageExport(2, singleMember);
+                        });
+        openSingle.setTag("archive-open-single");
+        saveSingle.setTag("archive-save-single");
+        singleFileActions.setVisibility(View.GONE);
+        root.addView(singleFileActions);
         LinearLayout navigation = new LinearLayout(this);
         root.addView(navigation);
         parent = button(navigation, "Parent folder", this::parentFolder);
@@ -384,6 +406,16 @@ public final class NativeArchiveExplorerActivity extends Activity {
         }
         NativeArchiveSession.Location location = session.current();
         NativeArchiveStore.Inventory inventory = location.inventory;
+        singleMember =
+                inventory.complete
+                                && inventory.members.size() == 1
+                                && inventory.members.get(0).canAcquire()
+                        ? inventory.members.get(0)
+                        : null;
+        singleFileActions.setVisibility(
+                singleMember == null || galleryMode ? View.GONE : View.VISIBLE);
+        openSingle.setEnabled(!busy && singleMember != null);
+        saveSingle.setEnabled(!busy && singleMember != null);
         title.setText(
                 inventory.format
                         + " · level "
@@ -549,7 +581,6 @@ public final class NativeArchiveExplorerActivity extends Activity {
                                 ? "Eligible for checked acquisition by exact index."
                                 : "Acquisition unavailable: incomplete inventory, link/special"
                                         + " type, encryption or size budget."));
-        content.addView(facts);
         ScrollView detailScroll = new ScrollView(this);
         detailScroll.addView(content);
         AlertDialog dialog =
@@ -558,20 +589,25 @@ public final class NativeArchiveExplorerActivity extends Activity {
                         .setView(detailScroll)
                         .setNegativeButton("Close", null)
                         .create();
-        addAction(
-                content,
-                "Full entry metadata / raw returned fields",
-                () -> raw("Entry #" + member.index, member.raw));
         boolean allowed = member.canAcquire() && session.current().inventory.complete;
         Button preview =
                 addAction(
                         content,
-                        "Open preview / media / export bytes",
+                        "Open decoded file / preview",
                         () -> {
                             dialog.dismiss();
                             select(member, 0);
                         });
         preview.setEnabled(allowed);
+        Button save =
+                addAction(
+                        content,
+                        "Save decoded file…",
+                        () -> {
+                            dialog.dismiss();
+                            stageExport(2, member);
+                        });
+        save.setEnabled(allowed);
         Button analyze =
                 addAction(
                         content,
@@ -590,6 +626,12 @@ public final class NativeArchiveExplorerActivity extends Activity {
                             select(member, 2);
                         });
         nested.setEnabled(allowed);
+        content.addView(WorkbenchUi.section(this, "Original member evidence"));
+        content.addView(facts);
+        addAction(
+                content,
+                "Full entry metadata / raw returned fields",
+                () -> raw("Entry #" + member.index, member.raw));
         addAction(
                 content,
                 "Definitions and limits",

@@ -30,6 +30,8 @@ public final class ContentPreviewActivity extends Activity {
     private TextView status, identity;
     private TextView exportNotice;
     private Button exportBytes, originButton;
+    private Button gallerize;
+    private boolean gallerizeBusy;
     private ContentOrigin origin;
     private boolean originBusy;
     private String originNotice = "No full discovery capture accompanied this preview";
@@ -176,6 +178,11 @@ public final class ContentPreviewActivity extends Activity {
         exportBytes = button("Export bytes", this::exportBytes);
         exportBytes.setEnabled(false);
         add(tools, exportBytes);
+        gallerize = button("Gallerize", this::gallerize);
+        gallerize.setTag("content-gallerize");
+        gallerize.setEnabled(false);
+        gallerize.setTooltipText("Find embedded files and media inside these decoded bytes");
+        add(tools, gallerize);
         root.addView(tools);
         status = text("Loading…", 12);
         root.addView(status);
@@ -247,6 +254,7 @@ public final class ContentPreviewActivity extends Activity {
                                                     + "\n"
                                                     + originNotice);
                                     exportBytes.setEnabled(!exportBusy && !exportPickerOpen);
+                                    gallerize.setEnabled(!gallerizeBusy);
                                     render();
                                 });
                     } catch (Exception error) {
@@ -1044,6 +1052,64 @@ public final class ContentPreviewActivity extends Activity {
         }
     }
 
+    private void gallerize() {
+        if (input == null || gallerizeBusy) return;
+        final InputSnapshot captured = input;
+        final int ticket = generation;
+        gallerizeBusy = true;
+        gallerize.setEnabled(false);
+        status.setText("Preparing independently owned bytes for file discovery…");
+        worker.execute(
+                () -> {
+                    InputSnapshot staged = null;
+                    String error = null;
+                    try {
+                        staged =
+                                OwnedContent.stageRange(
+                                        captured,
+                                        new FileRange(captured.size, 0, captured.size),
+                                        new File(getCacheDir(), "gallery-handoffs"),
+                                        () -> cancellation.get() || isDestroyed());
+                    } catch (Exception failure) {
+                        error = failure.toString();
+                    }
+                    InputSnapshot handoff = staged;
+                    String failure = error;
+                    runOnUiThread(
+                            () -> {
+                                gallerizeBusy = false;
+                                gallerize.setEnabled(input != null);
+                                if (isDestroyed()
+                                        || cancellation.get()
+                                        || ticket != generation
+                                        || input != captured) {
+                                    if (handoff != null) handoff.close();
+                                    return;
+                                }
+                                if (handoff == null) {
+                                    status.setText("File discovery handoff failed: " + failure);
+                                    return;
+                                }
+                                try {
+                                    startActivity(
+                                            new Intent(this, GallerizeActivity.class)
+                                                    .putExtra(
+                                                            "path", handoff.file.getAbsolutePath())
+                                                    .putExtra("name", name)
+                                                    .putExtra("sha256", handoff.sha256)
+                                                    .putExtra("sourceSize", handoff.size)
+                                                    .putExtra("ownedInputHandoff", true));
+                                    status.setText(
+                                            "Opened independently owned decoded bytes in"
+                                                + " Gallerize");
+                                } catch (RuntimeException unavailable) {
+                                    handoff.close();
+                                    status.setText("Cannot open Gallerize: " + unavailable);
+                                }
+                            });
+                });
+    }
+
     private void tools() {
         if (input == null) return;
         new AlertDialog.Builder(this)
@@ -1058,6 +1124,10 @@ public final class ContentPreviewActivity extends Activity {
                             "All native tools"
                         },
                         (dialog, which) -> {
+                            if (which == 4) {
+                                gallerize();
+                                return;
+                            }
                             Class<?> target =
                                     which == 3
                                             ? NativeArchiveExplorerActivity.class

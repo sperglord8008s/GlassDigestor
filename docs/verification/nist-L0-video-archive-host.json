@@ -1,0 +1,492 @@
+{
+  "schema": "org.glassdigestor.nist-archive-regression",
+  "compressedSizeBytes": 19741341,
+  "schemaVersion": 1,
+  "compressedSha256": "91f4bc9c1a7fafdc82088a1c08a457bbfb7a9df6aa520d066054ae20b2502b50",
+  "archiveDecodingPassed": true,
+  "decodedSha256": "20d8a231ded5223bbecab97d4155d028ef9cd0760a5dd3ecef22123c46b48870",
+  "environment": "host JNI; not Android UI or SAF",
+  "decodedSizeBytes": 62578688,
+  "recoveredFileExportScored": false,
+  "trustedAncestorAliasAccepted": true,
+  "acquisition": {
+    "schema": "org.diemobile.archive-evidence",
+    "formatCode": 589824,
+    "scopeOffset": 0,
+    "acquiredSizeBytes": 62578688,
+    "filesystemReaderEnabled": false,
+    "hasEncryptedEntries": -2,
+    "scopeMeaning": "Bounded parsing interval; not an inferred recovered archive extent",
+    "error": null,
+    "sourceReadOperations": 302,
+    "maximumTransformedStreamBytes": 536870912,
+    "iterationMode": "selected-member data reads with metadata iteration",
+    "ownedDescriptorDuplicate": true,
+    "errorBytesHex": null,
+    "passphraseSupport": false,
+    "acquisitionMeaning": "Only complete successful extraction publishes derived logical bytes; sparse holes are zeros, member names are never output paths, and stored-byte locations are not inferred.",
+    "maximumSourceReadWorkBytes": 4294967296,
+    "engineDetails": "libarchive 3.8.11 zlib/1.3.1 liblzma/5.8.4 bz2lib/1.0.8 liblz4/1.10.0 libzstd/1.5.7 libb2/bundled",
+    "iterationMeaning": "Metadata iteration and skips; upstream may decode/check as needed. No independent full-member validation is implied.",
+    "ok": true,
+    "engineVersion": "libarchive 3.8.11",
+    "schemaVersion": 1,
+    "adapter": "diemobile-libarchive-1",
+    "scopeSizeBytes": 19741341,
+    "maximumInputBytes": 1073741824,
+    "formatName": "raw",
+    "pathExtractionEnabled": false,
+    "filters": [
+      {
+        "code": 2,
+        "name": "bzip2",
+        "bytesConsumed": 62578688,
+        "index": 0
+      },
+      {
+        "code": 0,
+        "name": "none",
+        "bytesConsumed": 19741341,
+        "index": 1
+      }
+    ],
+    "maximumMemberBytes": 268435456,
+    "headerWarningCount": 0,
+    "entryDataReadRequested": true,
+    "selectedIndex": 0,
+    "fileSizeBytes": 19741341,
+    "entries": [{
+      "deviceMajor": 0,
+      "aclEntries": [],
+      "hardlinkUtf8": null,
+      "digestPresence": null,
+      "macMetadataSizeBytes": 0,
+      "sparseRanges": [],
+      "mtime": null,
+      "fileFlagsText": null,
+      "headerPositionMeaning": "Raw archive_read_header_position observation from this iteration; CAB values can change after data reads. Not a physical offset or stable entry identity",
+      "inode": null,
+      "mode": 33188,
+      "headerDiagnostic": null,
+      "hardlink": null,
+      "symlinkUtf8": null,
+      "permissions": 420,
+      "linkCount": 0,
+      "ctime": null,
+      "specialDeviceIsSet": false,
+      "atime": null,
+      "dataReadRequested": false,
+      "index": 0,
+      "pathname": {
+        "meaning": "libarchive accessor C-string bytes; original stored encoding/physical location not implied",
+        "utf8Valid": true,
+        "text": "data",
+        "returnedBytesHex": "64617461"
+      },
+      "dataEncrypted": 0,
+      "groupName": null,
+      "groupNameUtf8": null,
+      "specialDeviceMajor": 0,
+      "specialDeviceMinor": 0,
+      "metadataEncrypted": 0,
+      "gid": null,
+      "uid": null,
+      "formatNameAtHeader": "raw",
+      "digestAccessorBuffers": {
+        "SHA256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "SHA1": "0000000000000000000000000000000000000000",
+        "SHA384": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "RMD160": "0000000000000000000000000000000000000000",
+        "SHA512": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "MD5": "00000000000000000000000000000000"
+      },
+      "symlink": null,
+      "headerStatus": 0,
+      "fileFlagsClearUnsigned": "0",
+      "symlinkType": 0,
+      "userNameUtf8": null,
+      "pathnameUtf8": {
+        "meaning": "libarchive accessor C-string bytes; original stored encoding/physical location not implied",
+        "utf8Valid": true,
+        "text": "data",
+        "returnedBytesHex": "64617461"
+      },
+      "digestMeaning": "Pinned public getters return buffers even when unset; no public presence accessor exists. These are returned state bytes, not asserted declared/verified digests.",
+      "userName": null,
+      "sizeBytes": null,
+      "deviceIsSet": false,
+      "aclTypes": 0,
+      "encrypted": 0,
+      "sourcePathAccessor": null,
+      "xattrs": [],
+      "deviceMinor": 0,
+      "macMetadataHex": null,
+      "birthtime": null,
+      "fileFlagsSetUnsigned": "0",
+      "fileType": 32768,
+      "modeText": "-rw-r--r-- ",
+      "headerPositionUncompressedStream": 0
+    }],
+    "entryCount": 1,
+    "selectedEntry": {
+      "deviceMajor": 0,
+      "aclEntries": [],
+      "hardlinkUtf8": null,
+      "digestPresence": null,
+      "macMetadataSizeBytes": 0,
+      "sparseRanges": [],
+      "mtime": null,
+      "fileFlagsText": null,
+      "headerPositionMeaning": "Raw archive_read_header_position observation from this iteration; CAB values can change after data reads. Not a physical offset or stable entry identity",
+      "inode": null,
+      "mode": 33188,
+      "headerDiagnostic": null,
+      "hardlink": null,
+      "symlinkUtf8": null,
+      "permissions": 420,
+      "linkCount": 0,
+      "ctime": null,
+      "specialDeviceIsSet": false,
+      "atime": null,
+      "dataReadRequested": false,
+      "index": 0,
+      "pathname": {
+        "meaning": "libarchive accessor C-string bytes; original stored encoding/physical location not implied",
+        "utf8Valid": true,
+        "text": "data",
+        "returnedBytesHex": "64617461"
+      },
+      "dataEncrypted": 0,
+      "groupName": null,
+      "groupNameUtf8": null,
+      "specialDeviceMajor": 0,
+      "specialDeviceMinor": 0,
+      "metadataEncrypted": 0,
+      "gid": null,
+      "uid": null,
+      "formatNameAtHeader": "raw",
+      "digestAccessorBuffers": {
+        "SHA256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "SHA1": "0000000000000000000000000000000000000000",
+        "SHA384": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "RMD160": "0000000000000000000000000000000000000000",
+        "SHA512": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "MD5": "00000000000000000000000000000000"
+      },
+      "symlink": null,
+      "headerStatus": 0,
+      "fileFlagsClearUnsigned": "0",
+      "symlinkType": 0,
+      "userNameUtf8": null,
+      "pathnameUtf8": {
+        "meaning": "libarchive accessor C-string bytes; original stored encoding/physical location not implied",
+        "utf8Valid": true,
+        "text": "data",
+        "returnedBytesHex": "64617461"
+      },
+      "digestMeaning": "Pinned public getters return buffers even when unset; no public presence accessor exists. These are returned state bytes, not asserted declared/verified digests.",
+      "userName": null,
+      "sizeBytes": null,
+      "deviceIsSet": false,
+      "aclTypes": 0,
+      "encrypted": 0,
+      "sourcePathAccessor": null,
+      "xattrs": [],
+      "deviceMinor": 0,
+      "macMetadataHex": null,
+      "birthtime": null,
+      "fileFlagsSetUnsigned": "0",
+      "fileType": 32768,
+      "modeText": "-rw-r--r-- ",
+      "headerPositionUncompressedStream": 0
+    },
+    "sourceRevision": "03036ffa409a2aa1c5bbad35be2202641a040fda",
+    "sourceReadBytes": 19741341,
+    "complete": true,
+    "formatRegistrations": [
+      {
+        "registrationStatus": 0,
+        "format": "7zip",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": 0,
+        "format": "ar",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": 0,
+        "format": "cab",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": 0,
+        "format": "cpio",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": 0,
+        "format": "empty",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": 0,
+        "format": "iso9660",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": 0,
+        "format": "lha",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": 0,
+        "format": "rar",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": 0,
+        "format": "rar5",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": 0,
+        "format": "tar",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": 0,
+        "format": "warc",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": -20,
+        "format": "xar",
+        "diagnostic": "Xar not supported on this platform"
+      },
+      {
+        "registrationStatus": 0,
+        "format": "zip",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": 0,
+        "format": "raw-transformed-only",
+        "diagnostic": null
+      }
+    ],
+    "formatCapabilities": 0,
+    "memoryLimitMeaning": "Limits selected codec dictionaries/windows, not total upstream/worker heap or RSS",
+    "externalProgramsEnabled": false,
+    "lzmaDecoderMemoryLimitBytes": 67108864,
+    "callerDescriptorPositionPreserved": true,
+    "zstdMaximumWindowBytes": 67108864,
+    "maximumEntries": 20000,
+    "cooperativeDeadlineSeconds": 30
+  },
+  "case": "L0_Video",
+  "inspection": {
+    "schema": "org.diemobile.archive-evidence",
+    "formatCode": 589824,
+    "scopeOffset": 0,
+    "acquiredSizeBytes": null,
+    "filesystemReaderEnabled": false,
+    "hasEncryptedEntries": -2,
+    "scopeMeaning": "Bounded parsing interval; not an inferred recovered archive extent",
+    "error": null,
+    "sourceReadOperations": 13,
+    "maximumTransformedStreamBytes": 536870912,
+    "iterationMode": "metadata iteration and skips",
+    "ownedDescriptorDuplicate": true,
+    "errorBytesHex": null,
+    "passphraseSupport": false,
+    "acquisitionMeaning": "Only complete successful extraction publishes derived logical bytes; sparse holes are zeros, member names are never output paths, and stored-byte locations are not inferred.",
+    "maximumSourceReadWorkBytes": 4294967296,
+    "engineDetails": "libarchive 3.8.11 zlib/1.3.1 liblzma/5.8.4 bz2lib/1.0.8 liblz4/1.10.0 libzstd/1.5.7 libb2/bundled",
+    "iterationMeaning": "Metadata iteration and skips; upstream may decode/check as needed. No independent full-member validation is implied.",
+    "ok": true,
+    "engineVersion": "libarchive 3.8.11",
+    "schemaVersion": 1,
+    "adapter": "diemobile-libarchive-1",
+    "scopeSizeBytes": 19741341,
+    "maximumInputBytes": 1073741824,
+    "formatName": "raw",
+    "pathExtractionEnabled": false,
+    "filters": [
+      {
+        "code": 2,
+        "name": "bzip2",
+        "bytesConsumed": 0,
+        "index": 0
+      },
+      {
+        "code": 0,
+        "name": "none",
+        "bytesConsumed": 800389,
+        "index": 1
+      }
+    ],
+    "maximumMemberBytes": 268435456,
+    "headerWarningCount": 0,
+    "entryDataReadRequested": false,
+    "selectedIndex": -1,
+    "fileSizeBytes": 19741341,
+    "entries": [{
+      "deviceMajor": 0,
+      "aclEntries": [],
+      "hardlinkUtf8": null,
+      "digestPresence": null,
+      "macMetadataSizeBytes": 0,
+      "sparseRanges": [],
+      "mtime": null,
+      "fileFlagsText": null,
+      "headerPositionMeaning": "Raw archive_read_header_position observation from this iteration; CAB values can change after data reads. Not a physical offset or stable entry identity",
+      "inode": null,
+      "mode": 33188,
+      "headerDiagnostic": null,
+      "hardlink": null,
+      "symlinkUtf8": null,
+      "permissions": 420,
+      "linkCount": 0,
+      "ctime": null,
+      "specialDeviceIsSet": false,
+      "atime": null,
+      "dataReadRequested": false,
+      "index": 0,
+      "pathname": {
+        "meaning": "libarchive accessor C-string bytes; original stored encoding/physical location not implied",
+        "utf8Valid": true,
+        "text": "data",
+        "returnedBytesHex": "64617461"
+      },
+      "dataEncrypted": 0,
+      "groupName": null,
+      "groupNameUtf8": null,
+      "specialDeviceMajor": 0,
+      "specialDeviceMinor": 0,
+      "metadataEncrypted": 0,
+      "gid": null,
+      "uid": null,
+      "formatNameAtHeader": "raw",
+      "digestAccessorBuffers": {
+        "SHA256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "SHA1": "0000000000000000000000000000000000000000",
+        "SHA384": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "RMD160": "0000000000000000000000000000000000000000",
+        "SHA512": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "MD5": "00000000000000000000000000000000"
+      },
+      "symlink": null,
+      "headerStatus": 0,
+      "fileFlagsClearUnsigned": "0",
+      "symlinkType": 0,
+      "userNameUtf8": null,
+      "pathnameUtf8": {
+        "meaning": "libarchive accessor C-string bytes; original stored encoding/physical location not implied",
+        "utf8Valid": true,
+        "text": "data",
+        "returnedBytesHex": "64617461"
+      },
+      "digestMeaning": "Pinned public getters return buffers even when unset; no public presence accessor exists. These are returned state bytes, not asserted declared/verified digests.",
+      "userName": null,
+      "sizeBytes": null,
+      "deviceIsSet": false,
+      "aclTypes": 0,
+      "encrypted": 0,
+      "sourcePathAccessor": null,
+      "xattrs": [],
+      "deviceMinor": 0,
+      "macMetadataHex": null,
+      "birthtime": null,
+      "fileFlagsSetUnsigned": "0",
+      "fileType": 32768,
+      "modeText": "-rw-r--r-- ",
+      "headerPositionUncompressedStream": 0
+    }],
+    "entryCount": 1,
+    "selectedEntry": null,
+    "sourceRevision": "03036ffa409a2aa1c5bbad35be2202641a040fda",
+    "sourceReadBytes": 851968,
+    "complete": true,
+    "formatRegistrations": [
+      {
+        "registrationStatus": 0,
+        "format": "7zip",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": 0,
+        "format": "ar",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": 0,
+        "format": "cab",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": 0,
+        "format": "cpio",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": 0,
+        "format": "empty",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": 0,
+        "format": "iso9660",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": 0,
+        "format": "lha",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": 0,
+        "format": "rar",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": 0,
+        "format": "rar5",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": 0,
+        "format": "tar",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": 0,
+        "format": "warc",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": -20,
+        "format": "xar",
+        "diagnostic": "Xar not supported on this platform"
+      },
+      {
+        "registrationStatus": 0,
+        "format": "zip",
+        "diagnostic": null
+      },
+      {
+        "registrationStatus": 0,
+        "format": "raw-transformed-only",
+        "diagnostic": null
+      }
+    ],
+    "formatCapabilities": 0,
+    "memoryLimitMeaning": "Limits selected codec dictionaries/windows, not total upstream/worker heap or RSS",
+    "externalProgramsEnabled": false,
+    "lzmaDecoderMemoryLimitBytes": 67108864,
+    "callerDescriptorPositionPreserved": true,
+    "zstdMaximumWindowBytes": 67108864,
+    "maximumEntries": 20000,
+    "cooperativeDeadlineSeconds": 30
+  }
+}

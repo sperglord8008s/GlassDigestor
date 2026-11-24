@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 """Stage owned, pinned media fixtures offline; optionally regenerate the tiny MPEG-4 clip."""
 import argparse
+import bz2
 import hashlib
 import json
 from pathlib import Path
@@ -35,15 +36,31 @@ with wave.open(str(output / 'pcm-500ms.wav'), 'wb') as audio:
     audio.setsampwidth(2)
     audio.setframerate(8000)
     audio.writeframes(b'\x00\x00' * 4000)
+# A fully written incompressible compressed stream covers the reported ~20 MiB input.
+# The decoded payload is deterministic but is never included in a report/Binder result.
+archive_payload_digest = hashlib.sha256()
+archive_bytes = 20 * 1024 * 1024
+archive_encoder = bz2.BZ2Compressor(9)
+with (output / 'archive-session-20m.bz2').open('wb') as archive:
+    for first in range(0, archive_bytes // 32, 4096):
+        block = b''.join(hashlib.sha256(b'GlassDigestor archive fixture\0' +
+                         index.to_bytes(4, 'little')).digest()
+                         for index in range(first, min(first + 4096, archive_bytes // 32)))
+        archive_payload_digest.update(block)
+        archive.write(archive_encoder.compress(block))
+    archive.write(archive_encoder.flush())
+if archive_payload_digest.hexdigest() != '73aea6dfaf4ef1966595e77bfa2c69597b0830f7f6c82f9ca6490260ae16ccf3':
+    raise SystemExit('Owned archive payload differs from its independent fixed SHA-256 oracle.')
 manifest = {
     'meaning': 'Owned generated fixtures, not inspected applications or third-party media.',
     'video': {'width': 64, 'height': 48, 'durationMs': 1000, 'rgb': '008000', 'codec': 'mpeg4'},
+    'archiveSession': {'decodedBytes': archive_bytes, 'decodedSha256': archive_payload_digest.hexdigest(), 'codec': 'bzip2'},
     'audio': {'durationMs': 500, 'sampleRate': 8000, 'channels': 1, 'codec': 'pcm_s16le'},
     'videoGeneratedWith': 'FFmpeg 7.1.5 (Debian 7.1.5-0+deb13u1), exact command retained in generator source',
     'videoRegeneratedThisBuild': args.regenerate_video,
     'pcmGeneratedWith': 'Python standard-library wave',
     'files': {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
-              for p in sorted(output.iterdir()) if p.suffix in ['.mp4', '.wav']},
+              for p in sorted(output.iterdir()) if p.suffix in ['.mp4', '.wav', '.bz2']},
 }
 (output / 'fixture-manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
 print('Pinned owned 64×48 green video and generated 500 ms PCM fixtures staged offline.')

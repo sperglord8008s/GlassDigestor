@@ -1,0 +1,7345 @@
+{
+  "schema": "org.glassdigestor.nist-file-carving-corpus",
+  "schemaVersion": 1,
+  "sectorSizeBytes": 512,
+  "layoutSourceUrl": "https://cfreds-archive.nist.gov/FileCarving/ImageLayouts.htm",
+  "layoutSourceSha256": "665fb749210b7f86433ac0680351647ee7a01305cfaa41ecd1fd666127fc60c3",
+  "imageIndexUrl": "https://cfreds-archive.nist.gov/FileCarving/index.html",
+  "cases": [
+    {
+      "id": "L0_Graphic",
+      "level": 0,
+      "family": "Graphic",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L0_Graphic.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "000_0021.png",
+          "sizeBytes": 12966639,
+          "startSector": 10000,
+          "endSector": 35325,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "000_0021.png",
+            "12,966,639",
+            "10,000",
+            "35,325"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 35326,
+          "endSector": 45325,
+          "physicalOffset": 18086912,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "35,326",
+            "45,325"
+          ]
+        },
+        {
+          "name": "02010025.pcx",
+          "sizeBytes": 806664,
+          "startSector": 45326,
+          "endSector": 46901,
+          "physicalOffset": 23206912,
+          "rawCells": [
+            "02010025.pcx",
+            "806,664",
+            "45,326",
+            "46,901"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 46902,
+          "endSector": 56901,
+          "physicalOffset": 24013824,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "46,902",
+            "56,901"
+          ]
+        },
+        {
+          "name": "09260002.jpg",
+          "sizeBytes": 60716,
+          "startSector": 56902,
+          "endSector": 57020,
+          "physicalOffset": 29133824,
+          "rawCells": [
+            "09260002.jpg",
+            "60,716",
+            "56,902",
+            "57,020"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 57021,
+          "endSector": 67020,
+          "physicalOffset": 29194752,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "57,021",
+            "67,020"
+          ]
+        },
+        {
+          "name": "100_0304crop.bmp",
+          "sizeBytes": 5111906,
+          "startSector": 67021,
+          "endSector": 77005,
+          "physicalOffset": 34314752,
+          "rawCells": [
+            "100_0304crop.bmp",
+            "5,111,906",
+            "67,021",
+            "77,005"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 77006,
+          "endSector": 87005,
+          "physicalOffset": 39427072,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "77,006",
+            "87,005"
+          ]
+        },
+        {
+          "name": "100_0018.tif",
+          "sizeBytes": 14969328,
+          "startSector": 87006,
+          "endSector": 116242,
+          "physicalOffset": 44547072,
+          "rawCells": [
+            "100_0018.tif",
+            "14,969,328",
+            "87,006",
+            "116,242"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 116243,
+          "endSector": 126242,
+          "physicalOffset": 59516416,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "116,243",
+            "126,242"
+          ]
+        },
+        {
+          "name": "100_0183.gif",
+          "sizeBytes": 132948,
+          "startSector": 126243,
+          "endSector": 126502,
+          "physicalOffset": 64636416,
+          "rawCells": [
+            "100_0183.gif",
+            "132,948",
+            "126,243",
+            "126,502"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L1_Graphic",
+      "level": 1,
+      "family": "Graphic",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L1_Graphic.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "09260002.jpg (1)",
+          "sizeBytes": 30208,
+          "startSector": 10000,
+          "endSector": 10058,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "09260002.jpg (1)",
+            "30,208",
+            "10,000",
+            "10,058"
+          ]
+        },
+        {
+          "name": "09260002.jpg (2)",
+          "sizeBytes": 30508,
+          "startSector": 10059,
+          "endSector": 10118,
+          "physicalOffset": 5150208,
+          "rawCells": [
+            "09260002.jpg (2)",
+            "30,508",
+            "10,059",
+            "10,118"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 10119,
+          "endSector": 20118,
+          "physicalOffset": 5180928,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "10,119",
+            "20,118"
+          ]
+        },
+        {
+          "name": "100_0018.tif (1)",
+          "sizeBytes": 4989440,
+          "startSector": 20119,
+          "endSector": 29863,
+          "physicalOffset": 10300928,
+          "rawCells": [
+            "100_0018.tif (1)",
+            "4,989,440",
+            "20,119",
+            "29,863"
+          ]
+        },
+        {
+          "name": "100_0018.tif (2)",
+          "sizeBytes": 4989440,
+          "startSector": 29864,
+          "endSector": 39608,
+          "physicalOffset": 15290368,
+          "rawCells": [
+            "100_0018.tif (2)",
+            "4,989,440",
+            "29,864",
+            "39,608"
+          ]
+        },
+        {
+          "name": "100_0018.tif (3)",
+          "sizeBytes": 4990448,
+          "startSector": 39609,
+          "endSector": 49355,
+          "physicalOffset": 20279808,
+          "rawCells": [
+            "100_0018.tif (3)",
+            "4,990,448",
+            "39,609",
+            "49,355"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 49356,
+          "endSector": 59355,
+          "physicalOffset": 25270272,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "49,356",
+            "59,355"
+          ]
+        },
+        {
+          "name": "100_0304crop.bmp (1)",
+          "sizeBytes": 2555904,
+          "startSector": 59356,
+          "endSector": 64347,
+          "physicalOffset": 30390272,
+          "rawCells": [
+            "100_0304crop.bmp (1)",
+            "2,555,904",
+            "59,356",
+            "64,347"
+          ]
+        },
+        {
+          "name": "100_0304crop.bmp (2)",
+          "sizeBytes": 2556002,
+          "startSector": 64348,
+          "endSector": 69340,
+          "physicalOffset": 32946176,
+          "rawCells": [
+            "100_0304crop.bmp (2)",
+            "2,556,002",
+            "64,348",
+            "69,340"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 69341,
+          "endSector": 79340,
+          "physicalOffset": 35502592,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "69,341",
+            "79,340"
+          ]
+        },
+        {
+          "name": "02010025.pcx (1)",
+          "sizeBytes": 268800,
+          "startSector": 79341,
+          "endSector": 79865,
+          "physicalOffset": 40622592,
+          "rawCells": [
+            "02010025.pcx (1)",
+            "268,800",
+            "79,341",
+            "79,865"
+          ]
+        },
+        {
+          "name": "02010025.pcx (2)",
+          "sizeBytes": 268800,
+          "startSector": 79866,
+          "endSector": 80390,
+          "physicalOffset": 40891392,
+          "rawCells": [
+            "02010025.pcx (2)",
+            "268,800",
+            "79,866",
+            "80,390"
+          ]
+        },
+        {
+          "name": "02010025.pcx (3)",
+          "sizeBytes": 269064,
+          "startSector": 80391,
+          "endSector": 80916,
+          "physicalOffset": 41160192,
+          "rawCells": [
+            "02010025.pcx (3)",
+            "269,064",
+            "80,391",
+            "80,916"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 80917,
+          "endSector": 90916,
+          "physicalOffset": 41429504,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "80,917",
+            "90,916"
+          ]
+        },
+        {
+          "name": "100_0183.gif (1)",
+          "sizeBytes": 66048,
+          "startSector": 90917,
+          "endSector": 91045,
+          "physicalOffset": 46549504,
+          "rawCells": [
+            "100_0183.gif (1)",
+            "66,048",
+            "90,917",
+            "91,045"
+          ]
+        },
+        {
+          "name": "100_0183.gif (2)",
+          "sizeBytes": 66900,
+          "startSector": 91046,
+          "endSector": 91176,
+          "physicalOffset": 46615552,
+          "rawCells": [
+            "100_0183.gif (2)",
+            "66,900",
+            "91,046",
+            "91,176"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 91177,
+          "endSector": 101176,
+          "physicalOffset": 46682624,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "91,177",
+            "101,176"
+          ]
+        },
+        {
+          "name": "000_021.png (1)",
+          "sizeBytes": 4321792,
+          "startSector": 101177,
+          "endSector": 109617,
+          "physicalOffset": 51802624,
+          "rawCells": [
+            "000_021.png (1)",
+            "4,321,792",
+            "101,177",
+            "109,617"
+          ]
+        },
+        {
+          "name": "000_021.png (2)",
+          "sizeBytes": 8644847,
+          "startSector": 109618,
+          "endSector": 126502,
+          "physicalOffset": 56124416,
+          "rawCells": [
+            "000_021.png (2)",
+            "8,644,847",
+            "109,618",
+            "126,502"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L2_Graphic",
+      "level": 2,
+      "family": "Graphic",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L2_Graphic.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "100_0018.tif (1)",
+          "sizeBytes": 4989440,
+          "startSector": 10000,
+          "endSector": 19744,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "100_0018.tif (1)",
+            "4,989,440",
+            "10,000",
+            "19,744"
+          ]
+        },
+        {
+          "name": "100_0018.tif (3)",
+          "sizeBytes": 4990448,
+          "startSector": 19745,
+          "endSector": 29491,
+          "physicalOffset": 10109440,
+          "rawCells": [
+            "100_0018.tif (3)",
+            "4,990,448",
+            "19,745",
+            "29,491"
+          ]
+        },
+        {
+          "name": "100_0018.tif (2)",
+          "sizeBytes": 4989440,
+          "startSector": 29492,
+          "endSector": 39236,
+          "physicalOffset": 15099904,
+          "rawCells": [
+            "100_0018.tif (2)",
+            "4,989,440",
+            "29,492",
+            "39,236"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 39237,
+          "endSector": 49236,
+          "physicalOffset": 20089344,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "39,237",
+            "49,236"
+          ]
+        },
+        {
+          "name": "09260002.jpg (1)",
+          "sizeBytes": 19968,
+          "startSector": 49237,
+          "endSector": 49275,
+          "physicalOffset": 25209344,
+          "rawCells": [
+            "09260002.jpg (1)",
+            "19,968",
+            "49,237",
+            "49,275"
+          ]
+        },
+        {
+          "name": "09260002.jpg (3)",
+          "sizeBytes": 20780,
+          "startSector": 49276,
+          "endSector": 49316,
+          "physicalOffset": 25229312,
+          "rawCells": [
+            "09260002.jpg (3)",
+            "20,780",
+            "49,276",
+            "49,316"
+          ]
+        },
+        {
+          "name": "09260002.jpg (2)",
+          "sizeBytes": 19968,
+          "startSector": 49317,
+          "endSector": 49355,
+          "physicalOffset": 25250304,
+          "rawCells": [
+            "09260002.jpg (2)",
+            "19,968",
+            "49,317",
+            "49,355"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 49356,
+          "endSector": 59355,
+          "physicalOffset": 25270272,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "49,356",
+            "59,355"
+          ]
+        },
+        {
+          "name": "100_0304crop.bmp (2)",
+          "sizeBytes": 2556002,
+          "startSector": 59356,
+          "endSector": 64348,
+          "physicalOffset": 30390272,
+          "rawCells": [
+            "100_0304crop.bmp (2)",
+            "2,556,002",
+            "59,356",
+            "64,348"
+          ]
+        },
+        {
+          "name": "100_0304crop.bmp (1)",
+          "sizeBytes": 2555904,
+          "startSector": 64349,
+          "endSector": 69340,
+          "physicalOffset": 32946688,
+          "rawCells": [
+            "100_0304crop.bmp (1)",
+            "2,555,904",
+            "64,349",
+            "69,340"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 69341,
+          "endSector": 79340,
+          "physicalOffset": 35502592,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "69,341",
+            "79,340"
+          ]
+        },
+        {
+          "name": "02010025.pcx (1)",
+          "sizeBytes": 268800,
+          "startSector": 79341,
+          "endSector": 79865,
+          "physicalOffset": 40622592,
+          "rawCells": [
+            "02010025.pcx (1)",
+            "268,800",
+            "79,341",
+            "79,865"
+          ]
+        },
+        {
+          "name": "02010025.pcx (3)",
+          "sizeBytes": 269064,
+          "startSector": 79866,
+          "endSector": 80391,
+          "physicalOffset": 40891392,
+          "rawCells": [
+            "02010025.pcx (3)",
+            "269,064",
+            "79,866",
+            "80,391"
+          ]
+        },
+        {
+          "name": "02010025.pcx (2)",
+          "sizeBytes": 268800,
+          "startSector": 80392,
+          "endSector": 80916,
+          "physicalOffset": 41160704,
+          "rawCells": [
+            "02010025.pcx (2)",
+            "268,800",
+            "80,392",
+            "80,916"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 80917,
+          "endSector": 90916,
+          "physicalOffset": 41429504,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "80,917",
+            "90,916"
+          ]
+        },
+        {
+          "name": "100_0183.gif (3)",
+          "sizeBytes": 44884,
+          "startSector": 90917,
+          "endSector": 91004,
+          "physicalOffset": 46549504,
+          "rawCells": [
+            "100_0183.gif (3)",
+            "44,884",
+            "90,917",
+            "91,004"
+          ]
+        },
+        {
+          "name": "100_0183.gif (1)",
+          "sizeBytes": 44032,
+          "startSector": 91005,
+          "endSector": 91090,
+          "physicalOffset": 46594560,
+          "rawCells": [
+            "100_0183.gif (1)",
+            "44,032",
+            "91,005",
+            "91,090"
+          ]
+        },
+        {
+          "name": "100_0183.gif (2)",
+          "sizeBytes": 44032,
+          "startSector": 91091,
+          "endSector": 91176,
+          "physicalOffset": 46638592,
+          "rawCells": [
+            "100_0183.gif (2)",
+            "44,032",
+            "91,091",
+            "91,176"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 91177,
+          "endSector": 101176,
+          "physicalOffset": 46682624,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "91,177",
+            "101,176"
+          ]
+        },
+        {
+          "name": "000_0021.png (2)",
+          "sizeBytes": 6483695,
+          "startSector": 101177,
+          "endSector": 113840,
+          "physicalOffset": 51802624,
+          "rawCells": [
+            "000_0021.png (2)",
+            "6,483,695",
+            "101,177",
+            "113,840"
+          ]
+        },
+        {
+          "name": "000_0021.png (1)",
+          "sizeBytes": 6482944,
+          "startSector": 113841,
+          "endSector": 126502,
+          "physicalOffset": 58286592,
+          "rawCells": [
+            "000_0021.png (1)",
+            "6,482,944",
+            "113,841",
+            "126,502"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L3_Graphic",
+      "level": 3,
+      "family": "Graphic",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L3_Graphic.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "09260002.jpg (1)",
+          "sizeBytes": 30208,
+          "startSector": 10000,
+          "endSector": 10058,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "09260002.jpg (1)",
+            "30,208",
+            "10,000",
+            "10,058"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 10059,
+          "endSector": 20058,
+          "physicalOffset": 5150208,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "10,059",
+            "20,058"
+          ]
+        },
+        {
+          "name": "100_0018.tif (1)",
+          "sizeBytes": 4989440,
+          "startSector": 20059,
+          "endSector": 29803,
+          "physicalOffset": 10270208,
+          "rawCells": [
+            "100_0018.tif (1)",
+            "4,989,440",
+            "20,059",
+            "29,803"
+          ]
+        },
+        {
+          "name": "100_0018.tif (2)",
+          "sizeBytes": 4989440,
+          "startSector": 29804,
+          "endSector": 39548,
+          "physicalOffset": 15259648,
+          "rawCells": [
+            "100_0018.tif (2)",
+            "4,989,440",
+            "29,804",
+            "39,548"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 39549,
+          "endSector": 49548,
+          "physicalOffset": 20249088,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "39,549",
+            "49,548"
+          ]
+        },
+        {
+          "name": "100_0304crop.bmp (2)",
+          "sizeBytes": 2556002,
+          "startSector": 49549,
+          "endSector": 54541,
+          "physicalOffset": 25369088,
+          "rawCells": [
+            "100_0304crop.bmp (2)",
+            "2,556,002",
+            "49,549",
+            "54,541"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 54542,
+          "endSector": 64541,
+          "physicalOffset": 27925504,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "54,542",
+            "64,541"
+          ]
+        },
+        {
+          "name": "02010025.pcx (1)",
+          "sizeBytes": 268800,
+          "startSector": 64542,
+          "endSector": 65066,
+          "physicalOffset": 33045504,
+          "rawCells": [
+            "02010025.pcx (1)",
+            "268,800",
+            "64,542",
+            "65,066"
+          ]
+        },
+        {
+          "name": "02010025.pcx (3)",
+          "sizeBytes": 269064,
+          "startSector": 65067,
+          "endSector": 65592,
+          "physicalOffset": 33314304,
+          "rawCells": [
+            "02010025.pcx (3)",
+            "269,064",
+            "65,067",
+            "65,592"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 65593,
+          "endSector": 75592,
+          "physicalOffset": 33583616,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "65,593",
+            "75,592"
+          ]
+        },
+        {
+          "name": "100_0183.gif (2)",
+          "sizeBytes": 44032,
+          "startSector": 75593,
+          "endSector": 75678,
+          "physicalOffset": 38703616,
+          "rawCells": [
+            "100_0183.gif (2)",
+            "44,032",
+            "75,593",
+            "75,678"
+          ]
+        },
+        {
+          "name": "100_0183.gif (3)",
+          "sizeBytes": 44884,
+          "startSector": 75679,
+          "endSector": 75766,
+          "physicalOffset": 38747648,
+          "rawCells": [
+            "100_0183.gif (3)",
+            "44,884",
+            "75,679",
+            "75,766"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 75767,
+          "endSector": 85766,
+          "physicalOffset": 38792704,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "75,767",
+            "85,766"
+          ]
+        },
+        {
+          "name": "000_0021.png (3)",
+          "sizeBytes": 4332055,
+          "startSector": 85767,
+          "endSector": 94210,
+          "physicalOffset": 43912704,
+          "rawCells": [
+            "000_0021.png (3)",
+            "4,332,055",
+            "85,767",
+            "94,210"
+          ]
+        }
+      ],
+      "referenceIssues": [
+        {
+          "kind": "declared_size_sector_span_mismatch",
+          "recordIndex": 14
+        }
+      ]
+    },
+    {
+      "id": "L4_Graphic",
+      "level": 4,
+      "family": "Graphic",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L4_Graphic.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "09260002.jpg (1)",
+          "sizeBytes": 30208,
+          "startSector": 10000,
+          "endSector": 10058,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "09260002.jpg (1)",
+            "30,208",
+            "10,000",
+            "10,058"
+          ]
+        },
+        {
+          "name": "02010026.jpg",
+          "sizeBytes": 61038,
+          "startSector": 10059,
+          "endSector": 10178,
+          "physicalOffset": 5150208,
+          "rawCells": [
+            "02010026.jpg",
+            "61,038",
+            "10,059",
+            "10,178"
+          ]
+        },
+        {
+          "name": "09260002.jpg (2)",
+          "sizeBytes": 30508,
+          "startSector": 10179,
+          "endSector": 10238,
+          "physicalOffset": 5211648,
+          "rawCells": [
+            "09260002.jpg (2)",
+            "30,508",
+            "10,179",
+            "10,238"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 10239,
+          "endSector": 20238,
+          "physicalOffset": 5242368,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "10,239",
+            "20,238"
+          ]
+        },
+        {
+          "name": "100_0304crop.bmp (1)",
+          "sizeBytes": 1703936,
+          "startSector": 20239,
+          "endSector": 23566,
+          "physicalOffset": 10362368,
+          "rawCells": [
+            "100_0304crop.bmp (1)",
+            "1,703,936",
+            "20,239",
+            "23,566"
+          ]
+        },
+        {
+          "name": "100_0018.tif",
+          "sizeBytes": 14969328,
+          "startSector": 23567,
+          "endSector": 52803,
+          "physicalOffset": 12066304,
+          "rawCells": [
+            "100_0018.tif",
+            "14,969,328",
+            "23,567",
+            "52,803"
+          ]
+        },
+        {
+          "name": "100_0304crop.bmp (2,3)",
+          "sizeBytes": 3407970,
+          "startSector": 52804,
+          "endSector": 59460,
+          "physicalOffset": 27035648,
+          "rawCells": [
+            "100_0304crop.bmp (2,3)",
+            "3,407,970",
+            "52,804",
+            "59,460"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 59461,
+          "endSector": 69460,
+          "physicalOffset": 30444032,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "59,461",
+            "69,460"
+          ]
+        },
+        {
+          "name": "02010025.pcx(1)",
+          "sizeBytes": 402944,
+          "startSector": 69461,
+          "endSector": 70247,
+          "physicalOffset": 35564032,
+          "rawCells": [
+            "02010025.pcx(1)",
+            "402,944",
+            "69,461",
+            "70,247"
+          ]
+        },
+        {
+          "name": "100_0183.gif (1,2)",
+          "sizeBytes": 88064,
+          "startSector": 70248,
+          "endSector": 70419,
+          "physicalOffset": 35966976,
+          "rawCells": [
+            "100_0183.gif (1,2)",
+            "88,064",
+            "70,248",
+            "70,419"
+          ]
+        },
+        {
+          "name": "000_0021.png",
+          "sizeBytes": 12966639,
+          "startSector": 70420,
+          "endSector": 95745,
+          "physicalOffset": 36055040,
+          "rawCells": [
+            "000_0021.png",
+            "12,966,639",
+            "70,420",
+            "95,745"
+          ]
+        },
+        {
+          "name": "100_0183.gif (3)",
+          "sizeBytes": 44884,
+          "startSector": 95746,
+          "endSector": 95833,
+          "physicalOffset": 49021952,
+          "rawCells": [
+            "100_0183.gif (3)",
+            "44,884",
+            "95,746",
+            "95,833"
+          ]
+        },
+        {
+          "name": "02010025.pcx (2)",
+          "sizeBytes": 403720,
+          "startSector": 95834,
+          "endSector": 96622,
+          "physicalOffset": 49067008,
+          "rawCells": [
+            "02010025.pcx (2)",
+            "403,720",
+            "95,834",
+            "96,622"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L5_Graphic",
+      "level": 5,
+      "family": "Graphic",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L5_Graphic.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "09260002.jpg (1)",
+          "sizeBytes": 30208,
+          "startSector": 10000,
+          "endSector": 10058,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "09260002.jpg (1)",
+            "30,208",
+            "10,000",
+            "10,058"
+          ]
+        },
+        {
+          "name": "100_0304crop.bmp (1)",
+          "sizeBytes": 2555904,
+          "startSector": 10059,
+          "endSector": 15050,
+          "physicalOffset": 5150208,
+          "rawCells": [
+            "100_0304crop.bmp (1)",
+            "2,555,904",
+            "10,059",
+            "15,050"
+          ]
+        },
+        {
+          "name": "09260002.jpg (2)",
+          "sizeBytes": 30508,
+          "startSector": 15051,
+          "endSector": 15110,
+          "physicalOffset": 7706112,
+          "rawCells": [
+            "09260002.jpg (2)",
+            "30,508",
+            "15,051",
+            "15,110"
+          ]
+        },
+        {
+          "name": "100_0304crop.bmp (2)",
+          "sizeBytes": 2556002,
+          "startSector": 15111,
+          "endSector": 20103,
+          "physicalOffset": 7736832,
+          "rawCells": [
+            "100_0304crop.bmp (2)",
+            "2,556,002",
+            "15,111",
+            "20,103"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 20104,
+          "endSector": 30103,
+          "physicalOffset": 10293248,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "20,104",
+            "30,103"
+          ]
+        },
+        {
+          "name": "100_0018.tif (1)",
+          "sizeBytes": 4989440,
+          "startSector": 30104,
+          "endSector": 39848,
+          "physicalOffset": 15413248,
+          "rawCells": [
+            "100_0018.tif (1)",
+            "4,989,440",
+            "30,104",
+            "39,848"
+          ]
+        },
+        {
+          "name": "02010025.pcx (1)",
+          "sizeBytes": 268800,
+          "startSector": 39849,
+          "endSector": 40373,
+          "physicalOffset": 20402688,
+          "rawCells": [
+            "02010025.pcx (1)",
+            "268,800",
+            "39,849",
+            "40,373"
+          ]
+        },
+        {
+          "name": "100_0018.tif (2)",
+          "sizeBytes": 4989440,
+          "startSector": 40374,
+          "endSector": 50118,
+          "physicalOffset": 20671488,
+          "rawCells": [
+            "100_0018.tif (2)",
+            "4,989,440",
+            "40,374",
+            "50,118"
+          ]
+        },
+        {
+          "name": "02010025.pcx (2)",
+          "sizeBytes": 268800,
+          "startSector": 50119,
+          "endSector": 50643,
+          "physicalOffset": 25660928,
+          "rawCells": [
+            "02010025.pcx (2)",
+            "268,800",
+            "50,119",
+            "50,643"
+          ]
+        },
+        {
+          "name": "100_0018.tif (3)",
+          "sizeBytes": 4990448,
+          "startSector": 50644,
+          "endSector": 60390,
+          "physicalOffset": 25929728,
+          "rawCells": [
+            "100_0018.tif (3)",
+            "4,990,448",
+            "50,644",
+            "60,390"
+          ]
+        },
+        {
+          "name": "02010025.pcx (3)",
+          "sizeBytes": 269064,
+          "startSector": 60391,
+          "endSector": 60916,
+          "physicalOffset": 30920192,
+          "rawCells": [
+            "02010025.pcx (3)",
+            "269,064",
+            "60,391",
+            "60,916"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 60917,
+          "endSector": 70916,
+          "physicalOffset": 31189504,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "60,917",
+            "70,916"
+          ]
+        },
+        {
+          "name": "100_0183.gif (1)",
+          "sizeBytes": 66048,
+          "startSector": 70917,
+          "endSector": 71045,
+          "physicalOffset": 36309504,
+          "rawCells": [
+            "100_0183.gif (1)",
+            "66,048",
+            "70,917",
+            "71,045"
+          ]
+        },
+        {
+          "name": "000_0021.png (1)",
+          "sizeBytes": 6482944,
+          "startSector": 71046,
+          "endSector": 83707,
+          "physicalOffset": 36375552,
+          "rawCells": [
+            "000_0021.png (1)",
+            "6,482,944",
+            "71,046",
+            "83,707"
+          ]
+        },
+        {
+          "name": "02010025.pcx (1)",
+          "sizeBytes": 402944,
+          "startSector": 83708,
+          "endSector": 84494,
+          "physicalOffset": 42858496,
+          "rawCells": [
+            "02010025.pcx (1)",
+            "402,944",
+            "83,708",
+            "84,494"
+          ]
+        },
+        {
+          "name": "100_0183.gif (2)",
+          "sizeBytes": 66900,
+          "startSector": 84495,
+          "endSector": 84625,
+          "physicalOffset": 43261440,
+          "rawCells": [
+            "100_0183.gif (2)",
+            "66,900",
+            "84,495",
+            "84,625"
+          ]
+        },
+        {
+          "name": "000_0021.png (2)",
+          "sizeBytes": 6483695,
+          "startSector": 84626,
+          "endSector": 97289,
+          "physicalOffset": 43328512,
+          "rawCells": [
+            "000_0021.png (2)",
+            "6,483,695",
+            "84,626",
+            "97,289"
+          ]
+        },
+        {
+          "name": "02010025.pcx (2)",
+          "sizeBytes": 403720,
+          "startSector": 97290,
+          "endSector": 98078,
+          "physicalOffset": 49812480,
+          "rawCells": [
+            "02010025.pcx (2)",
+            "403,720",
+            "97,290",
+            "98,078"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L0_Archive",
+      "level": 0,
+      "family": "Archive",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L0_Archive.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "arc1.7z",
+          "sizeBytes": 1130244,
+          "startSector": 10000,
+          "endSector": 12207,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "arc1.7z",
+            "1,130,244",
+            "10,000",
+            "12,207"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 12208,
+          "endSector": 22207,
+          "physicalOffset": 6250496,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "12,208",
+            "22,207"
+          ]
+        },
+        {
+          "name": "arc2.bz2",
+          "sizeBytes": 565104,
+          "startSector": 22208,
+          "endSector": 23311,
+          "physicalOffset": 11370496,
+          "rawCells": [
+            "arc2.bz2",
+            "565,104",
+            "22,208",
+            "23,311"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 23312,
+          "endSector": 33311,
+          "physicalOffset": 11935744,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "23,312",
+            "33,311"
+          ]
+        },
+        {
+          "name": "arc3.gz",
+          "sizeBytes": 50605,
+          "startSector": 33312,
+          "endSector": 33410,
+          "physicalOffset": 17055744,
+          "rawCells": [
+            "arc3.gz",
+            "50,605",
+            "33,312",
+            "33,410"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 33411,
+          "endSector": 43410,
+          "physicalOffset": 17106432,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "33,411",
+            "43,410"
+          ]
+        },
+        {
+          "name": "arc4.tar",
+          "sizeBytes": 1212928,
+          "startSector": 43411,
+          "endSector": 45779,
+          "physicalOffset": 22226432,
+          "rawCells": [
+            "arc4.tar",
+            "1,212,928",
+            "43,411",
+            "45,779"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 45780,
+          "endSector": 55779,
+          "physicalOffset": 23439360,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "45,780",
+            "55,779"
+          ]
+        },
+        {
+          "name": "arc5.wim",
+          "sizeBytes": 941059,
+          "startSector": 55780,
+          "endSector": 57618,
+          "physicalOffset": 28559360,
+          "rawCells": [
+            "arc5.wim",
+            "941,059",
+            "55,780",
+            "57,618"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 57619,
+          "endSector": 67618,
+          "physicalOffset": 29500928,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "57,619",
+            "67,618"
+          ]
+        },
+        {
+          "name": "arc6.rar",
+          "sizeBytes": 868785,
+          "startSector": 67619,
+          "endSector": 69315,
+          "physicalOffset": 34620928,
+          "rawCells": [
+            "arc6.rar",
+            "868,785",
+            "67,619",
+            "69,315"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 69316,
+          "endSector": 79315,
+          "physicalOffset": 35489792,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "69,316",
+            "79,315"
+          ]
+        },
+        {
+          "name": "arc7.zip",
+          "sizeBytes": 643764,
+          "startSector": 79316,
+          "endSector": 80573,
+          "physicalOffset": 40609792,
+          "rawCells": [
+            "arc7.zip",
+            "643,764",
+            "79,316",
+            "80,573"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L1_Archive",
+      "level": 1,
+      "family": "Archive",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L1_Archive.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "acr1.7z (1)",
+          "sizeBytes": 564736,
+          "startSector": 10000,
+          "endSector": 11102,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "acr1.7z (1)",
+            "564,736",
+            "10,000",
+            "11,102"
+          ]
+        },
+        {
+          "name": "arc1.7z (2)",
+          "sizeBytes": 565508,
+          "startSector": 11103,
+          "endSector": 12207,
+          "physicalOffset": 5684736,
+          "rawCells": [
+            "arc1.7z (2)",
+            "565,508",
+            "11,103",
+            "12,207"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 12208,
+          "endSector": 22207,
+          "physicalOffset": 6250496,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "12,208",
+            "22,207"
+          ]
+        },
+        {
+          "name": "arc2.bz2 (1)",
+          "sizeBytes": 187904,
+          "startSector": 22208,
+          "endSector": 22574,
+          "physicalOffset": 11370496,
+          "rawCells": [
+            "arc2.bz2 (1)",
+            "187,904",
+            "22,208",
+            "22,574"
+          ]
+        },
+        {
+          "name": "arc2.bz2 (2)",
+          "sizeBytes": 187904,
+          "startSector": 22575,
+          "endSector": 22941,
+          "physicalOffset": 11558400,
+          "rawCells": [
+            "arc2.bz2 (2)",
+            "187,904",
+            "22,575",
+            "22,941"
+          ]
+        },
+        {
+          "name": "arc2.bz2 (3)",
+          "sizeBytes": 189296,
+          "startSector": 22942,
+          "endSector": 23311,
+          "physicalOffset": 11746304,
+          "rawCells": [
+            "arc2.bz2 (3)",
+            "189,296",
+            "22,942",
+            "23,311"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 23312,
+          "endSector": 33311,
+          "physicalOffset": 11935744,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "23,312",
+            "33,311"
+          ]
+        },
+        {
+          "name": "arc3.gz (1)",
+          "sizeBytes": 25088,
+          "startSector": 33312,
+          "endSector": 33360,
+          "physicalOffset": 17055744,
+          "rawCells": [
+            "arc3.gz (1)",
+            "25,088",
+            "33,312",
+            "33,360"
+          ]
+        },
+        {
+          "name": "arc3.gz (2)",
+          "sizeBytes": 25517,
+          "startSector": 33361,
+          "endSector": 33410,
+          "physicalOffset": 17080832,
+          "rawCells": [
+            "arc3.gz (2)",
+            "25,517",
+            "33,361",
+            "33,410"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 33411,
+          "endSector": 43410,
+          "physicalOffset": 17106432,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "33,411",
+            "43,410"
+          ]
+        },
+        {
+          "name": "arc4.tar (1)",
+          "sizeBytes": 403968,
+          "startSector": 43411,
+          "endSector": 44199,
+          "physicalOffset": 22226432,
+          "rawCells": [
+            "arc4.tar (1)",
+            "403,968",
+            "43,411",
+            "44,199"
+          ]
+        },
+        {
+          "name": "arc4.tar (2)",
+          "sizeBytes": 403968,
+          "startSector": 44200,
+          "endSector": 44988,
+          "physicalOffset": 22630400,
+          "rawCells": [
+            "arc4.tar (2)",
+            "403,968",
+            "44,200",
+            "44,988"
+          ]
+        },
+        {
+          "name": "arc4.tar (3)",
+          "sizeBytes": 404992,
+          "startSector": 44989,
+          "endSector": 45779,
+          "physicalOffset": 23034368,
+          "rawCells": [
+            "arc4.tar (3)",
+            "404,992",
+            "44,989",
+            "45,779"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 45780,
+          "endSector": 55779,
+          "physicalOffset": 23439360,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "45,780",
+            "55,779"
+          ]
+        },
+        {
+          "name": "arc5.wim (1)",
+          "sizeBytes": 470528,
+          "startSector": 55780,
+          "endSector": 56698,
+          "physicalOffset": 28559360,
+          "rawCells": [
+            "arc5.wim (1)",
+            "470,528",
+            "55,780",
+            "56,698"
+          ]
+        },
+        {
+          "name": "arc5.wim (2)",
+          "sizeBytes": 470531,
+          "startSector": 56699,
+          "endSector": 57618,
+          "physicalOffset": 29029888,
+          "rawCells": [
+            "arc5.wim (2)",
+            "470,531",
+            "56,699",
+            "57,618"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 57619,
+          "endSector": 67618,
+          "physicalOffset": 29500928,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "57,619",
+            "67,618"
+          ]
+        },
+        {
+          "name": "arc6.rar (1)",
+          "sizeBytes": 289280,
+          "startSector": 67619,
+          "endSector": 68183,
+          "physicalOffset": 34620928,
+          "rawCells": [
+            "arc6.rar (1)",
+            "289,280",
+            "67,619",
+            "68,183"
+          ]
+        },
+        {
+          "name": "arc6.rar (2)",
+          "sizeBytes": 289280,
+          "startSector": 68184,
+          "endSector": 68748,
+          "physicalOffset": 34910208,
+          "rawCells": [
+            "arc6.rar (2)",
+            "289,280",
+            "68,184",
+            "68,748"
+          ]
+        },
+        {
+          "name": "arc6.rar (3)",
+          "sizeBytes": 290225,
+          "startSector": 68749,
+          "endSector": 69315,
+          "physicalOffset": 35199488,
+          "rawCells": [
+            "arc6.rar (3)",
+            "290,225",
+            "68,749",
+            "69,315"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 69316,
+          "endSector": 79315,
+          "physicalOffset": 35489792,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "69,316",
+            "79,315"
+          ]
+        },
+        {
+          "name": "arc7.zip (1)",
+          "sizeBytes": 321536,
+          "startSector": 79316,
+          "endSector": 79943,
+          "physicalOffset": 40609792,
+          "rawCells": [
+            "arc7.zip (1)",
+            "321,536",
+            "79,316",
+            "79,943"
+          ]
+        },
+        {
+          "name": "arc7.zip (2)",
+          "sizeBytes": 322228,
+          "startSector": 79944,
+          "endSector": 80573,
+          "physicalOffset": 40931328,
+          "rawCells": [
+            "arc7.zip (2)",
+            "322,228",
+            "79,944",
+            "80,573"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L2_Archive",
+      "level": 2,
+      "family": "Archive",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L2_Archive.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "arc6.rar (2)",
+          "sizeBytes": 434609,
+          "startSector": 10000,
+          "endSector": 10848,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "arc6.rar (2)",
+            "434,609",
+            "10,000",
+            "10,848"
+          ]
+        },
+        {
+          "name": "arc6.rar (1)",
+          "sizeBytes": 434176,
+          "startSector": 10849,
+          "endSector": 11696,
+          "physicalOffset": 5554688,
+          "rawCells": [
+            "arc6.rar (1)",
+            "434,176",
+            "10,849",
+            "11,696"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 11697,
+          "endSector": 21696,
+          "physicalOffset": 5988864,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "11,697",
+            "21,696"
+          ]
+        },
+        {
+          "name": "acr7.zip (1)",
+          "sizeBytes": 214528,
+          "startSector": 21697,
+          "endSector": 22115,
+          "physicalOffset": 11108864,
+          "rawCells": [
+            "acr7.zip (1)",
+            "214,528",
+            "21,697",
+            "22,115"
+          ]
+        },
+        {
+          "name": "arc7.zip (3)",
+          "sizeBytes": 214708,
+          "startSector": 22116,
+          "endSector": 22535,
+          "physicalOffset": 11323392,
+          "rawCells": [
+            "arc7.zip (3)",
+            "214,708",
+            "22,116",
+            "22,535"
+          ]
+        },
+        {
+          "name": "arc7.zip (2)",
+          "sizeBytes": 214528,
+          "startSector": 22536,
+          "endSector": 22954,
+          "physicalOffset": 11538432,
+          "rawCells": [
+            "arc7.zip (2)",
+            "214,528",
+            "22,536",
+            "22,954"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 22955,
+          "endSector": 32954,
+          "physicalOffset": 11752960,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "22,955",
+            "32,954"
+          ]
+        },
+        {
+          "name": "arc1.7z (2)",
+          "sizeBytes": 376320,
+          "startSector": 32955,
+          "endSector": 33689,
+          "physicalOffset": 16872960,
+          "rawCells": [
+            "arc1.7z (2)",
+            "376,320",
+            "32,955",
+            "33,689"
+          ]
+        },
+        {
+          "name": "arc1.7z (1)",
+          "sizeBytes": 376320,
+          "startSector": 33690,
+          "endSector": 34424,
+          "physicalOffset": 17249280,
+          "rawCells": [
+            "arc1.7z (1)",
+            "376,320",
+            "33,690",
+            "34,424"
+          ]
+        },
+        {
+          "name": "arc1.7z (3)",
+          "sizeBytes": 377604,
+          "startSector": 34425,
+          "endSector": 35162,
+          "physicalOffset": 17625600,
+          "rawCells": [
+            "arc1.7z (3)",
+            "377,604",
+            "34,425",
+            "35,162"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 35163,
+          "endSector": 45162,
+          "physicalOffset": 18003456,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "35,163",
+            "45,162"
+          ]
+        },
+        {
+          "name": "arc2.bz2 (2)",
+          "sizeBytes": 187904,
+          "startSector": 45163,
+          "endSector": 45529,
+          "physicalOffset": 23123456,
+          "rawCells": [
+            "arc2.bz2 (2)",
+            "187,904",
+            "45,163",
+            "45,529"
+          ]
+        },
+        {
+          "name": "arc2.bz2 (3)",
+          "sizeBytes": 189296,
+          "startSector": 45530,
+          "endSector": 45899,
+          "physicalOffset": 23311360,
+          "rawCells": [
+            "arc2.bz2 (3)",
+            "189,296",
+            "45,530",
+            "45,899"
+          ]
+        },
+        {
+          "name": "arc2.bz2 (1)",
+          "sizeBytes": 187904,
+          "startSector": 45900,
+          "endSector": 46266,
+          "physicalOffset": 23500800,
+          "rawCells": [
+            "arc2.bz2 (1)",
+            "187,904",
+            "45,900",
+            "46,266"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 46267,
+          "endSector": 56266,
+          "physicalOffset": 23688704,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "46,267",
+            "56,266"
+          ]
+        },
+        {
+          "name": "arc4.tar (3)",
+          "sizeBytes": 404992,
+          "startSector": 56267,
+          "endSector": 57057,
+          "physicalOffset": 28808704,
+          "rawCells": [
+            "arc4.tar (3)",
+            "404,992",
+            "56,267",
+            "57,057"
+          ]
+        },
+        {
+          "name": "arc4.tar (1)",
+          "sizeBytes": 403968,
+          "startSector": 57058,
+          "endSector": 57846,
+          "physicalOffset": 29213696,
+          "rawCells": [
+            "arc4.tar (1)",
+            "403,968",
+            "57,058",
+            "57,846"
+          ]
+        },
+        {
+          "name": "arc4.tar (2)",
+          "sizeBytes": 403968,
+          "startSector": 57847,
+          "endSector": 58635,
+          "physicalOffset": 29617664,
+          "rawCells": [
+            "arc4.tar (2)",
+            "403,968",
+            "57,847",
+            "58,635"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 58636,
+          "endSector": 68635,
+          "physicalOffset": 30021632,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "58,636",
+            "68,635"
+          ]
+        },
+        {
+          "name": "arc5.wim (3)",
+          "sizeBytes": 314371,
+          "startSector": 68636,
+          "endSector": 69250,
+          "physicalOffset": 35141632,
+          "rawCells": [
+            "arc5.wim (3)",
+            "314,371",
+            "68,636",
+            "69,250"
+          ]
+        },
+        {
+          "name": "arc5.wim (2)",
+          "sizeBytes": 313344,
+          "startSector": 69251,
+          "endSector": 69862,
+          "physicalOffset": 35456512,
+          "rawCells": [
+            "arc5.wim (2)",
+            "313,344",
+            "69,251",
+            "69,862"
+          ]
+        },
+        {
+          "name": "arc5.wim (1)",
+          "sizeBytes": 313344,
+          "startSector": 69863,
+          "endSector": 70474,
+          "physicalOffset": 35769856,
+          "rawCells": [
+            "arc5.wim (1)",
+            "313,344",
+            "69,863",
+            "70,474"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 70475,
+          "endSector": 80474,
+          "physicalOffset": 36083200,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "70,475",
+            "80,474"
+          ]
+        },
+        {
+          "name": "arc3.gz (2,3)",
+          "sizeBytes": 34221,
+          "startSector": 80475,
+          "endSector": 80541,
+          "physicalOffset": 41203200,
+          "rawCells": [
+            "arc3.gz (2,3)",
+            "34,221",
+            "80,475",
+            "80,541"
+          ]
+        },
+        {
+          "name": "arc3.gz (1)",
+          "sizeBytes": 16384,
+          "startSector": 80542,
+          "endSector": 80573,
+          "physicalOffset": 41237504,
+          "rawCells": [
+            "arc3.gz (1)",
+            "16,384",
+            "80,542",
+            "80,573"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L3_Archive",
+      "level": 3,
+      "family": "Archive",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L3_Archive.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "arc6.rar (1)",
+          "sizeBytes": 434176,
+          "startSector": 10000,
+          "endSector": 10847,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "arc6.rar (1)",
+            "434,176",
+            "10,000",
+            "10,847"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 10848,
+          "endSector": 20847,
+          "physicalOffset": 5554176,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "10,848",
+            "20,847"
+          ]
+        },
+        {
+          "name": "arc7.zip (2)",
+          "sizeBytes": 322228,
+          "startSector": 20848,
+          "endSector": 21477,
+          "physicalOffset": 10674176,
+          "rawCells": [
+            "arc7.zip (2)",
+            "322,228",
+            "20,848",
+            "21,477"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 21478,
+          "endSector": 31477,
+          "physicalOffset": 10996736,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "21,478",
+            "31,477"
+          ]
+        },
+        {
+          "name": "arc3.gz (1)",
+          "sizeBytes": 16384,
+          "startSector": 31478,
+          "endSector": 31509,
+          "physicalOffset": 16116736,
+          "rawCells": [
+            "arc3.gz (1)",
+            "16,384",
+            "31,478",
+            "31,509"
+          ]
+        },
+        {
+          "name": "arc3.gz (2)",
+          "sizeBytes": 16384,
+          "startSector": 31510,
+          "endSector": 31541,
+          "physicalOffset": 16133120,
+          "rawCells": [
+            "arc3.gz (2)",
+            "16,384",
+            "31,510",
+            "31,541"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 31542,
+          "endSector": 41541,
+          "physicalOffset": 16149504,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "31,542",
+            "41,541"
+          ]
+        },
+        {
+          "name": "arc2.bz2 (1)",
+          "sizeBytes": 187904,
+          "startSector": 41542,
+          "endSector": 41908,
+          "physicalOffset": 21269504,
+          "rawCells": [
+            "arc2.bz2 (1)",
+            "187,904",
+            "41,542",
+            "41,908"
+          ]
+        },
+        {
+          "name": "arc2.bz2 (3)",
+          "sizeBytes": 189296,
+          "startSector": 41909,
+          "endSector": 42278,
+          "physicalOffset": 21457408,
+          "rawCells": [
+            "arc2.bz2 (3)",
+            "189,296",
+            "41,909",
+            "42,278"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 42279,
+          "endSector": 52278,
+          "physicalOffset": 21646848,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "42,279",
+            "52,278"
+          ]
+        },
+        {
+          "name": "arc1.7z (2)",
+          "sizeBytes": 376320,
+          "startSector": 52279,
+          "endSector": 53013,
+          "physicalOffset": 26766848,
+          "rawCells": [
+            "arc1.7z (2)",
+            "376,320",
+            "52,279",
+            "53,013"
+          ]
+        },
+        {
+          "name": "arc1.7z (3)",
+          "sizeBytes": 377604,
+          "startSector": 53014,
+          "endSector": 53751,
+          "physicalOffset": 27143168,
+          "rawCells": [
+            "arc1.7z (3)",
+            "377,604",
+            "53,014",
+            "53,751"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 53752,
+          "endSector": 63751,
+          "physicalOffset": 27521024,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "53,752",
+            "63,751"
+          ]
+        },
+        {
+          "name": "arc4.tar (3)",
+          "sizeBytes": 404992,
+          "startSector": 63752,
+          "endSector": 64542,
+          "physicalOffset": 32641024,
+          "rawCells": [
+            "arc4.tar (3)",
+            "404,992",
+            "63,752",
+            "64,542"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 64543,
+          "endSector": 74542,
+          "physicalOffset": 33046016,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "64,543",
+            "74,542"
+          ]
+        },
+        {
+          "name": "arc5.wim (2,3)",
+          "sizeBytes": 627715,
+          "startSector": 74543,
+          "endSector": 75769,
+          "physicalOffset": 38166016,
+          "rawCells": [
+            "arc5.wim (2,3)",
+            "627,715",
+            "74,543",
+            "75,769"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L4_Archive",
+      "level": 4,
+      "family": "Archive",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L4_Archive.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "arc4.tar (1)",
+          "sizeBytes": 606208,
+          "startSector": 10000,
+          "endSector": 11183,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "arc4.tar (1)",
+            "606,208",
+            "10,000",
+            "11,183"
+          ]
+        },
+        {
+          "name": "arc1.7z",
+          "sizeBytes": 1130244,
+          "startSector": 11184,
+          "endSector": 13391,
+          "physicalOffset": 5726208,
+          "rawCells": [
+            "arc1.7z",
+            "1,130,244",
+            "11,184",
+            "13,391"
+          ]
+        },
+        {
+          "name": "arc4.tar (2)",
+          "sizeBytes": 606720,
+          "startSector": 13392,
+          "endSector": 14576,
+          "physicalOffset": 6856704,
+          "rawCells": [
+            "arc4.tar (2)",
+            "606,720",
+            "13,392",
+            "14,576"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 14577,
+          "endSector": 24576,
+          "physicalOffset": 7463424,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "14,577",
+            "24,576"
+          ]
+        },
+        {
+          "name": "arc3.gz (1)",
+          "sizeBytes": 16384,
+          "startSector": 24577,
+          "endSector": 24608,
+          "physicalOffset": 12583424,
+          "rawCells": [
+            "arc3.gz (1)",
+            "16,384",
+            "24,577",
+            "24,608"
+          ]
+        },
+        {
+          "name": "arc6.rar",
+          "sizeBytes": 868785,
+          "startSector": 24609,
+          "endSector": 26305,
+          "physicalOffset": 12599808,
+          "rawCells": [
+            "arc6.rar",
+            "868,785",
+            "24,609",
+            "26,305"
+          ]
+        },
+        {
+          "name": "arc3.gz (2)",
+          "sizeBytes": 16384,
+          "startSector": 26306,
+          "endSector": 26337,
+          "physicalOffset": 13468672,
+          "rawCells": [
+            "arc3.gz (2)",
+            "16,384",
+            "26,306",
+            "26,337"
+          ]
+        },
+        {
+          "name": "arc3.gz (3)",
+          "sizeBytes": 17837,
+          "startSector": 26338,
+          "endSector": 26372,
+          "physicalOffset": 13485056,
+          "rawCells": [
+            "arc3.gz (3)",
+            "17,837",
+            "26,338",
+            "26,372"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 26373,
+          "endSector": 36372,
+          "physicalOffset": 13502976,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "26,373",
+            "36,372"
+          ]
+        },
+        {
+          "name": "arc1.7z (1)",
+          "sizeBytes": 376320,
+          "startSector": 36373,
+          "endSector": 37107,
+          "physicalOffset": 18622976,
+          "rawCells": [
+            "arc1.7z (1)",
+            "376,320",
+            "36,373",
+            "37,107"
+          ]
+        },
+        {
+          "name": "arc1.7z (2)",
+          "sizeBytes": 376320,
+          "startSector": 37108,
+          "endSector": 37842,
+          "physicalOffset": 18999296,
+          "rawCells": [
+            "arc1.7z (2)",
+            "376,320",
+            "37,108",
+            "37,842"
+          ]
+        },
+        {
+          "name": "arc3.gz",
+          "sizeBytes": 565104,
+          "startSector": 37843,
+          "endSector": 38946,
+          "physicalOffset": 19375616,
+          "rawCells": [
+            "arc3.gz",
+            "565,104",
+            "37,843",
+            "38,946"
+          ]
+        },
+        {
+          "name": "arc1.7z (3)",
+          "sizeBytes": 377604,
+          "startSector": 38947,
+          "endSector": 39684,
+          "physicalOffset": 19940864,
+          "rawCells": [
+            "arc1.7z (3)",
+            "377,604",
+            "38,947",
+            "39,684"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 39685,
+          "endSector": 49684,
+          "physicalOffset": 20318720,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "39,685",
+            "49,684"
+          ]
+        },
+        {
+          "name": "arc7.zip (1)",
+          "sizeBytes": 321536,
+          "startSector": 49685,
+          "endSector": 50312,
+          "physicalOffset": 25438720,
+          "rawCells": [
+            "arc7.zip (1)",
+            "321,536",
+            "49,685",
+            "50,312"
+          ]
+        },
+        {
+          "name": "arc2.bz2 (1,2)",
+          "sizeBytes": 375808,
+          "startSector": 50313,
+          "endSector": 51046,
+          "physicalOffset": 25760256,
+          "rawCells": [
+            "arc2.bz2 (1,2)",
+            "375,808",
+            "50,313",
+            "51,046"
+          ]
+        },
+        {
+          "name": "arc5.wim",
+          "sizeBytes": 941059,
+          "startSector": 51047,
+          "endSector": 52885,
+          "physicalOffset": 26136064,
+          "rawCells": [
+            "arc5.wim",
+            "941,059",
+            "51,047",
+            "52,885"
+          ]
+        },
+        {
+          "name": "arc2.bz2 (3)",
+          "sizeBytes": 189296,
+          "startSector": 52886,
+          "endSector": 53255,
+          "physicalOffset": 27077632,
+          "rawCells": [
+            "arc2.bz2 (3)",
+            "189,296",
+            "52,886",
+            "53,255"
+          ]
+        },
+        {
+          "name": "arc7.zip (2)",
+          "sizeBytes": 322228,
+          "startSector": 53256,
+          "endSector": 53885,
+          "physicalOffset": 27267072,
+          "rawCells": [
+            "arc7.zip (2)",
+            "322,228",
+            "53,256",
+            "53,885"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L5_Archive",
+      "level": 5,
+      "family": "Archive",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L5_Archive.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "arc3.gz (1)",
+          "sizeBytes": 25088,
+          "startSector": 10000,
+          "endSector": 10048,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "arc3.gz (1)",
+            "25,088",
+            "10,000",
+            "10,048"
+          ]
+        },
+        {
+          "name": "arc5.wim (1)",
+          "sizeBytes": 470528,
+          "startSector": 10049,
+          "endSector": 10967,
+          "physicalOffset": 5145088,
+          "rawCells": [
+            "arc5.wim (1)",
+            "470,528",
+            "10,049",
+            "10,967"
+          ]
+        },
+        {
+          "name": "arc3.gz (2)",
+          "sizeBytes": 25517,
+          "startSector": 10968,
+          "endSector": 11017,
+          "physicalOffset": 5615616,
+          "rawCells": [
+            "arc3.gz (2)",
+            "25,517",
+            "10,968",
+            "11,017"
+          ]
+        },
+        {
+          "name": "arc5.wim (2)",
+          "sizeBytes": 470531,
+          "startSector": 11018,
+          "endSector": 11937,
+          "physicalOffset": 5641216,
+          "rawCells": [
+            "arc5.wim (2)",
+            "470,531",
+            "11,018",
+            "11,937"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 11938,
+          "endSector": 21937,
+          "physicalOffset": 6112256,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "11,938",
+            "21,937"
+          ]
+        },
+        {
+          "name": "arc7.zip (1)",
+          "sizeBytes": 321536,
+          "startSector": 21938,
+          "endSector": 22565,
+          "physicalOffset": 11232256,
+          "rawCells": [
+            "arc7.zip (1)",
+            "321,536",
+            "21,938",
+            "22,565"
+          ]
+        },
+        {
+          "name": "arc1.7z (1)",
+          "sizeBytes": 564736,
+          "startSector": 22566,
+          "endSector": 23668,
+          "physicalOffset": 11553792,
+          "rawCells": [
+            "arc1.7z (1)",
+            "564,736",
+            "22,566",
+            "23,668"
+          ]
+        },
+        {
+          "name": "arc4.tar (1)",
+          "sizeBytes": 606208,
+          "startSector": 23669,
+          "endSector": 24852,
+          "physicalOffset": 12118528,
+          "rawCells": [
+            "arc4.tar (1)",
+            "606,208",
+            "23,669",
+            "24,852"
+          ]
+        },
+        {
+          "name": "arc7.zip (2)",
+          "sizeBytes": 322228,
+          "startSector": 24853,
+          "endSector": 25482,
+          "physicalOffset": 12724736,
+          "rawCells": [
+            "arc7.zip (2)",
+            "322,228",
+            "24,853",
+            "25,482"
+          ]
+        },
+        {
+          "name": "arc1.7z (2)",
+          "sizeBytes": 565508,
+          "startSector": 25483,
+          "endSector": 26587,
+          "physicalOffset": 13047296,
+          "rawCells": [
+            "arc1.7z (2)",
+            "565,508",
+            "25,483",
+            "26,587"
+          ]
+        },
+        {
+          "name": "arc4.tar (2)",
+          "sizeBytes": 606720,
+          "startSector": 26588,
+          "endSector": 27772,
+          "physicalOffset": 13613056,
+          "rawCells": [
+            "arc4.tar (2)",
+            "606,720",
+            "26,588",
+            "27,772"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 27773,
+          "endSector": 37772,
+          "physicalOffset": 14219776,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "27,773",
+            "37,772"
+          ]
+        },
+        {
+          "name": "arc2.bz2 (1)",
+          "sizeBytes": 187904,
+          "startSector": 37773,
+          "endSector": 38139,
+          "physicalOffset": 19339776,
+          "rawCells": [
+            "arc2.bz2 (1)",
+            "187,904",
+            "37,773",
+            "38,139"
+          ]
+        },
+        {
+          "name": "arc7.zip (1)",
+          "sizeBytes": 214528,
+          "startSector": 38140,
+          "endSector": 38558,
+          "physicalOffset": 19527680,
+          "rawCells": [
+            "arc7.zip (1)",
+            "214,528",
+            "38,140",
+            "38,558"
+          ]
+        },
+        {
+          "name": "arc2.bz2 (2)",
+          "sizeBytes": 187904,
+          "startSector": 38559,
+          "endSector": 38925,
+          "physicalOffset": 19742208,
+          "rawCells": [
+            "arc2.bz2 (2)",
+            "187,904",
+            "38,559",
+            "38,925"
+          ]
+        },
+        {
+          "name": "arc7.zip (2)",
+          "sizeBytes": 214528,
+          "startSector": 38926,
+          "endSector": 39344,
+          "physicalOffset": 19930112,
+          "rawCells": [
+            "arc7.zip (2)",
+            "214,528",
+            "38,926",
+            "39,344"
+          ]
+        },
+        {
+          "name": "arc2.bz2 (3)",
+          "sizeBytes": 189296,
+          "startSector": 39345,
+          "endSector": 39714,
+          "physicalOffset": 20144640,
+          "rawCells": [
+            "arc2.bz2 (3)",
+            "189,296",
+            "39,345",
+            "39,714"
+          ]
+        },
+        {
+          "name": "arc7.zip (3)",
+          "sizeBytes": 214708,
+          "startSector": 39715,
+          "endSector": 40134,
+          "physicalOffset": 20334080,
+          "rawCells": [
+            "arc7.zip (3)",
+            "214,708",
+            "39,715",
+            "40,134"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 40135,
+          "endSector": 50134,
+          "physicalOffset": 20549120,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "40,135",
+            "50,134"
+          ]
+        },
+        {
+          "name": "arc1.7z (1)",
+          "sizeBytes": 376320,
+          "startSector": 50135,
+          "endSector": 50869,
+          "physicalOffset": 25669120,
+          "rawCells": [
+            "arc1.7z (1)",
+            "376,320",
+            "50,135",
+            "50,869"
+          ]
+        },
+        {
+          "name": "arc5.wim (1)",
+          "sizeBytes": 313344,
+          "startSector": 50870,
+          "endSector": 51481,
+          "physicalOffset": 26045440,
+          "rawCells": [
+            "arc5.wim (1)",
+            "313,344",
+            "50,870",
+            "51,481"
+          ]
+        },
+        {
+          "name": "arc6.rar (1)",
+          "sizeBytes": 289280,
+          "startSector": 51482,
+          "endSector": 52216,
+          "physicalOffset": 26358784,
+          "rawCells": [
+            "arc6.rar (1)",
+            "289,280",
+            "51,482",
+            "52,216"
+          ]
+        },
+        {
+          "name": "arc1.7z (2)",
+          "sizeBytes": 376320,
+          "startSector": 52217,
+          "endSector": 52828,
+          "physicalOffset": 26735104,
+          "rawCells": [
+            "arc1.7z (2)",
+            "376,320",
+            "52,217",
+            "52,828"
+          ]
+        },
+        {
+          "name": "arc5.wim (2)",
+          "sizeBytes": 313344,
+          "startSector": 52829,
+          "endSector": 53393,
+          "physicalOffset": 27048448,
+          "rawCells": [
+            "arc5.wim (2)",
+            "313,344",
+            "52,829",
+            "53,393"
+          ]
+        },
+        {
+          "name": "arc6.rar (2)",
+          "sizeBytes": 289280,
+          "startSector": 53394,
+          "endSector": 53958,
+          "physicalOffset": 27337728,
+          "rawCells": [
+            "arc6.rar (2)",
+            "289,280",
+            "53,394",
+            "53,958"
+          ]
+        },
+        {
+          "name": "arc1.7z (3)",
+          "sizeBytes": 377604,
+          "startSector": 53959,
+          "endSector": 54696,
+          "physicalOffset": 27627008,
+          "rawCells": [
+            "arc1.7z (3)",
+            "377,604",
+            "53,959",
+            "54,696"
+          ]
+        },
+        {
+          "name": "arc5.wim (3)",
+          "sizeBytes": 314371,
+          "startSector": 54697,
+          "endSector": 55311,
+          "physicalOffset": 28004864,
+          "rawCells": [
+            "arc5.wim (3)",
+            "314,371",
+            "54,697",
+            "55,311"
+          ]
+        },
+        {
+          "name": "arc6.rar (3)",
+          "sizeBytes": 290225,
+          "startSector": 55312,
+          "endSector": 55878,
+          "physicalOffset": 28319744,
+          "rawCells": [
+            "arc6.rar (3)",
+            "290,225",
+            "55,312",
+            "55,878"
+          ]
+        }
+      ],
+      "referenceIssues": [
+        {
+          "kind": "declared_size_sector_span_mismatch",
+          "recordIndex": 22
+        },
+        {
+          "kind": "declared_size_sector_span_mismatch",
+          "recordIndex": 23
+        },
+        {
+          "kind": "declared_size_sector_span_mismatch",
+          "recordIndex": 24
+        }
+      ]
+    },
+    {
+      "id": "L0_Video",
+      "level": 0,
+      "family": "Video",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L0_Video.dd.bz2",
+      "compressedSha256": "91f4bc9c1a7fafdc82088a1c08a457bbfb7a9df6aa520d066054ae20b2502b50",
+      "compressedSizeBytes": 19741341,
+      "decodedSha256": "20d8a231ded5223bbecab97d4155d028ef9cd0760a5dd3ecef22123c46b48870",
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "vid1.mp4",
+          "sizeBytes": 1136007,
+          "startSector": 10000,
+          "endSector": 12218,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "vid1.mp4",
+            "1,136,007",
+            "10,000",
+            "12,218"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 12219,
+          "endSector": 22218,
+          "physicalOffset": 6256128,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "12,219",
+            "22,218"
+          ]
+        },
+        {
+          "name": "vid2.avi",
+          "sizeBytes": 1470360,
+          "startSector": 22219,
+          "endSector": 25090,
+          "physicalOffset": 11376128,
+          "rawCells": [
+            "vid2.avi",
+            "1,470,360",
+            "22,219",
+            "25,090"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 25091,
+          "endSector": 35090,
+          "physicalOffset": 12846592,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "25,091",
+            "35,090"
+          ]
+        },
+        {
+          "name": "vid3.mov",
+          "sizeBytes": 497414,
+          "startSector": 35091,
+          "endSector": 36062,
+          "physicalOffset": 17966592,
+          "rawCells": [
+            "vid3.mov",
+            "497,414",
+            "35,091",
+            "36,062"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 36063,
+          "endSector": 46062,
+          "physicalOffset": 18464256,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "36,063",
+            "46,062"
+          ]
+        },
+        {
+          "name": "vid4.flv",
+          "sizeBytes": 3713213,
+          "startSector": 46063,
+          "endSector": 53315,
+          "physicalOffset": 23584256,
+          "rawCells": [
+            "vid4.flv",
+            "3,713,213",
+            "46,063",
+            "53,315"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 53316,
+          "endSector": 63515,
+          "physicalOffset": 27297792,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "53,316",
+            "63,515"
+          ]
+        },
+        {
+          "name": "vid5.mpg",
+          "sizeBytes": 22579200,
+          "startSector": 63316,
+          "endSector": 107415,
+          "physicalOffset": 32417792,
+          "rawCells": [
+            "vid5.mpg",
+            "22,579,200",
+            "63,316",
+            "107,415"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 107416,
+          "endSector": 117415,
+          "physicalOffset": 54996992,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "107,416",
+            "117,415"
+          ]
+        },
+        {
+          "name": "vid6.wmv",
+          "sizeBytes": 2461696,
+          "startSector": 117416,
+          "endSector": 122223,
+          "physicalOffset": 60116992,
+          "rawCells": [
+            "vid6.wmv",
+            "2,461,696",
+            "117,416",
+            "122,223"
+          ]
+        }
+      ],
+      "referenceIssues": [
+        {
+          "kind": "declared_size_sector_span_mismatch",
+          "recordIndex": 8
+        }
+      ],
+      "decodedSizeBytes": 62578688
+    },
+    {
+      "id": "L1_Video",
+      "level": 1,
+      "family": "Video",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L1_Video.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "vid1.mp4 (1)",
+          "sizeBytes": 378368,
+          "startSector": 10000,
+          "endSector": 10738,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "vid1.mp4 (1)",
+            "378,368",
+            "10,000",
+            "10,738"
+          ]
+        },
+        {
+          "name": "vid1.mp4 (2)",
+          "sizeBytes": 378368,
+          "startSector": 10739,
+          "endSector": 11477,
+          "physicalOffset": 5498368,
+          "rawCells": [
+            "vid1.mp4 (2)",
+            "378,368",
+            "10,739",
+            "11,477"
+          ]
+        },
+        {
+          "name": "vid1.mp4 (3)",
+          "sizeBytes": 379271,
+          "startSector": 11478,
+          "endSector": 12218,
+          "physicalOffset": 5876736,
+          "rawCells": [
+            "vid1.mp4 (3)",
+            "379,271",
+            "11,478",
+            "12,218"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 12219,
+          "endSector": 22218,
+          "physicalOffset": 6256128,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "12,219",
+            "22,218"
+          ]
+        },
+        {
+          "name": "vid2.avi (1)",
+          "sizeBytes": 734720,
+          "startSector": 22219,
+          "endSector": 23653,
+          "physicalOffset": 11376128,
+          "rawCells": [
+            "vid2.avi (1)",
+            "734,720",
+            "22,219",
+            "23,653"
+          ]
+        },
+        {
+          "name": "vid2.avi (2)",
+          "sizeBytes": 735640,
+          "startSector": 23654,
+          "endSector": 25090,
+          "physicalOffset": 12110848,
+          "rawCells": [
+            "vid2.avi (2)",
+            "735,640",
+            "23,654",
+            "25,090"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 25091,
+          "endSector": 35090,
+          "physicalOffset": 12846592,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "25,091",
+            "35,090"
+          ]
+        },
+        {
+          "name": "vid3.mov (1)",
+          "sizeBytes": 165376,
+          "startSector": 35091,
+          "endSector": 35413,
+          "physicalOffset": 17966592,
+          "rawCells": [
+            "vid3.mov (1)",
+            "165,376",
+            "35,091",
+            "35,413"
+          ]
+        },
+        {
+          "name": "vid3.mov (2)",
+          "sizeBytes": 165376,
+          "startSector": 35414,
+          "endSector": 35736,
+          "physicalOffset": 18131968,
+          "rawCells": [
+            "vid3.mov (2)",
+            "165,376",
+            "35,414",
+            "35,736"
+          ]
+        },
+        {
+          "name": "vid3.mov (3)",
+          "sizeBytes": 166662,
+          "startSector": 35737,
+          "endSector": 36062,
+          "physicalOffset": 18297344,
+          "rawCells": [
+            "vid3.mov (3)",
+            "166,662",
+            "35,737",
+            "36,062"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 36063,
+          "endSector": 46062,
+          "physicalOffset": 18464256,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "36,063",
+            "46,062"
+          ]
+        },
+        {
+          "name": "vid4.flv (1)",
+          "sizeBytes": 1856512,
+          "startSector": 46063,
+          "endSector": 49688,
+          "physicalOffset": 23584256,
+          "rawCells": [
+            "vid4.flv (1)",
+            "1,856,512",
+            "46,063",
+            "49,688"
+          ]
+        },
+        {
+          "name": "vid4.flv (2)",
+          "sizeBytes": 1856701,
+          "startSector": 49689,
+          "endSector": 53315,
+          "physicalOffset": 25440768,
+          "rawCells": [
+            "vid4.flv (2)",
+            "1,856,701",
+            "49,689",
+            "53,315"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 53316,
+          "endSector": 63315,
+          "physicalOffset": 27297792,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "53,316",
+            "63,315"
+          ]
+        },
+        {
+          "name": "vid5.mpg (1)",
+          "sizeBytes": 7526400,
+          "startSector": 63316,
+          "endSector": 78015,
+          "physicalOffset": 32417792,
+          "rawCells": [
+            "vid5.mpg (1)",
+            "7,526,400",
+            "63,316",
+            "78,015"
+          ]
+        },
+        {
+          "name": "vid5.mpg (2)",
+          "sizeBytes": 7526400,
+          "startSector": 78016,
+          "endSector": 92715,
+          "physicalOffset": 39944192,
+          "rawCells": [
+            "vid5.mpg (2)",
+            "7,526,400",
+            "78,016",
+            "92,715"
+          ]
+        },
+        {
+          "name": "vid5.mpg (3)",
+          "sizeBytes": 7526400,
+          "startSector": 92716,
+          "endSector": 107415,
+          "physicalOffset": 47470592,
+          "rawCells": [
+            "vid5.mpg (3)",
+            "7,526,400",
+            "92,716",
+            "107,415"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 107416,
+          "endSector": 117415,
+          "physicalOffset": 54996992,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "107,416",
+            "117,415"
+          ]
+        },
+        {
+          "name": "vid6.wmv (1)",
+          "sizeBytes": 1230848,
+          "startSector": 117416,
+          "endSector": 119819,
+          "physicalOffset": 60116992,
+          "rawCells": [
+            "vid6.wmv (1)",
+            "1,230,848",
+            "117,416",
+            "119,819"
+          ]
+        },
+        {
+          "name": "vid6.wmv (2)",
+          "sizeBytes": 1230848,
+          "startSector": 119820,
+          "endSector": 122223,
+          "physicalOffset": 61347840,
+          "rawCells": [
+            "vid6.wmv (2)",
+            "1,230,848",
+            "119,820",
+            "122,223"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L2_Video",
+      "level": 2,
+      "family": "Video",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L2_Video.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "vid2.avi (2)",
+          "sizeBytes": 735640,
+          "startSector": 10000,
+          "endSector": 11436,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "vid2.avi (2)",
+            "735,640",
+            "10,000",
+            "11,436"
+          ]
+        },
+        {
+          "name": "vid2.avi (1)",
+          "sizeBytes": 734720,
+          "startSector": 11437,
+          "endSector": 12871,
+          "physicalOffset": 5855744,
+          "rawCells": [
+            "vid2.avi (1)",
+            "734,720",
+            "11,437",
+            "12,871"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 12872,
+          "endSector": 22871,
+          "physicalOffset": 6590464,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "12,872",
+            "22,871"
+          ]
+        },
+        {
+          "name": "vid6.wmv (1)",
+          "sizeBytes": 820224,
+          "startSector": 22872,
+          "endSector": 24473,
+          "physicalOffset": 11710464,
+          "rawCells": [
+            "vid6.wmv (1)",
+            "820,224",
+            "22,872",
+            "24,473"
+          ]
+        },
+        {
+          "name": "vid6.wmv (3)",
+          "sizeBytes": 821248,
+          "startSector": 24474,
+          "endSector": 26077,
+          "physicalOffset": 12530688,
+          "rawCells": [
+            "vid6.wmv (3)",
+            "821,248",
+            "24,474",
+            "26,077"
+          ]
+        },
+        {
+          "name": "vid6.wmv (2)",
+          "sizeBytes": 820224,
+          "startSector": 26078,
+          "endSector": 27679,
+          "physicalOffset": 13351936,
+          "rawCells": [
+            "vid6.wmv (2)",
+            "820,224",
+            "26,078",
+            "27,679"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 27680,
+          "endSector": 37679,
+          "physicalOffset": 14172160,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "27,680",
+            "37,679"
+          ]
+        },
+        {
+          "name": "vid1.mp4 (2)",
+          "sizeBytes": 378368,
+          "startSector": 37680,
+          "endSector": 38418,
+          "physicalOffset": 19292160,
+          "rawCells": [
+            "vid1.mp4 (2)",
+            "378,368",
+            "37,680",
+            "38,418"
+          ]
+        },
+        {
+          "name": "vid1.mp4 (1)",
+          "sizeBytes": 378368,
+          "startSector": 38419,
+          "endSector": 39157,
+          "physicalOffset": 19670528,
+          "rawCells": [
+            "vid1.mp4 (1)",
+            "378,368",
+            "38,419",
+            "39,157"
+          ]
+        },
+        {
+          "name": "vid1.mp4 (3)",
+          "sizeBytes": 379271,
+          "startSector": 39158,
+          "endSector": 39898,
+          "physicalOffset": 20048896,
+          "rawCells": [
+            "vid1.mp4 (3)",
+            "379,271",
+            "39,158",
+            "39,898"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 39899,
+          "endSector": 49898,
+          "physicalOffset": 20428288,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "39,899",
+            "49,898"
+          ]
+        },
+        {
+          "name": "vid3.mov (2)",
+          "sizeBytes": 165376,
+          "startSector": 49899,
+          "endSector": 50221,
+          "physicalOffset": 25548288,
+          "rawCells": [
+            "vid3.mov (2)",
+            "165,376",
+            "49,899",
+            "50,221"
+          ]
+        },
+        {
+          "name": "vid3.mov (3)",
+          "sizeBytes": 166662,
+          "startSector": 50222,
+          "endSector": 50547,
+          "physicalOffset": 25713664,
+          "rawCells": [
+            "vid3.mov (3)",
+            "166,662",
+            "50,222",
+            "50,547"
+          ]
+        },
+        {
+          "name": "vid3.mov (1)",
+          "sizeBytes": 165376,
+          "startSector": 50548,
+          "endSector": 50870,
+          "physicalOffset": 25880576,
+          "rawCells": [
+            "vid3.mov (1)",
+            "165,376",
+            "50,548",
+            "50,870"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 50871,
+          "endSector": 60870,
+          "physicalOffset": 26045952,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "50,871",
+            "60,870"
+          ]
+        },
+        {
+          "name": "vid5.mpg (3)",
+          "sizeBytes": 7526400,
+          "startSector": 60871,
+          "endSector": 75570,
+          "physicalOffset": 31165952,
+          "rawCells": [
+            "vid5.mpg (3)",
+            "7,526,400",
+            "60,871",
+            "75,570"
+          ]
+        },
+        {
+          "name": "vid5.mpg (1)",
+          "sizeBytes": 7526400,
+          "startSector": 75571,
+          "endSector": 90720,
+          "physicalOffset": 38692352,
+          "rawCells": [
+            "vid5.mpg (1)",
+            "7,526,400",
+            "75,571",
+            "90,720"
+          ]
+        },
+        {
+          "name": "vid5.mpg (2)",
+          "sizeBytes": 7526400,
+          "startSector": 90721,
+          "endSector": 104970,
+          "physicalOffset": 46449152,
+          "rawCells": [
+            "vid5.mpg (2)",
+            "7,526,400",
+            "90,721",
+            "104,970"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 104971,
+          "endSector": 114970,
+          "physicalOffset": 53745152,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "104,971",
+            "114,970"
+          ]
+        },
+        {
+          "name": "vid4.flv (3)",
+          "sizeBytes": 1238205,
+          "startSector": 114971,
+          "endSector": 117389,
+          "physicalOffset": 58865152,
+          "rawCells": [
+            "vid4.flv (3)",
+            "1,238,205",
+            "114,971",
+            "117,389"
+          ]
+        },
+        {
+          "name": "vid4.flv (2)",
+          "sizeBytes": 1237504,
+          "startSector": 117390,
+          "endSector": 119806,
+          "physicalOffset": 60103680,
+          "rawCells": [
+            "vid4.flv (2)",
+            "1,237,504",
+            "117,390",
+            "119,806"
+          ]
+        },
+        {
+          "name": "vid4.flv (1)",
+          "sizeBytes": 1237504,
+          "startSector": 119807,
+          "endSector": 122223,
+          "physicalOffset": 61341184,
+          "rawCells": [
+            "vid4.flv (1)",
+            "1,237,504",
+            "119,807",
+            "122,223"
+          ]
+        }
+      ],
+      "referenceIssues": [
+        {
+          "kind": "declared_size_sector_span_mismatch",
+          "recordIndex": 17
+        },
+        {
+          "kind": "declared_size_sector_span_mismatch",
+          "recordIndex": 18
+        }
+      ]
+    },
+    {
+      "id": "L3_Video",
+      "level": 3,
+      "family": "Video",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L3_Video.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "vid4.flv (1)",
+          "sizeBytes": 1856512,
+          "startSector": 10000,
+          "endSector": 13625,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "vid4.flv (1)",
+            "1,856,512",
+            "10,000",
+            "13,625"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 13626,
+          "endSector": 23625,
+          "physicalOffset": 6976512,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "13,626",
+            "23,625"
+          ]
+        },
+        {
+          "name": "vid2.avi (2)",
+          "sizeBytes": 735640,
+          "startSector": 23626,
+          "endSector": 25062,
+          "physicalOffset": 12096512,
+          "rawCells": [
+            "vid2.avi (2)",
+            "735,640",
+            "23,626",
+            "25,062"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 25063,
+          "endSector": 35062,
+          "physicalOffset": 12832256,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "25,063",
+            "35,062"
+          ]
+        },
+        {
+          "name": "vid1.mp4 (1)",
+          "sizeBytes": 378368,
+          "startSector": 35063,
+          "endSector": 35801,
+          "physicalOffset": 17952256,
+          "rawCells": [
+            "vid1.mp4 (1)",
+            "378,368",
+            "35,063",
+            "35,801"
+          ]
+        },
+        {
+          "name": "vid1.mp4 (2)",
+          "sizeBytes": 378368,
+          "startSector": 35802,
+          "endSector": 36540,
+          "physicalOffset": 18330624,
+          "rawCells": [
+            "vid1.mp4 (2)",
+            "378,368",
+            "35,802",
+            "36,540"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 36541,
+          "endSector": 46540,
+          "physicalOffset": 18708992,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "36,541",
+            "46,540"
+          ]
+        },
+        {
+          "name": "vid5.mpg (1)",
+          "sizeBytes": 7526400,
+          "startSector": 46541,
+          "endSector": 61240,
+          "physicalOffset": 23828992,
+          "rawCells": [
+            "vid5.mpg (1)",
+            "7,526,400",
+            "46,541",
+            "61,240"
+          ]
+        },
+        {
+          "name": "vid5.mpg (3)",
+          "sizeBytes": 7526400,
+          "startSector": 61241,
+          "endSector": 75940,
+          "physicalOffset": 31355392,
+          "rawCells": [
+            "vid5.mpg (3)",
+            "7,526,400",
+            "61,241",
+            "75,940"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 75941,
+          "endSector": 85940,
+          "physicalOffset": 38881792,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "75,941",
+            "85,940"
+          ]
+        },
+        {
+          "name": "vid6.wmv (2)",
+          "sizeBytes": 820224,
+          "startSector": 85941,
+          "endSector": 87542,
+          "physicalOffset": 44001792,
+          "rawCells": [
+            "vid6.wmv (2)",
+            "820,224",
+            "85,941",
+            "87,542"
+          ]
+        },
+        {
+          "name": "vid6.wmv (3)",
+          "sizeBytes": 821248,
+          "startSector": 87543,
+          "endSector": 89146,
+          "physicalOffset": 44822016,
+          "rawCells": [
+            "vid6.wmv (3)",
+            "821,248",
+            "87,543",
+            "89,146"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 89147,
+          "endSector": 99146,
+          "physicalOffset": 45643264,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "89,147",
+            "99,146"
+          ]
+        },
+        {
+          "name": "vid3.mov (3)",
+          "sizeBytes": 166662,
+          "startSector": 99147,
+          "endSector": 99472,
+          "physicalOffset": 50763264,
+          "rawCells": [
+            "vid3.mov (3)",
+            "166,662",
+            "99,147",
+            "99,472"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L4_Video",
+      "level": 4,
+      "family": "Video",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L4_Video.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "vid3.mov (1)",
+          "sizeBytes": 248320,
+          "startSector": 10000,
+          "endSector": 10484,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "vid3.mov (1)",
+            "248,320",
+            "10,000",
+            "10,484"
+          ]
+        },
+        {
+          "name": "vid5.mpg",
+          "sizeBytes": 22579200,
+          "startSector": 10485,
+          "endSector": 54584,
+          "physicalOffset": 5368320,
+          "rawCells": [
+            "vid5.mpg",
+            "22,579,200",
+            "10,485",
+            "54,584"
+          ]
+        },
+        {
+          "name": "vid3.mov (2)",
+          "sizeBytes": 249094,
+          "startSector": 54585,
+          "endSector": 55071,
+          "physicalOffset": 27947520,
+          "rawCells": [
+            "vid3.mov (2)",
+            "249,094",
+            "54,585",
+            "55,071"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 55072,
+          "endSector": 65071,
+          "physicalOffset": 28196864,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "55,072",
+            "65,071"
+          ]
+        },
+        {
+          "name": "vid6.wmv (1)",
+          "sizeBytes": 820224,
+          "startSector": 65072,
+          "endSector": 66673,
+          "physicalOffset": 33316864,
+          "rawCells": [
+            "vid6.wmv (1)",
+            "820,224",
+            "65,072",
+            "66,673"
+          ]
+        },
+        {
+          "name": "vid1.mp4",
+          "sizeBytes": 1136007,
+          "startSector": 66674,
+          "endSector": 68892,
+          "physicalOffset": 34137088,
+          "rawCells": [
+            "vid1.mp4",
+            "1,136,007",
+            "66,674",
+            "68,892"
+          ]
+        },
+        {
+          "name": "vid6.wmv (2)",
+          "sizeBytes": 820224,
+          "startSector": 68893,
+          "endSector": 70494,
+          "physicalOffset": 35273216,
+          "rawCells": [
+            "vid6.wmv (2)",
+            "820,224",
+            "68,893",
+            "70,494"
+          ]
+        },
+        {
+          "name": "vid6.wmv (3)",
+          "sizeBytes": 821248,
+          "startSector": 70495,
+          "endSector": 72098,
+          "physicalOffset": 36093440,
+          "rawCells": [
+            "vid6.wmv (3)",
+            "821,248",
+            "70,495",
+            "72,098"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 72099,
+          "endSector": 82098,
+          "physicalOffset": 36914688,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "72,099",
+            "82,098"
+          ]
+        },
+        {
+          "name": "vid2.avi (1)",
+          "sizeBytes": 734720,
+          "startSector": 82099,
+          "endSector": 83533,
+          "physicalOffset": 42034688,
+          "rawCells": [
+            "vid2.avi (1)",
+            "734,720",
+            "82,099",
+            "83,533"
+          ]
+        },
+        {
+          "name": "vid4.flv (1)",
+          "sizeBytes": 1237504,
+          "startSector": 83534,
+          "endSector": 85950,
+          "physicalOffset": 42769408,
+          "rawCells": [
+            "vid4.flv (1)",
+            "1,237,504",
+            "83,534",
+            "85,950"
+          ]
+        },
+        {
+          "name": "vid3.mov",
+          "sizeBytes": 497414,
+          "startSector": 85951,
+          "endSector": 86922,
+          "physicalOffset": 44006912,
+          "rawCells": [
+            "vid3.mov",
+            "497,414",
+            "85,951",
+            "86,922"
+          ]
+        },
+        {
+          "name": "vid4.flv (2,3)",
+          "sizeBytes": 2475709,
+          "startSector": 86923,
+          "endSector": 91758,
+          "physicalOffset": 44504576,
+          "rawCells": [
+            "vid4.flv (2,3)",
+            "2,475,709",
+            "86,923",
+            "91,758"
+          ]
+        },
+        {
+          "name": "vid2.avi (2)",
+          "sizeBytes": 735640,
+          "startSector": 91759,
+          "endSector": 93195,
+          "physicalOffset": 46980608,
+          "rawCells": [
+            "vid2.avi (2)",
+            "735,640",
+            "91,759",
+            "93,195"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L5_Video",
+      "level": 5,
+      "family": "Video",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L5_Video.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "vid1.mp4 (1)",
+          "sizeBytes": 567808,
+          "startSector": 10000,
+          "endSector": 11108,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "vid1.mp4 (1)",
+            "567,808",
+            "10,000",
+            "11,108"
+          ]
+        },
+        {
+          "name": "vid4.flv (1)",
+          "sizeBytes": 1856512,
+          "startSector": 11109,
+          "endSector": 14734,
+          "physicalOffset": 5687808,
+          "rawCells": [
+            "vid4.flv (1)",
+            "1,856,512",
+            "11,109",
+            "14,734"
+          ]
+        },
+        {
+          "name": "vid1.mp4 (2)",
+          "sizeBytes": 568199,
+          "startSector": 14735,
+          "endSector": 15844,
+          "physicalOffset": 7544320,
+          "rawCells": [
+            "vid1.mp4 (2)",
+            "568,199",
+            "14,735",
+            "15,844"
+          ]
+        },
+        {
+          "name": "vid4.flv (2)",
+          "sizeBytes": 1856701,
+          "startSector": 15845,
+          "endSector": 19471,
+          "physicalOffset": 8112640,
+          "rawCells": [
+            "vid4.flv (2)",
+            "1,856,701",
+            "15,845",
+            "19,471"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 19472,
+          "endSector": 29471,
+          "physicalOffset": 9969664,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "19,472",
+            "29,471"
+          ]
+        },
+        {
+          "name": "vid3.mov (1)",
+          "sizeBytes": 248320,
+          "startSector": 29472,
+          "endSector": 29956,
+          "physicalOffset": 15089664,
+          "rawCells": [
+            "vid3.mov (1)",
+            "248,320",
+            "29,472",
+            "29,956"
+          ]
+        },
+        {
+          "name": "vid5.mpg (1)",
+          "sizeBytes": 11289600,
+          "startSector": 29957,
+          "endSector": 52006,
+          "physicalOffset": 15337984,
+          "rawCells": [
+            "vid5.mpg (1)",
+            "11,289,600",
+            "29,957",
+            "52,006"
+          ]
+        },
+        {
+          "name": "vid6.wmv (1)",
+          "sizeBytes": 1230848,
+          "startSector": 52007,
+          "endSector": 54410,
+          "physicalOffset": 26627584,
+          "rawCells": [
+            "vid6.wmv (1)",
+            "1,230,848",
+            "52,007",
+            "54,410"
+          ]
+        },
+        {
+          "name": "vid3.mov (2)",
+          "sizeBytes": 249094,
+          "startSector": 54411,
+          "endSector": 54897,
+          "physicalOffset": 27858432,
+          "rawCells": [
+            "vid3.mov (2)",
+            "249,094",
+            "54,411",
+            "54,897"
+          ]
+        },
+        {
+          "name": "vid5.mpg (2)",
+          "sizeBytes": 11289600,
+          "startSector": 54898,
+          "endSector": 76947,
+          "physicalOffset": 28107776,
+          "rawCells": [
+            "vid5.mpg (2)",
+            "11,289,600",
+            "54,898",
+            "76,947"
+          ]
+        },
+        {
+          "name": "vid6.wmv (2)",
+          "sizeBytes": 1230848,
+          "startSector": 76948,
+          "endSector": 79351,
+          "physicalOffset": 39397376,
+          "rawCells": [
+            "vid6.wmv (2)",
+            "1,230,848",
+            "76,948",
+            "79,351"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 79352,
+          "endSector": 89351,
+          "physicalOffset": 40628224,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "79,352",
+            "89,351"
+          ]
+        },
+        {
+          "name": "vid2.avi (1)",
+          "sizeBytes": 489984,
+          "startSector": 89352,
+          "endSector": 90308,
+          "physicalOffset": 45748224,
+          "rawCells": [
+            "vid2.avi (1)",
+            "489,984",
+            "89,352",
+            "90,308"
+          ]
+        },
+        {
+          "name": "vid4.flv (1)",
+          "sizeBytes": 1237504,
+          "startSector": 90309,
+          "endSector": 92725,
+          "physicalOffset": 46238208,
+          "rawCells": [
+            "vid4.flv (1)",
+            "1,237,504",
+            "90,309",
+            "92,725"
+          ]
+        },
+        {
+          "name": "vid2.avi (2)",
+          "sizeBytes": 489984,
+          "startSector": 92726,
+          "endSector": 93682,
+          "physicalOffset": 47475712,
+          "rawCells": [
+            "vid2.avi (2)",
+            "489,984",
+            "92,726",
+            "93,682"
+          ]
+        },
+        {
+          "name": "vid4.flv (2)",
+          "sizeBytes": 1237504,
+          "startSector": 93683,
+          "endSector": 96099,
+          "physicalOffset": 47965696,
+          "rawCells": [
+            "vid4.flv (2)",
+            "1,237,504",
+            "93,683",
+            "96,099"
+          ]
+        },
+        {
+          "name": "vid2.avi (3)",
+          "sizeBytes": 490392,
+          "startSector": 96100,
+          "endSector": 97057,
+          "physicalOffset": 49203200,
+          "rawCells": [
+            "vid2.avi (3)",
+            "490,392",
+            "96,100",
+            "97,057"
+          ]
+        },
+        {
+          "name": "vid4.flv (3)",
+          "sizeBytes": 1238205,
+          "startSector": 97058,
+          "endSector": 99476,
+          "physicalOffset": 49693696,
+          "rawCells": [
+            "vid4.flv (3)",
+            "1,238,205",
+            "97,058",
+            "99,476"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L0_Document",
+      "level": 0,
+      "family": "Document",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L0_Document.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "D1.pdf",
+          "sizeBytes": 3176275,
+          "startSector": 10000,
+          "endSector": 16203,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "D1.pdf",
+            "3,176,275",
+            "10,000",
+            "16,203"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 16204,
+          "endSector": 26203,
+          "physicalOffset": 8296448,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "16,204",
+            "26,203"
+          ]
+        },
+        {
+          "name": "D2.pdf",
+          "sizeBytes": 2525414,
+          "startSector": 26204,
+          "endSector": 31136,
+          "physicalOffset": 13416448,
+          "rawCells": [
+            "D2.pdf",
+            "2,525,414",
+            "26,204",
+            "31,136"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 31137,
+          "endSector": 41136,
+          "physicalOffset": 15942144,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "31,137",
+            "41,136"
+          ]
+        },
+        {
+          "name": "D3.xlsx",
+          "sizeBytes": 23513,
+          "startSector": 41137,
+          "endSector": 41182,
+          "physicalOffset": 21062144,
+          "rawCells": [
+            "D3.xlsx",
+            "23,513",
+            "41,137",
+            "41,182"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 41183,
+          "endSector": 51182,
+          "physicalOffset": 21085696,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "41,183",
+            "51,182"
+          ]
+        },
+        {
+          "name": "D4.xlsx",
+          "sizeBytes": 13824,
+          "startSector": 51183,
+          "endSector": 51209,
+          "physicalOffset": 26205696,
+          "rawCells": [
+            "D4.xlsx",
+            "13,824",
+            "51,183",
+            "51,209"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 51210,
+          "endSector": 61209,
+          "physicalOffset": 26219520,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "51,210",
+            "61,209"
+          ]
+        },
+        {
+          "name": "D5.docx",
+          "sizeBytes": 4424,
+          "startSector": 61210,
+          "endSector": 61218,
+          "physicalOffset": 31339520,
+          "rawCells": [
+            "D5.docx",
+            "4,424",
+            "61,210",
+            "61,218"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 61219,
+          "endSector": 71218,
+          "physicalOffset": 31344128,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "61,219",
+            "71,218"
+          ]
+        },
+        {
+          "name": "D6.docx",
+          "sizeBytes": 4004,
+          "startSector": 71219,
+          "endSector": 71226,
+          "physicalOffset": 36464128,
+          "rawCells": [
+            "D6.docx",
+            "4,004",
+            "71,219",
+            "71,226"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 71227,
+          "endSector": 81226,
+          "physicalOffset": 36468224,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "71,227",
+            "81,226"
+          ]
+        },
+        {
+          "name": "D7.pptx",
+          "sizeBytes": 902645,
+          "startSector": 81227,
+          "endSector": 82989,
+          "physicalOffset": 41588224,
+          "rawCells": [
+            "D7.pptx",
+            "902,645",
+            "81,227",
+            "82,989"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L1_Document",
+      "level": 1,
+      "family": "Document",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L1_Document.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "D1.pdf (1)",
+          "sizeBytes": 1587712,
+          "startSector": 10000,
+          "endSector": 13100,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "D1.pdf (1)",
+            "1,587,712",
+            "10,000",
+            "13,100"
+          ]
+        },
+        {
+          "name": "D2.pdf (2)",
+          "sizeBytes": 1588563,
+          "startSector": 13101,
+          "endSector": 16203,
+          "physicalOffset": 6707712,
+          "rawCells": [
+            "D2.pdf (2)",
+            "1,588,563",
+            "13,101",
+            "16,203"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 16204,
+          "endSector": 26203,
+          "physicalOffset": 8296448,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "16,204",
+            "26,203"
+          ]
+        },
+        {
+          "name": "D2.pdf (1)",
+          "sizeBytes": 841728,
+          "startSector": 26204,
+          "endSector": 27847,
+          "physicalOffset": 13416448,
+          "rawCells": [
+            "D2.pdf (1)",
+            "841,728",
+            "26,204",
+            "27,847"
+          ]
+        },
+        {
+          "name": "D2.pdf (2)",
+          "sizeBytes": 841728,
+          "startSector": 27848,
+          "endSector": 29491,
+          "physicalOffset": 14258176,
+          "rawCells": [
+            "D2.pdf (2)",
+            "841,728",
+            "27,848",
+            "29,491"
+          ]
+        },
+        {
+          "name": "D2.pdf (3)",
+          "sizeBytes": 841958,
+          "startSector": 29492,
+          "endSector": 31136,
+          "physicalOffset": 15099904,
+          "rawCells": [
+            "D2.pdf (3)",
+            "841,958",
+            "29,492",
+            "31,136"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 31137,
+          "endSector": 41136,
+          "physicalOffset": 15942144,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "31,137",
+            "41,136"
+          ]
+        },
+        {
+          "name": "D3.xlsx (1)",
+          "sizeBytes": 7680,
+          "startSector": 41137,
+          "endSector": 41151,
+          "physicalOffset": 21062144,
+          "rawCells": [
+            "D3.xlsx (1)",
+            "7,680",
+            "41,137",
+            "41,151"
+          ]
+        },
+        {
+          "name": "D3.xlsx (2,3)",
+          "sizeBytes": 15833,
+          "startSector": 41152,
+          "endSector": 41182,
+          "physicalOffset": 21069824,
+          "rawCells": [
+            "D3.xlsx (2,3)",
+            "15,833",
+            "41,152",
+            "41,182"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 41183,
+          "endSector": 51182,
+          "physicalOffset": 21085696,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "41,183",
+            "51,182"
+          ]
+        },
+        {
+          "name": "D4.xlsx (1,2)",
+          "sizeBytes": 9216,
+          "startSector": 51183,
+          "endSector": 51200,
+          "physicalOffset": 26205696,
+          "rawCells": [
+            "D4.xlsx (1,2)",
+            "9,216",
+            "51,183",
+            "51,200"
+          ]
+        },
+        {
+          "name": "D4.xlsx (3)",
+          "sizeBytes": 4608,
+          "startSector": 51201,
+          "endSector": 51209,
+          "physicalOffset": 26214912,
+          "rawCells": [
+            "D4.xlsx (3)",
+            "4,608",
+            "51,201",
+            "51,209"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 51210,
+          "endSector": 61209,
+          "physicalOffset": 26219520,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "51,210",
+            "61,209"
+          ]
+        },
+        {
+          "name": "D5.docx (1)",
+          "sizeBytes": 1024,
+          "startSector": 61210,
+          "endSector": 61211,
+          "physicalOffset": 31339520,
+          "rawCells": [
+            "D5.docx (1)",
+            "1,024",
+            "61,210",
+            "61,211"
+          ]
+        },
+        {
+          "name": "D5.docx (2)",
+          "sizeBytes": 1024,
+          "startSector": 61212,
+          "endSector": 61213,
+          "physicalOffset": 31340544,
+          "rawCells": [
+            "D5.docx (2)",
+            "1,024",
+            "61,212",
+            "61,213"
+          ]
+        },
+        {
+          "name": "D5.docx (3)",
+          "sizeBytes": 2376,
+          "startSector": 61214,
+          "endSector": 61218,
+          "physicalOffset": 31341568,
+          "rawCells": [
+            "D5.docx (3)",
+            "2,376",
+            "61,214",
+            "61,218"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 61219,
+          "endSector": 71218,
+          "physicalOffset": 31344128,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "61,219",
+            "71,218"
+          ]
+        },
+        {
+          "name": "D6.docx (1)",
+          "sizeBytes": 1536,
+          "startSector": 71219,
+          "endSector": 71221,
+          "physicalOffset": 36464128,
+          "rawCells": [
+            "D6.docx (1)",
+            "1,536",
+            "71,219",
+            "71,221"
+          ]
+        },
+        {
+          "name": "D6.docx (2)",
+          "sizeBytes": 2468,
+          "startSector": 71222,
+          "endSector": 71226,
+          "physicalOffset": 36465664,
+          "rawCells": [
+            "D6.docx (2)",
+            "2,468",
+            "71,222",
+            "71,226"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 71227,
+          "endSector": 81226,
+          "physicalOffset": 36468224,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "71,227",
+            "81,226"
+          ]
+        },
+        {
+          "name": "D7.pptx (1)",
+          "sizeBytes": 300544,
+          "startSector": 81227,
+          "endSector": 81813,
+          "physicalOffset": 41588224,
+          "rawCells": [
+            "D7.pptx (1)",
+            "300,544",
+            "81,227",
+            "81,813"
+          ]
+        },
+        {
+          "name": "D7.pptx (2,3)",
+          "sizeBytes": 602101,
+          "startSector": 81814,
+          "endSector": 82989,
+          "physicalOffset": 41888768,
+          "rawCells": [
+            "D7.pptx (2,3)",
+            "602,101",
+            "81,814",
+            "82,989"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L2_Document",
+      "level": 2,
+      "family": "Document",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L2_Document.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "D1.pdf (3)",
+          "sizeBytes": 1059667,
+          "startSector": 10000,
+          "endSector": 12069,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "D1.pdf (3)",
+            "1,059,667",
+            "10,000",
+            "12,069"
+          ]
+        },
+        {
+          "name": "D1.pdf (1)",
+          "sizeBytes": 1058304,
+          "startSector": 12070,
+          "endSector": 14136,
+          "physicalOffset": 6179840,
+          "rawCells": [
+            "D1.pdf (1)",
+            "1,058,304",
+            "12,070",
+            "14,136"
+          ]
+        },
+        {
+          "name": "D1.pdf (2)",
+          "sizeBytes": 1058304,
+          "startSector": 14137,
+          "endSector": 16203,
+          "physicalOffset": 7238144,
+          "rawCells": [
+            "D1.pdf (2)",
+            "1,058,304",
+            "14,137",
+            "16,203"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 16204,
+          "endSector": 26203,
+          "physicalOffset": 8296448,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "16,204",
+            "26,203"
+          ]
+        },
+        {
+          "name": "D2.pdf (2)",
+          "sizeBytes": 841728,
+          "startSector": 26204,
+          "endSector": 27847,
+          "physicalOffset": 13416448,
+          "rawCells": [
+            "D2.pdf (2)",
+            "841,728",
+            "26,204",
+            "27,847"
+          ]
+        },
+        {
+          "name": "D2.pdf (3)",
+          "sizeBytes": 841958,
+          "startSector": 27848,
+          "endSector": 29492,
+          "physicalOffset": 14258176,
+          "rawCells": [
+            "D2.pdf (3)",
+            "841,958",
+            "27,848",
+            "29,492"
+          ]
+        },
+        {
+          "name": "D2.pdf (1)",
+          "sizeBytes": 841728,
+          "startSector": 29493,
+          "endSector": 31136,
+          "physicalOffset": 15100416,
+          "rawCells": [
+            "D2.pdf (1)",
+            "841,728",
+            "29,493",
+            "31,136"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 31137,
+          "endSector": 41136,
+          "physicalOffset": 15942144,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "31,137",
+            "41,136"
+          ]
+        },
+        {
+          "name": "D3.xlsx (2)",
+          "sizeBytes": 12249,
+          "startSector": 41137,
+          "endSector": 41160,
+          "physicalOffset": 21062144,
+          "rawCells": [
+            "D3.xlsx (2)",
+            "12,249",
+            "41,137",
+            "41,160"
+          ]
+        },
+        {
+          "name": "D3.xlsx (1)",
+          "sizeBytes": 11264,
+          "startSector": 41161,
+          "endSector": 41182,
+          "physicalOffset": 21074432,
+          "rawCells": [
+            "D3.xlsx (1)",
+            "11,264",
+            "41,161",
+            "41,182"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 41183,
+          "endSector": 51182,
+          "physicalOffset": 21085696,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "41,183",
+            "51,182"
+          ]
+        },
+        {
+          "name": "D4.xlsx (2)",
+          "sizeBytes": 4608,
+          "startSector": 51183,
+          "endSector": 51191,
+          "physicalOffset": 26205696,
+          "rawCells": [
+            "D4.xlsx (2)",
+            "4,608",
+            "51,183",
+            "51,191"
+          ]
+        },
+        {
+          "name": "D4.xlsx (1)",
+          "sizeBytes": 4608,
+          "startSector": 51192,
+          "endSector": 51200,
+          "physicalOffset": 26210304,
+          "rawCells": [
+            "D4.xlsx (1)",
+            "4,608",
+            "51,192",
+            "51,200"
+          ]
+        },
+        {
+          "name": "D4.xlsx (3)",
+          "sizeBytes": 4608,
+          "startSector": 51201,
+          "endSector": 51209,
+          "physicalOffset": 26214912,
+          "rawCells": [
+            "D4.xlsx (3)",
+            "4,608",
+            "51,201",
+            "51,209"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 51210,
+          "endSector": 61209,
+          "physicalOffset": 26219520,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "51,210",
+            "61,209"
+          ]
+        },
+        {
+          "name": "D5.docx (1)",
+          "sizeBytes": 1024,
+          "startSector": 61210,
+          "endSector": 61211,
+          "physicalOffset": 31339520,
+          "rawCells": [
+            "D5.docx (1)",
+            "1,024",
+            "61,210",
+            "61,211"
+          ]
+        },
+        {
+          "name": "D5.docx (3)",
+          "sizeBytes": 2376,
+          "startSector": 61212,
+          "endSector": 61216,
+          "physicalOffset": 31340544,
+          "rawCells": [
+            "D5.docx (3)",
+            "2376",
+            "61,212",
+            "61,216"
+          ]
+        },
+        {
+          "name": "D5.docx (2)",
+          "sizeBytes": 1024,
+          "startSector": 61217,
+          "endSector": 61218,
+          "physicalOffset": 31343104,
+          "rawCells": [
+            "D5.docx (2)",
+            "1,024",
+            "61,217",
+            "61,218"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 61219,
+          "endSector": 71218,
+          "physicalOffset": 31344128,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "61,219",
+            "71,218"
+          ]
+        },
+        {
+          "name": "D6.docx (2,3)",
+          "sizeBytes": 2980,
+          "startSector": 71219,
+          "endSector": 71224,
+          "physicalOffset": 36464128,
+          "rawCells": [
+            "D6.docx (2,3)",
+            "2,980",
+            "71,219",
+            "71,224"
+          ]
+        },
+        {
+          "name": "D6.docx (1)",
+          "sizeBytes": 1024,
+          "startSector": 71225,
+          "endSector": 71226,
+          "physicalOffset": 36467200,
+          "rawCells": [
+            "D6.docx (1)",
+            "1,024",
+            "71,225",
+            "71,226"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 71227,
+          "endSector": 81226,
+          "physicalOffset": 36468224,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "71,227",
+            "81,226"
+          ]
+        },
+        {
+          "name": "D7.pptx (3)",
+          "sizeBytes": 301557,
+          "startSector": 81227,
+          "endSector": 81815,
+          "physicalOffset": 41588224,
+          "rawCells": [
+            "D7.pptx (3)",
+            "301,557",
+            "81,227",
+            "81,815"
+          ]
+        },
+        {
+          "name": "D7.pptx (2)",
+          "sizeBytes": 300544,
+          "startSector": 81816,
+          "endSector": 82402,
+          "physicalOffset": 41889792,
+          "rawCells": [
+            "D7.pptx (2)",
+            "300,544",
+            "81,816",
+            "82,402"
+          ]
+        },
+        {
+          "name": "D7.pptx (1)",
+          "sizeBytes": 300544,
+          "startSector": 82403,
+          "endSector": 82989,
+          "physicalOffset": 42190336,
+          "rawCells": [
+            "D7.pptx (1)",
+            "300,544",
+            "82,403",
+            "82,989"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L3_Document",
+      "level": 3,
+      "family": "Document",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L3_Document.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "D1.pdf (1)",
+          "sizeBytes": 1058304,
+          "startSector": 10000,
+          "endSector": 12066,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "D1.pdf (1)",
+            "1,058,304",
+            "10,000",
+            "12,066"
+          ]
+        },
+        {
+          "name": "D1.pdf (2,3)",
+          "sizeBytes": 1058304,
+          "startSector": 12067,
+          "endSector": 14133,
+          "physicalOffset": 6178304,
+          "rawCells": [
+            "D1.pdf (2,3)",
+            "1,058,304",
+            "12,067",
+            "14,133"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 14134,
+          "endSector": 24133,
+          "physicalOffset": 7236608,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "14,134",
+            "24,133"
+          ]
+        },
+        {
+          "name": "D2.pdf (1)",
+          "sizeBytes": 841728,
+          "startSector": 24134,
+          "endSector": 25777,
+          "physicalOffset": 12356608,
+          "rawCells": [
+            "D2.pdf (1)",
+            "841,728",
+            "24,134",
+            "25,777"
+          ]
+        },
+        {
+          "name": "D2.pdf (3)",
+          "sizeBytes": 841958,
+          "startSector": 25778,
+          "endSector": 27422,
+          "physicalOffset": 13198336,
+          "rawCells": [
+            "D2.pdf (3)",
+            "841,958",
+            "25,778",
+            "27,422"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 27423,
+          "endSector": 37422,
+          "physicalOffset": 14040576,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "27,423",
+            "37,422"
+          ]
+        },
+        {
+          "name": "D3.xlsx (2)",
+          "sizeBytes": 7680,
+          "startSector": 37423,
+          "endSector": 37437,
+          "physicalOffset": 19160576,
+          "rawCells": [
+            "D3.xlsx (2)",
+            "7,680",
+            "37,423",
+            "37,437"
+          ]
+        },
+        {
+          "name": "D3.xlsx (3)",
+          "sizeBytes": 8153,
+          "startSector": 37438,
+          "endSector": 37453,
+          "physicalOffset": 19168256,
+          "rawCells": [
+            "D3.xlsx (3)",
+            "8,153",
+            "37,438",
+            "37,453"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 37454,
+          "endSector": 47453,
+          "physicalOffset": 19176448,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "37,454",
+            "47,453"
+          ]
+        },
+        {
+          "name": "D4.xlsx (2)",
+          "sizeBytes": 7168,
+          "startSector": 47454,
+          "endSector": 47467,
+          "physicalOffset": 24296448,
+          "rawCells": [
+            "D4.xlsx (2)",
+            "7,168",
+            "47,454",
+            "47,467"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 47468,
+          "endSector": 57467,
+          "physicalOffset": 24303616,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "47,468",
+            "57,467"
+          ]
+        },
+        {
+          "name": "D5.docx (1)",
+          "sizeBytes": 2048,
+          "startSector": 57468,
+          "endSector": 57471,
+          "physicalOffset": 29423616,
+          "rawCells": [
+            "D5.docx (1)",
+            "2,048",
+            "57,468",
+            "57,471"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 57472,
+          "endSector": 67471,
+          "physicalOffset": 29425664,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "57,472",
+            "67,471"
+          ]
+        },
+        {
+          "name": "D6.docx (2,3)",
+          "sizeBytes": 2980,
+          "startSector": 67472,
+          "endSector": 67477,
+          "physicalOffset": 34545664,
+          "rawCells": [
+            "D6.docx (2,3)",
+            "2,980",
+            "67,472",
+            "67,477"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 67478,
+          "endSector": 77477,
+          "physicalOffset": 34548736,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "67,478",
+            "77,477"
+          ]
+        },
+        {
+          "name": "D7.pptx (3)",
+          "sizeBytes": 301557,
+          "startSector": 77478,
+          "endSector": 78066,
+          "physicalOffset": 39668736,
+          "rawCells": [
+            "D7.pptx (3)",
+            "301,557",
+            "77,478",
+            "78,066"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L4_Document",
+      "level": 4,
+      "family": "Document",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L4_Document.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "D4.xlsx (1)",
+          "sizeBytes": 6656,
+          "startSector": 10000,
+          "endSector": 10012,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "D4.xlsx (1)",
+            "6,656",
+            "10,000",
+            "10,012"
+          ]
+        },
+        {
+          "name": "D1.pdf",
+          "sizeBytes": 3176275,
+          "startSector": 10013,
+          "endSector": 16216,
+          "physicalOffset": 5126656,
+          "rawCells": [
+            "D1.pdf",
+            "3,176,275",
+            "10,013",
+            "16,216"
+          ]
+        },
+        {
+          "name": "D4.xlsx (2)",
+          "sizeBytes": 7168,
+          "startSector": 16217,
+          "endSector": 16230,
+          "physicalOffset": 8303104,
+          "rawCells": [
+            "D4.xlsx (2)",
+            "7,168",
+            "16,217",
+            "16,230"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 16231,
+          "endSector": 26230,
+          "physicalOffset": 8310272,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "16,231",
+            "26,230"
+          ]
+        },
+        {
+          "name": "D3.xlsx (1)",
+          "sizeBytes": 7680,
+          "startSector": 26231,
+          "endSector": 26245,
+          "physicalOffset": 13430272,
+          "rawCells": [
+            "D3.xlsx (1)",
+            "7,680",
+            "26,231",
+            "26,245"
+          ]
+        },
+        {
+          "name": "D6.docx",
+          "sizeBytes": 4004,
+          "startSector": 26246,
+          "endSector": 26253,
+          "physicalOffset": 13437952,
+          "rawCells": [
+            "D6.docx",
+            "4,004",
+            "26,246",
+            "26,253"
+          ]
+        },
+        {
+          "name": "D3.xlsx (2,3)",
+          "sizeBytes": 15833,
+          "startSector": 26254,
+          "endSector": 26284,
+          "physicalOffset": 13442048,
+          "rawCells": [
+            "D3.xlsx (2,3)",
+            "15,833",
+            "26,254",
+            "26,284"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 26285,
+          "endSector": 36284,
+          "physicalOffset": 13457920,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "26,285",
+            "36,284"
+          ]
+        },
+        {
+          "name": "D1.pdf (1)",
+          "sizeBytes": 1058304,
+          "startSector": 36285,
+          "endSector": 38351,
+          "physicalOffset": 18577920,
+          "rawCells": [
+            "D1.pdf (1)",
+            "1,058,304",
+            "36,285",
+            "38,351"
+          ]
+        },
+        {
+          "name": "D1.pdf (2)",
+          "sizeBytes": 1058304,
+          "startSector": 38352,
+          "endSector": 40418,
+          "physicalOffset": 19636224,
+          "rawCells": [
+            "D1.pdf (2)",
+            "1,058,304",
+            "38,352",
+            "40,418"
+          ]
+        },
+        {
+          "name": "D2.pdf",
+          "sizeBytes": 2525414,
+          "startSector": 40419,
+          "endSector": 45351,
+          "physicalOffset": 20694528,
+          "rawCells": [
+            "D2.pdf",
+            "2,525,414",
+            "40,419",
+            "45,351"
+          ]
+        },
+        {
+          "name": "D1.pdf (3)",
+          "sizeBytes": 1059667,
+          "startSector": 45352,
+          "endSector": 47421,
+          "physicalOffset": 23220224,
+          "rawCells": [
+            "D1.pdf (3)",
+            "1,059,667",
+            "45,352",
+            "47,421"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 47422,
+          "endSector": 57421,
+          "physicalOffset": 24280064,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "47,422",
+            "57,421"
+          ]
+        },
+        {
+          "name": "D7.pptx (1)",
+          "sizeBytes": 451072,
+          "startSector": 57422,
+          "endSector": 58302,
+          "physicalOffset": 29400064,
+          "rawCells": [
+            "D7.pptx (1)",
+            "451,072",
+            "57,422",
+            "58,302"
+          ]
+        },
+        {
+          "name": "D2.pdf (1,2)",
+          "sizeBytes": 1683456,
+          "startSector": 58303,
+          "endSector": 61590,
+          "physicalOffset": 29851136,
+          "rawCells": [
+            "D2.pdf (1,2)",
+            "1,683,456",
+            "58,303",
+            "61,590"
+          ]
+        },
+        {
+          "name": "D5.docx",
+          "sizeBytes": 4424,
+          "startSector": 61591,
+          "endSector": 61599,
+          "physicalOffset": 31534592,
+          "rawCells": [
+            "D5.docx",
+            "4,424",
+            "61,591",
+            "61,599"
+          ]
+        },
+        {
+          "name": "D2.pdf (3)",
+          "sizeBytes": 841958,
+          "startSector": 61600,
+          "endSector": 63244,
+          "physicalOffset": 31539200,
+          "rawCells": [
+            "D2.pdf (3)",
+            "841,958",
+            "61,600",
+            "63,244"
+          ]
+        },
+        {
+          "name": "D7.pptx (2)",
+          "sizeBytes": 451573,
+          "startSector": 63245,
+          "endSector": 64126,
+          "physicalOffset": 32381440,
+          "rawCells": [
+            "D7.pptx (2)",
+            "451,573",
+            "63,245",
+            "64,126"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L5_Document",
+      "level": 5,
+      "family": "Document",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L5_Document.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "D3.xlsx (1)",
+          "sizeBytes": 11264,
+          "startSector": 10000,
+          "endSector": 10021,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "D3.xlsx (1)",
+            "11,264",
+            "10,000",
+            "10,021"
+          ]
+        },
+        {
+          "name": "D5.docx (1)",
+          "sizeBytes": 2048,
+          "startSector": 10022,
+          "endSector": 10025,
+          "physicalOffset": 5131264,
+          "rawCells": [
+            "D5.docx (1)",
+            "2,048",
+            "10,022",
+            "10,025"
+          ]
+        },
+        {
+          "name": "D3.xlsx (2)",
+          "sizeBytes": 12249,
+          "startSector": 10026,
+          "endSector": 10049,
+          "physicalOffset": 5133312,
+          "rawCells": [
+            "D3.xlsx (2)",
+            "12,249",
+            "10,026",
+            "10,049"
+          ]
+        },
+        {
+          "name": "D5.docx (2)",
+          "sizeBytes": 2376,
+          "startSector": 10050,
+          "endSector": 10054,
+          "physicalOffset": 5145600,
+          "rawCells": [
+            "D5.docx (2)",
+            "2,376",
+            "10,050",
+            "10,054"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 10055,
+          "endSector": 20054,
+          "physicalOffset": 5148160,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "10,055",
+            "20,054"
+          ]
+        },
+        {
+          "name": "D7.pptx (1)",
+          "sizeBytes": 451072,
+          "startSector": 20055,
+          "endSector": 20935,
+          "physicalOffset": 10268160,
+          "rawCells": [
+            "D7.pptx (1)",
+            "451,072",
+            "20,055",
+            "20,935"
+          ]
+        },
+        {
+          "name": "D1.pdf (1)",
+          "sizeBytes": 1587712,
+          "startSector": 20936,
+          "endSector": 24036,
+          "physicalOffset": 10719232,
+          "rawCells": [
+            "D1.pdf (1)",
+            "1,587,712",
+            "20,936",
+            "24,036"
+          ]
+        },
+        {
+          "name": "D4.xlsx (1)",
+          "sizeBytes": 6656,
+          "startSector": 24037,
+          "endSector": 24049,
+          "physicalOffset": 12306944,
+          "rawCells": [
+            "D4.xlsx (1)",
+            "6,656",
+            "24,037",
+            "24,049"
+          ]
+        },
+        {
+          "name": "D7.pptx (2)",
+          "sizeBytes": 451573,
+          "startSector": 24050,
+          "endSector": 24931,
+          "physicalOffset": 12313600,
+          "rawCells": [
+            "D7.pptx (2)",
+            "451,573",
+            "24,050",
+            "24,931"
+          ]
+        },
+        {
+          "name": "D1.pdf (2)",
+          "sizeBytes": 1588563,
+          "startSector": 24932,
+          "endSector": 28034,
+          "physicalOffset": 12765184,
+          "rawCells": [
+            "D1.pdf (2)",
+            "1,588,563",
+            "24,932",
+            "28,034"
+          ]
+        },
+        {
+          "name": "D4.xlsx (2)",
+          "sizeBytes": 7168,
+          "startSector": 28035,
+          "endSector": 28048,
+          "physicalOffset": 14353920,
+          "rawCells": [
+            "D4.xlsx (2)",
+            "7,168",
+            "28,035",
+            "28,048"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 28049,
+          "endSector": 38048,
+          "physicalOffset": 14361088,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "28,049",
+            "38,048"
+          ]
+        },
+        {
+          "name": "D2.pdf (1)",
+          "sizeBytes": 841728,
+          "startSector": 38049,
+          "endSector": 39692,
+          "physicalOffset": 19481088,
+          "rawCells": [
+            "D2.pdf (1)",
+            "841,728",
+            "38,049",
+            "39,692"
+          ]
+        },
+        {
+          "name": "D7.pptx (1)",
+          "sizeBytes": 300544,
+          "startSector": 39693,
+          "endSector": 40279,
+          "physicalOffset": 20322816,
+          "rawCells": [
+            "D7.pptx (1)",
+            "300,544",
+            "39,693",
+            "40,279"
+          ]
+        },
+        {
+          "name": "D2.pdf (2)",
+          "sizeBytes": 841728,
+          "startSector": 40280,
+          "endSector": 41923,
+          "physicalOffset": 20623360,
+          "rawCells": [
+            "D2.pdf (2)",
+            "841,728",
+            "40,280",
+            "41,923"
+          ]
+        },
+        {
+          "name": "D7.pptx (2)",
+          "sizeBytes": 300544,
+          "startSector": 41924,
+          "endSector": 42510,
+          "physicalOffset": 21465088,
+          "rawCells": [
+            "D7.pptx (2)",
+            "300,544",
+            "41,924",
+            "42,510"
+          ]
+        },
+        {
+          "name": "D2.pdf (3)",
+          "sizeBytes": 841958,
+          "startSector": 42511,
+          "endSector": 44155,
+          "physicalOffset": 21765632,
+          "rawCells": [
+            "D2.pdf (3)",
+            "841,958",
+            "42,511",
+            "44,155"
+          ]
+        },
+        {
+          "name": "D7.pptx (3)",
+          "sizeBytes": 301557,
+          "startSector": 44156,
+          "endSector": 44744,
+          "physicalOffset": 22607872,
+          "rawCells": [
+            "D7.pptx (3)",
+            "301,557",
+            "44,156",
+            "44,744"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 44745,
+          "endSector": 54744,
+          "physicalOffset": 22909440,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "44,745",
+            "54,744"
+          ]
+        },
+        {
+          "name": "D2.pdf (1)",
+          "sizeBytes": 841728,
+          "startSector": 54745,
+          "endSector": 56388,
+          "physicalOffset": 28029440,
+          "rawCells": [
+            "D2.pdf (1)",
+            "841,728",
+            "54,745",
+            "56,388"
+          ]
+        },
+        {
+          "name": "D5.docx (1)",
+          "sizeBytes": 1024,
+          "startSector": 56389,
+          "endSector": 56390,
+          "physicalOffset": 28871168,
+          "rawCells": [
+            "D5.docx (1)",
+            "1,024",
+            "56,389",
+            "56,390"
+          ]
+        },
+        {
+          "name": "D6.docx (1)",
+          "sizeBytes": 1024,
+          "startSector": 56391,
+          "endSector": 56392,
+          "physicalOffset": 28872192,
+          "rawCells": [
+            "D6.docx (1)",
+            "1,024",
+            "56,391",
+            "56,392"
+          ]
+        },
+        {
+          "name": "D2.pdf (2)",
+          "sizeBytes": 841728,
+          "startSector": 56393,
+          "endSector": 58036,
+          "physicalOffset": 28873216,
+          "rawCells": [
+            "D2.pdf (2)",
+            "841,728",
+            "56,393",
+            "58,036"
+          ]
+        },
+        {
+          "name": "D5.docx (2)",
+          "sizeBytes": 1024,
+          "startSector": 58037,
+          "endSector": 58038,
+          "physicalOffset": 29714944,
+          "rawCells": [
+            "D5.docx (2)",
+            "1,024",
+            "58,037",
+            "58,038"
+          ]
+        },
+        {
+          "name": "D6.docx (2)",
+          "sizeBytes": 1024,
+          "startSector": 58039,
+          "endSector": 58040,
+          "physicalOffset": 29715968,
+          "rawCells": [
+            "D6.docx (2)",
+            "1,024",
+            "58,039",
+            "58,040"
+          ]
+        },
+        {
+          "name": "D2.pdf (3)",
+          "sizeBytes": 841958,
+          "startSector": 58041,
+          "endSector": 59685,
+          "physicalOffset": 29716992,
+          "rawCells": [
+            "D2.pdf (3)",
+            "841,958",
+            "58,041",
+            "59,685"
+          ]
+        },
+        {
+          "name": "D5.docx (3)",
+          "sizeBytes": 2376,
+          "startSector": 59686,
+          "endSector": 59690,
+          "physicalOffset": 30559232,
+          "rawCells": [
+            "D5.docx (3)",
+            "2,376",
+            "59,686",
+            "59,690"
+          ]
+        },
+        {
+          "name": "D6.docx (3)",
+          "sizeBytes": 1956,
+          "startSector": 59691,
+          "endSector": 59694,
+          "physicalOffset": 30561792,
+          "rawCells": [
+            "D6.docx (3)",
+            "1,956",
+            "59,691",
+            "59,694"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L0_Audio",
+      "level": 0,
+      "family": "Audio",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L0_Audio.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "Audio1.mp3",
+          "sizeBytes": 1052707,
+          "startSector": 10000,
+          "endSector": 12056,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "Audio1.mp3",
+            "1,052,707",
+            "10,000",
+            "12,056"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 12057,
+          "endSector": 22056,
+          "physicalOffset": 6173184,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "12,057",
+            "22,056"
+          ]
+        },
+        {
+          "name": "Audio2.wav",
+          "sizeBytes": 4612652,
+          "startSector": 22057,
+          "endSector": 31066,
+          "physicalOffset": 11293184,
+          "rawCells": [
+            "Audio2.wav",
+            "4,612,652",
+            "22,057",
+            "31,066"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 31067,
+          "endSector": 41066,
+          "physicalOffset": 15906304,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "31,067",
+            "41,066"
+          ]
+        },
+        {
+          "name": "Audio3.au",
+          "sizeBytes": 9243672,
+          "startSector": 41067,
+          "endSector": 59121,
+          "physicalOffset": 21026304,
+          "rawCells": [
+            "Audio3.au",
+            "9,243,672",
+            "41,067",
+            "59,121"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 59122,
+          "endSector": 69121,
+          "physicalOffset": 30270464,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "59,122",
+            "69,121"
+          ]
+        },
+        {
+          "name": "Audio4.wma",
+          "sizeBytes": 1074987,
+          "startSector": 69122,
+          "endSector": 71221,
+          "physicalOffset": 35390464,
+          "rawCells": [
+            "Audio4.wma",
+            "1,074,987",
+            "69,122",
+            "71,221"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L1_Audio",
+      "level": 1,
+      "family": "Audio",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L1_Audio.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "Audio1.mp3 (1)",
+          "sizeBytes": 526336,
+          "startSector": 10000,
+          "endSector": 11027,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "Audio1.mp3 (1)",
+            "526,336",
+            "10,000",
+            "11,027"
+          ]
+        },
+        {
+          "name": "Audio1.mp3 (2)",
+          "sizeBytes": 526371,
+          "startSector": 11028,
+          "endSector": 12056,
+          "physicalOffset": 5646336,
+          "rawCells": [
+            "Audio1.mp3 (2)",
+            "526,371",
+            "11,028",
+            "12,056"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 12057,
+          "endSector": 22056,
+          "physicalOffset": 6173184,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "12,057",
+            "22,056"
+          ]
+        },
+        {
+          "name": "Audio2.wav (1)",
+          "sizeBytes": 1537536,
+          "startSector": 22057,
+          "endSector": 25059,
+          "physicalOffset": 11293184,
+          "rawCells": [
+            "Audio2.wav (1)",
+            "1,537,536",
+            "22,057",
+            "25,059"
+          ]
+        },
+        {
+          "name": "Audio2.wav (2)",
+          "sizeBytes": 1537536,
+          "startSector": 25060,
+          "endSector": 28062,
+          "physicalOffset": 12830720,
+          "rawCells": [
+            "Audio2.wav (2)",
+            "1,537,536",
+            "25,060",
+            "28,062"
+          ]
+        },
+        {
+          "name": "Audio2.wav (3)",
+          "sizeBytes": 1537580,
+          "startSector": 28063,
+          "endSector": 31066,
+          "physicalOffset": 14368256,
+          "rawCells": [
+            "Audio2.wav (3)",
+            "1,537,580",
+            "28,063",
+            "31,066"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 31067,
+          "endSector": 41066,
+          "physicalOffset": 15906304,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "31,067",
+            "41,066"
+          ]
+        },
+        {
+          "name": "Audio3.au (1)",
+          "sizeBytes": 4621824,
+          "startSector": 41067,
+          "endSector": 50093,
+          "physicalOffset": 21026304,
+          "rawCells": [
+            "Audio3.au (1)",
+            "4,621,824",
+            "41,067",
+            "50,093"
+          ]
+        },
+        {
+          "name": "Audio3.au (2)",
+          "sizeBytes": 4621848,
+          "startSector": 50094,
+          "endSector": 59121,
+          "physicalOffset": 25648128,
+          "rawCells": [
+            "Audio3.au (2)",
+            "4,621,848",
+            "50,094",
+            "59,121"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 59122,
+          "endSector": 69121,
+          "physicalOffset": 30270464,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "59,122",
+            "69,121"
+          ]
+        },
+        {
+          "name": "Audio4.wma (1)",
+          "sizeBytes": 357888,
+          "startSector": 69122,
+          "endSector": 69820,
+          "physicalOffset": 35390464,
+          "rawCells": [
+            "Audio4.wma (1)",
+            "357,888",
+            "69,122",
+            "69,820"
+          ]
+        },
+        {
+          "name": "Audio4.wma (2)",
+          "sizeBytes": 357888,
+          "startSector": 69821,
+          "endSector": 70519,
+          "physicalOffset": 35748352,
+          "rawCells": [
+            "Audio4.wma (2)",
+            "357,888",
+            "69,821",
+            "70,519"
+          ]
+        },
+        {
+          "name": "Audio4.wma (3)",
+          "sizeBytes": 359211,
+          "startSector": 70520,
+          "endSector": 71221,
+          "physicalOffset": 36106240,
+          "rawCells": [
+            "Audio4.wma (3)",
+            "359,211",
+            "70,520",
+            "71,221"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L2_Audio",
+      "level": 2,
+      "family": "Audio",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L2_Audio.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "Audio1.mp3 (2)",
+          "sizeBytes": 526371,
+          "startSector": 10000,
+          "endSector": 11028,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "Audio1.mp3 (2)",
+            "526,371",
+            "10,000",
+            "11,028"
+          ]
+        },
+        {
+          "name": "Audio1.mp3 (1)",
+          "sizeBytes": 526336,
+          "startSector": 11029,
+          "endSector": 12056,
+          "physicalOffset": 5646848,
+          "rawCells": [
+            "Audio1.mp3 (1)",
+            "526,336",
+            "11,029",
+            "12,056"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 12057,
+          "endSector": 22056,
+          "physicalOffset": 6173184,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "12,057",
+            "22,056"
+          ]
+        },
+        {
+          "name": "Audio2.wav (1)",
+          "sizeBytes": 1537536,
+          "startSector": 22057,
+          "endSector": 25059,
+          "physicalOffset": 11293184,
+          "rawCells": [
+            "Audio2.wav (1)",
+            "1,537,536",
+            "22,057",
+            "25,059"
+          ]
+        },
+        {
+          "name": "Audio2.wav (3)",
+          "sizeBytes": 1537580,
+          "startSector": 25060,
+          "endSector": 28063,
+          "physicalOffset": 12830720,
+          "rawCells": [
+            "Audio2.wav (3)",
+            "1,537,580",
+            "25,060",
+            "28,063"
+          ]
+        },
+        {
+          "name": "Audio2.wav (2)",
+          "sizeBytes": 1537536,
+          "startSector": 28064,
+          "endSector": 31066,
+          "physicalOffset": 14368768,
+          "rawCells": [
+            "Audio2.wav (2)",
+            "1,537,536",
+            "28,064",
+            "31,066"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 31067,
+          "endSector": 41066,
+          "physicalOffset": 15906304,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "31,067",
+            "41,066"
+          ]
+        },
+        {
+          "name": "Audio3.au (2)",
+          "sizeBytes": 3081216,
+          "startSector": 41067,
+          "endSector": 47084,
+          "physicalOffset": 21026304,
+          "rawCells": [
+            "Audio3.au (2)",
+            "3,081,216",
+            "41,067",
+            "47,084"
+          ]
+        },
+        {
+          "name": "Audio3.au (1)",
+          "sizeBytes": 3081216,
+          "startSector": 47085,
+          "endSector": 53102,
+          "physicalOffset": 24107520,
+          "rawCells": [
+            "Audio3.au (1)",
+            "3,081,216",
+            "47,085",
+            "53,102"
+          ]
+        },
+        {
+          "name": "Audio3.au (3)",
+          "sizeBytes": 3081240,
+          "startSector": 53103,
+          "endSector": 59121,
+          "physicalOffset": 27188736,
+          "rawCells": [
+            "Audio3.au (3)",
+            "3,081,240",
+            "53,103",
+            "59,121"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 59122,
+          "endSector": 69121,
+          "physicalOffset": 30270464,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "59,122",
+            "69,121"
+          ]
+        },
+        {
+          "name": "Audio4.wma (3)",
+          "sizeBytes": 359211,
+          "startSector": 69122,
+          "endSector": 69823,
+          "physicalOffset": 35390464,
+          "rawCells": [
+            "Audio4.wma (3)",
+            "359,211",
+            "69,122",
+            "69,823"
+          ]
+        },
+        {
+          "name": "Audio4.wma (1)",
+          "sizeBytes": 357888,
+          "startSector": 69824,
+          "endSector": 70522,
+          "physicalOffset": 35749888,
+          "rawCells": [
+            "Audio4.wma (1)",
+            "357,888",
+            "69,824",
+            "70,522"
+          ]
+        },
+        {
+          "name": "Audio4.wma (2)",
+          "sizeBytes": 357888,
+          "startSector": 70523,
+          "endSector": 71221,
+          "physicalOffset": 36107776,
+          "rawCells": [
+            "Audio4.wma (2)",
+            "357,888",
+            "70,523",
+            "71,221"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L3_Audio",
+      "level": 3,
+      "family": "Audio",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L3_Audio.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "Audio1.mp3 (1)",
+          "sizeBytes": 350720,
+          "startSector": 10000,
+          "endSector": 10684,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "Audio1.mp3 (1)",
+            "350,720",
+            "10,000",
+            "10,684"
+          ]
+        },
+        {
+          "name": "Audio1.mp3 (3)",
+          "sizeBytes": 351267,
+          "startSector": 10685,
+          "endSector": 11371,
+          "physicalOffset": 5470720,
+          "rawCells": [
+            "Audio1.mp3 (3)",
+            "351,267",
+            "10,685",
+            "11,371"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 11372,
+          "endSector": 21371,
+          "physicalOffset": 5822464,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "11,372",
+            "21,371"
+          ]
+        },
+        {
+          "name": "Audio2.wav (1)",
+          "sizeBytes": 2306048,
+          "startSector": 21372,
+          "endSector": 25875,
+          "physicalOffset": 10942464,
+          "rawCells": [
+            "Audio2.wav (1)",
+            "2,306,048",
+            "21,372",
+            "25,875"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 25876,
+          "endSector": 35875,
+          "physicalOffset": 13248512,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "25,876",
+            "35,875"
+          ]
+        },
+        {
+          "name": "Audio3.au (2)",
+          "sizeBytes": 3081216,
+          "startSector": 35876,
+          "endSector": 41893,
+          "physicalOffset": 18368512,
+          "rawCells": [
+            "Audio3.au (2)",
+            "3,081,216",
+            "35,876",
+            "41,893"
+          ]
+        },
+        {
+          "name": "Audio3.au (3)",
+          "sizeBytes": 3081240,
+          "startSector": 41894,
+          "endSector": 47912,
+          "physicalOffset": 21449728,
+          "rawCells": [
+            "Audio3.au (3)",
+            "3,081,240",
+            "41,894",
+            "47,912"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 47913,
+          "endSector": 57912,
+          "physicalOffset": 24531456,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "47,913",
+            "57,912"
+          ]
+        },
+        {
+          "name": "Audio4.wma (1)",
+          "sizeBytes": 357888,
+          "startSector": 57913,
+          "endSector": 58611,
+          "physicalOffset": 29651456,
+          "rawCells": [
+            "Audio4.wma (1)",
+            "357,888",
+            "57,913",
+            "58,611"
+          ]
+        },
+        {
+          "name": "Audio4.wma (2)",
+          "sizeBytes": 357888,
+          "startSector": 58612,
+          "endSector": 59310,
+          "physicalOffset": 30009344,
+          "rawCells": [
+            "Audio4.wma (2)",
+            "357,888",
+            "58,612",
+            "59,310"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L4_Audio",
+      "level": 4,
+      "family": "Audio",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L4_Audio.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "Audio1.mp3 (1)",
+          "sizeBytes": 526336,
+          "startSector": 10000,
+          "endSector": 11027,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "Audio1.mp3 (1)",
+            "526,336",
+            "10,000",
+            "11,027"
+          ]
+        },
+        {
+          "name": "Audio2.wav",
+          "sizeBytes": 4612652,
+          "startSector": 11028,
+          "endSector": 20037,
+          "physicalOffset": 5646336,
+          "rawCells": [
+            "Audio2.wav",
+            "4,612,652",
+            "11,028",
+            "20,037"
+          ]
+        },
+        {
+          "name": "Audio1.mp3 (2)",
+          "sizeBytes": 526336,
+          "startSector": 20038,
+          "endSector": 21065,
+          "physicalOffset": 10259456,
+          "rawCells": [
+            "Audio1.mp3 (2)",
+            "526,336",
+            "20,038",
+            "21,065"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 21066,
+          "endSector": 31065,
+          "physicalOffset": 10785792,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "21,066",
+            "31,065"
+          ]
+        },
+        {
+          "name": "Audio3.au (1)",
+          "sizeBytes": 3081216,
+          "startSector": 31066,
+          "endSector": 37083,
+          "physicalOffset": 15905792,
+          "rawCells": [
+            "Audio3.au (1)",
+            "3,081,216",
+            "31,066",
+            "37,083"
+          ]
+        },
+        {
+          "name": "Audio3.au (2)",
+          "sizeBytes": 3081216,
+          "startSector": 37084,
+          "endSector": 43101,
+          "physicalOffset": 18987008,
+          "rawCells": [
+            "Audio3.au (2)",
+            "3,081,216",
+            "37,084",
+            "43,101"
+          ]
+        },
+        {
+          "name": "Audio4.wma",
+          "sizeBytes": 1074987,
+          "startSector": 43102,
+          "endSector": 45201,
+          "physicalOffset": 22068224,
+          "rawCells": [
+            "Audio4.wma",
+            "1,074,987",
+            "43,102",
+            "45,201"
+          ]
+        },
+        {
+          "name": "Audio3.au (3)",
+          "sizeBytes": 3081240,
+          "startSector": 45202,
+          "endSector": 51220,
+          "physicalOffset": 23143424,
+          "rawCells": [
+            "Audio3.au (3)",
+            "3,081,240",
+            "45,202",
+            "51,220"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    },
+    {
+      "id": "L5_Audio",
+      "level": 5,
+      "family": "Audio",
+      "archiveUrl": "https://cfreds-archive.nist.gov/FileCarving/Images/L5_Audio.dd.bz2",
+      "compressedSha256": null,
+      "compressedSizeBytes": null,
+      "decodedSha256": null,
+      "layout": [
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 0,
+          "endSector": 9999,
+          "physicalOffset": 0,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "0",
+            "9,999"
+          ]
+        },
+        {
+          "name": "Audio1.mp3 (1)",
+          "sizeBytes": 526336,
+          "startSector": 10000,
+          "endSector": 11027,
+          "physicalOffset": 5120000,
+          "rawCells": [
+            "Audio1.mp3 (1)",
+            "526,336",
+            "10,000",
+            "11,027"
+          ]
+        },
+        {
+          "name": "Audio2.wav (1)",
+          "sizeBytes": 2306048,
+          "startSector": 11028,
+          "endSector": 15531,
+          "physicalOffset": 5646336,
+          "rawCells": [
+            "Audio2.wav (1)",
+            "2,306,048",
+            "11,028",
+            "15,531"
+          ]
+        },
+        {
+          "name": "Audio1.mp3 (2)",
+          "sizeBytes": 526371,
+          "startSector": 15532,
+          "endSector": 16560,
+          "physicalOffset": 7952384,
+          "rawCells": [
+            "Audio1.mp3 (2)",
+            "526,371",
+            "15,532",
+            "16,560"
+          ]
+        },
+        {
+          "name": "Audio2.wav (2)",
+          "sizeBytes": 2306604,
+          "startSector": 16561,
+          "endSector": 21066,
+          "physicalOffset": 8479232,
+          "rawCells": [
+            "Audio2.wav (2)",
+            "2,306,604",
+            "16,561",
+            "21,066"
+          ]
+        },
+        {
+          "name": "Fill",
+          "sizeBytes": 5120000,
+          "startSector": 21067,
+          "endSector": 31066,
+          "physicalOffset": 10786304,
+          "rawCells": [
+            "Fill",
+            "5,120,000",
+            "21,067",
+            "31,066"
+          ]
+        },
+        {
+          "name": "Audio3.au (1)",
+          "sizeBytes": 3081216,
+          "startSector": 31067,
+          "endSector": 37084,
+          "physicalOffset": 15906304,
+          "rawCells": [
+            "Audio3.au (1)",
+            "3,081,216",
+            "31,067",
+            "37,084"
+          ]
+        },
+        {
+          "name": "Audio4.wma (1)",
+          "sizeBytes": 357888,
+          "startSector": 37085,
+          "endSector": 37783,
+          "physicalOffset": 18987520,
+          "rawCells": [
+            "Audio4.wma (1)",
+            "357,888",
+            "37,085",
+            "37,783"
+          ]
+        },
+        {
+          "name": "Audio3.au (2)",
+          "sizeBytes": 3081216,
+          "startSector": 37784,
+          "endSector": 43801,
+          "physicalOffset": 19345408,
+          "rawCells": [
+            "Audio3.au (2)",
+            "3,081,216",
+            "37,784",
+            "43,801"
+          ]
+        },
+        {
+          "name": "Audio4.wma (2)",
+          "sizeBytes": 357888,
+          "startSector": 43802,
+          "endSector": 44500,
+          "physicalOffset": 22426624,
+          "rawCells": [
+            "Audio4.wma (2)",
+            "357,888",
+            "43,802",
+            "44,500"
+          ]
+        },
+        {
+          "name": "Audio3.au (3)",
+          "sizeBytes": 3081240,
+          "startSector": 44501,
+          "endSector": 50519,
+          "physicalOffset": 22784512,
+          "rawCells": [
+            "Audio3.au (3)",
+            "3,081,240",
+            "44,501",
+            "50,519"
+          ]
+        },
+        {
+          "name": "Audio4.wma (3)",
+          "sizeBytes": 359211,
+          "startSector": 50520,
+          "endSector": 51221,
+          "physicalOffset": 25866240,
+          "rawCells": [
+            "Audio4.wma (3)",
+            "359,211",
+            "50,520",
+            "51,221"
+          ]
+        }
+      ],
+      "referenceIssues": []
+    }
+  ]
+}
