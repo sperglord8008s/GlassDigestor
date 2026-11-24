@@ -167,6 +167,7 @@ public final class BinaryWorkerService extends Service {
                                                 member,
                                                 frameMaximum,
                                                 requestLimits,
+                                                false,
                                                 rejection);
                                     else
                                         worker.execute(
@@ -183,6 +184,7 @@ public final class BinaryWorkerService extends Service {
                                                                 member,
                                                                 frameMaximum,
                                                                 requestLimits,
+                                                                true,
                                                                 null));
                                     return true;
                                 }));
@@ -200,12 +202,15 @@ public final class BinaryWorkerService extends Service {
             int member,
             int maximumDimensionPixels,
             AnalysisTimeLimits.Request limits,
+            boolean ownsSlot,
             String rejection) {
+        // No report try-with-resource may signal EOF before the main-owned slot is released.
+        // This local is then retained strongly by the single completion callback.
+        Closeable report = output;
         try (ParcelFileDescriptor source = input;
                 ParcelFileDescriptor destination = payload;
-                ParcelFileDescriptor pixels = raster;
-                ParcelFileDescriptor envelope = output) {
-            if (!reportChannelSafe(source, envelope, destination, pixels)) return;
+                ParcelFileDescriptor pixels = raster) {
+            if (!reportChannelSafe(source, output, destination, pixels)) return;
             String result;
             try {
                 if (rejection != null) throw new IOException(rejection);
@@ -273,42 +278,68 @@ public final class BinaryWorkerService extends Service {
             }
             // This stays outside the parser-error catch: a channel failure cannot itself be
             // serialized into the descriptor it rejected. Recheck after native work as well.
-            if (!reportChannelSafe(source, envelope, destination, pixels)) return;
-            try (OutputStream target = new ParcelFileDescriptor.AutoCloseOutputStream(envelope)) {
-                target.write(
-                        ("{\"workerUid\":"
-                                        + android.os.Process.myUid()
-                                        + ",\"applicationUid\":"
-                                        + getApplicationInfo().uid
-                                        + ",\"isolatedUid\":"
-                                        + isolated
-                                        + ",\"engine\":"
-                                        + JSONObject.quote(engine)
-                                        + (engine.equals("mpv-frame")
-                                                ? ",\"requestToken\":"
-                                                        + JSONObject.quote(token)
-                                                        + ",\"maximumDimensionPixels\":"
-                                                        + maximumDimensionPixels
-                                                : "")
-                                        + (limits == null
-                                                ? ""
-                                                : ",\"analysisDeadlineMs\":"
-                                                        + limits.analysisDeadlineMs
-                                                        + ",\"requestDeadlineMs\":"
-                                                        + limits.requestDeadlineMs)
-                                        + ",\"report\":")
-                                .getBytes(StandardCharsets.UTF_8));
-                target.write(result.getBytes(StandardCharsets.UTF_8));
-                target.write('}');
-            }
+            if (!reportChannelSafe(source, output, destination, pixels)) return;
+            OutputStream target = new ParcelFileDescriptor.AutoCloseOutputStream(output);
+            report = target;
+            target.write(
+                    ("{\"workerUid\":"
+                                    + android.os.Process.myUid()
+                                    + ",\"applicationUid\":"
+                                    + getApplicationInfo().uid
+                                    + ",\"isolatedUid\":"
+                                    + isolated
+                                    + ",\"engine\":"
+                                    + JSONObject.quote(engine)
+                                    + (engine.equals("mpv-frame")
+                                            ? ",\"requestToken\":"
+                                                    + JSONObject.quote(token)
+                                                    + ",\"maximumDimensionPixels\":"
+                                                    + maximumDimensionPixels
+                                            : "")
+                                    + (limits == null
+                                            ? ""
+                                            : ",\"analysisDeadlineMs\":"
+                                                    + limits.analysisDeadlineMs
+                                                    + ",\"requestDeadlineMs\":"
+                                                    + limits.requestDeadlineMs)
+                                    + ",\"report\":")
+                            .getBytes(StandardCharsets.UTF_8));
+            target.write(result.getBytes(StandardCharsets.UTF_8));
+            target.write('}');
         } catch (Exception ignored) {
             /* Pipe closure/crash is an explicit incomplete-report failure in the caller. */
         } finally {
-            new Handler(Looper.getMainLooper())
-                    .post(
-                            () -> {
-                                if (token.equals(activeToken)) activeToken = null;
-                            });
+            finishReport(token, ownsSlot, report);
+        }
+    }
+
+    /**
+     * Data cleanup precedes this call; accepted ownership retires before the report signals EOF.
+     */
+    void finishReport(String token, boolean ownsSlot, Closeable report) {
+        Runnable closeReport =
+                () -> {
+                    try {
+                        report.close();
+                    } catch (IOException ignored) {
+                        // Report closure is terminal; a broken channel cannot carry another
+                        // diagnostic.
+                    }
+                };
+        if (!ownsSlot) {
+            // In particular, a rejected caller reusing the active token never owns its release.
+            closeReport.run();
+            return;
+        }
+        Runnable releaseAndClose =
+                () -> {
+                    if (token.equals(activeToken)) activeToken = null;
+                    closeReport.run();
+                };
+        if (Looper.myLooper() == Looper.getMainLooper()) releaseAndClose.run();
+        else if (!new Handler(Looper.getMainLooper()).post(releaseAndClose)) {
+            // A quitting main looper cannot dispatch a later RUN. Do not leak its retained FD.
+            closeReport.run();
         }
     }
 

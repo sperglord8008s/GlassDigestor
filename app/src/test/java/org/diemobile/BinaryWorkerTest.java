@@ -14,12 +14,15 @@ import org.junit.runner.RunWith;
 import org.robolectric.*;
 import org.robolectric.android.controller.ServiceController;
 import org.robolectric.annotation.*;
+import org.robolectric.shadows.ShadowProcess;
 import org.robolectric.util.ReflectionHelpers;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
 
 /**
  * Manifest/refusal and real descriptor closure with explicit facts; no isolated OS UID is
@@ -478,7 +481,9 @@ public final class BinaryWorkerTest {
             List<ParcelFileDescriptor> descriptors = requestDescriptors(request.getData());
             dispatch(controller, request, WorkerDescriptorFactsFixture.safe(request.getData()));
             JSONObject reply =
-                    new JSONObject(new String(Files.readAllBytes(report.toPath()), StandardCharsets.UTF_8));
+                    new JSONObject(
+                            new String(
+                                    Files.readAllBytes(report.toPath()), StandardCharsets.UTF_8));
             assertFalse(reply.getBoolean("isolatedUid"));
             assertTrue(reply.getJSONObject("report").getString("error").contains("isolated UID"));
             assertEquals(0, source.length());
@@ -487,6 +492,235 @@ public final class BinaryWorkerTest {
             controller.destroy();
             remove(directory);
         }
+    }
+
+    @Test
+    public void blockedReportRetainsOwnershipAndMainCompletionReleasesBeforeItsOnlyClose()
+            throws Exception {
+        Path directory = Files.createTempDirectory("worker-report-publication");
+        ServiceController<BinaryWorkerService> controller =
+                Robolectric.buildService(BinaryWorkerService.class).create();
+        BinaryWorkerService service = controller.get();
+        ExecutorService publisher = Executors.newSingleThreadExecutor();
+        CountDownLatch writing = new CountDownLatch(1), allowWrites = new CountDownLatch(1);
+        AtomicBoolean dataClosed = new AtomicBoolean();
+        AtomicInteger closes = new AtomicInteger();
+        AtomicReference<String> slotAtClose = new AtomicReference<>("not-closed");
+        AtomicBoolean dataClosedAtClose = new AtomicBoolean();
+        OutputStream report =
+                new OutputStream() {
+                    @Override
+                    public void write(int value) throws IOException {
+                        writing.countDown();
+                        try {
+                            allowWrites.await();
+                        } catch (InterruptedException interrupted) {
+                            Thread.currentThread().interrupt();
+                            throw new InterruptedIOException("Fixture writer interrupted");
+                        }
+                    }
+
+                    @Override
+                    public void close() {
+                        slotAtClose.set(ReflectionHelpers.getField(service, "activeToken"));
+                        dataClosedAtClose.set(dataClosed.get());
+                        closes.incrementAndGet();
+                    }
+                };
+        try {
+            ReflectionHelpers.setField(service, "isolated", true);
+            ReflectionHelpers.setField(service, "activeToken", "accepted-job");
+            Future<?> producing =
+                    publisher.submit(
+                            () -> {
+                                report.write('}');
+                                dataClosed.set(true);
+                                service.finishReport("accepted-job", true, report);
+                                return null;
+                            });
+            assertTrue(writing.await(5, TimeUnit.SECONDS));
+            assertEquals(0, closes.get());
+            File source = directory.resolve("source").toFile(),
+                    busyReport = directory.resolve("busy").toFile();
+            Files.write(source.toPath(), new byte[] {1, 2, 3});
+            Message busy = guardedRequest(directory, source, busyReport);
+            busy.getData()
+                    .putString("token", "accepted-job"); // A rejected duplicate is not the owner.
+            List<ParcelFileDescriptor> rejected = requestDescriptors(busy.getData());
+            dispatch(controller, busy, WorkerDescriptorFactsFixture.safe(busy.getData()));
+            JSONObject refusal =
+                    new JSONObject(
+                            new String(
+                                    Files.readAllBytes(busyReport.toPath()),
+                                    StandardCharsets.UTF_8));
+            assertTrue(
+                    refusal.getJSONObject("report").getString("error").contains("already serving"));
+            assertEquals(
+                    "accepted-job", ReflectionHelpers.<String>getField(service, "activeToken"));
+            assertEquals(0, closes.get());
+            assertClosed(rejected);
+            ShadowProcess.clearKilledProcesses();
+            cancel(service, "another-job");
+            assertFalse(ShadowProcess.wasKilled(android.os.Process.myPid()));
+            assertEquals(
+                    "accepted-job", ReflectionHelpers.<String>getField(service, "activeToken"));
+
+            allowWrites.countDown();
+            producing.get(5, TimeUnit.SECONDS);
+            assertTrue(dataClosed.get());
+            assertEquals(
+                    "The report must remain open while its release is queued", 0, closes.get());
+            assertEquals(
+                    "accepted-job", ReflectionHelpers.<String>getField(service, "activeToken"));
+            Shadows.shadowOf(Looper.getMainLooper()).idle();
+            assertEquals(1, closes.get());
+            assertNull(slotAtClose.get());
+            assertTrue(dataClosedAtClose.get());
+            assertNull(ReflectionHelpers.getField(service, "activeToken"));
+
+            ReflectionHelpers.setField(service, "activeToken", "unrelated-job");
+            AtomicInteger unrelatedCloses = new AtomicInteger();
+            publisher
+                    .submit(
+                            () ->
+                                    service.finishReport(
+                                            "accepted-job",
+                                            true,
+                                            () -> unrelatedCloses.incrementAndGet()))
+                    .get(5, TimeUnit.SECONDS);
+            Shadows.shadowOf(Looper.getMainLooper()).idle();
+            assertEquals(
+                    "unrelated-job", ReflectionHelpers.<String>getField(service, "activeToken"));
+            assertEquals(1, unrelatedCloses.get());
+        } finally {
+            allowWrites.countDown();
+            publisher.shutdownNow();
+            assertTrue(publisher.awaitTermination(5, TimeUnit.SECONDS));
+            Shadows.shadowOf(Looper.getMainLooper()).idle();
+            ShadowProcess.clearKilledProcesses();
+            controller.destroy();
+            remove(directory);
+        }
+    }
+
+    @Test
+    public void executeKeepsReportOpenUntilMainReleaseThenImmediatelyAdmitsTheNextRequest()
+            throws Exception {
+        Path directory = Files.createTempDirectory("worker-report-eof-order");
+        ServiceController<BinaryWorkerService> controller =
+                Robolectric.buildService(BinaryWorkerService.class).create();
+        BinaryWorkerService service = controller.get();
+        ExecutorService worker = ReflectionHelpers.getField(service, "worker");
+        CountDownLatch atFinalGuard = new CountDownLatch(1),
+                allowPublication = new CountDownLatch(1);
+        CountDownLatch nextWorkerBlocked = new CountDownLatch(1),
+                allowNextWorker = new CountDownLatch(1);
+        List<ParcelFileDescriptor> firstDescriptors = new ArrayList<>(),
+                nextDescriptors = new ArrayList<>();
+        try {
+            ReflectionHelpers.setField(
+                    service, "isolated", true); // Only policy/ordering is simulated.
+            File source = directory.resolve("source").toFile(),
+                    firstReport = directory.resolve("first").toFile();
+            Files.write(source.toPath(), new byte[] {1, 2, 3});
+            Message first = resourceRequest(directory, source, firstReport, "first-job");
+            firstDescriptors.addAll(requestDescriptors(first.getData()));
+            ParcelFileDescriptor firstInput = first.getData().getParcelable("input"),
+                    firstOutput = first.getData().getParcelable("output");
+            WorkerDescriptorFactsFixture facts = WorkerDescriptorFactsFixture.safe(first.getData());
+            AtomicInteger reportInspections = new AtomicInteger();
+            BinaryWorkerService.DescriptorInspector paused =
+                    descriptor -> {
+                        BinaryWorkerService.DescriptorFacts observed = facts.inspect(descriptor);
+                        if (descriptor == firstOutput && reportInspections.incrementAndGet() == 3) {
+                            atFinalGuard.countDown();
+                            try {
+                                allowPublication.await();
+                            } catch (InterruptedException interrupted) {
+                                Thread.currentThread().interrupt();
+                                throw new InterruptedIOException("Fixture publication interrupted");
+                            }
+                        }
+                        return observed;
+                    };
+            ReflectionHelpers.setField(service, "descriptorInspector", paused);
+            new Messenger(service.onBind(new Intent())).send(first);
+            Shadows.shadowOf(Looper.getMainLooper()).idle();
+            assertTrue(atFinalGuard.await(15, TimeUnit.SECONDS));
+            assertEquals("first-job", ReflectionHelpers.<String>getField(service, "activeToken"));
+            allowPublication.countDown();
+            worker.submit(() -> {})
+                    .get(15, TimeUnit.SECONDS); // All writes/data cleanup have settled.
+            assertThrows(IllegalStateException.class, firstInput::getFd);
+            assertTrue("EOF must wait for main-owned release", firstOutput.getFd() >= 0);
+            assertEquals("first-job", ReflectionHelpers.<String>getField(service, "activeToken"));
+            assertTrue(firstReport.length() > 0);
+            JSONObject firstEnvelope =
+                    new JSONObject(
+                            new String(
+                                    Files.readAllBytes(firstReport.toPath()),
+                                    StandardCharsets.UTF_8));
+            assertEquals("resources", firstEnvelope.getString("engine"));
+            Shadows.shadowOf(Looper.getMainLooper()).idle();
+            assertNull(ReflectionHelpers.getField(service, "activeToken"));
+            assertThrows(IllegalStateException.class, firstOutput::getFd);
+
+            // Hold the executor so admission is observable without running another parser.
+            worker.submit(
+                    () -> {
+                        nextWorkerBlocked.countDown();
+                        allowNextWorker.await();
+                        return null;
+                    });
+            assertTrue(nextWorkerBlocked.await(5, TimeUnit.SECONDS));
+            File nextReport = directory.resolve("next").toFile();
+            Message next = resourceRequest(directory, source, nextReport, "next-job");
+            nextDescriptors.addAll(requestDescriptors(next.getData()));
+            dispatch(controller, next, WorkerDescriptorFactsFixture.safe(next.getData()));
+            assertEquals("next-job", ReflectionHelpers.<String>getField(service, "activeToken"));
+            assertEquals("One immediate request is admitted without retry", 0, nextReport.length());
+            for (ParcelFileDescriptor descriptor : nextDescriptors)
+                assertTrue(descriptor.getFd() >= 0);
+            ShadowProcess.clearKilledProcesses();
+            cancel(service, "first-job");
+            assertFalse(ShadowProcess.wasKilled(android.os.Process.myPid()));
+            cancel(service, "next-job");
+            assertTrue(
+                    "Cancellation still targets the pending accepted owner",
+                    ShadowProcess.wasKilled(android.os.Process.myPid()));
+            assertEquals("next-job", ReflectionHelpers.<String>getField(service, "activeToken"));
+        } finally {
+            allowPublication.countDown();
+            // The next accepted task is deliberately never executed; release its test-owned FDs.
+            worker.shutdownNow();
+            allowNextWorker.countDown();
+            assertTrue(worker.awaitTermination(5, TimeUnit.SECONDS));
+            for (ParcelFileDescriptor descriptor : firstDescriptors) descriptor.close();
+            for (ParcelFileDescriptor descriptor : nextDescriptors) descriptor.close();
+            Shadows.shadowOf(Looper.getMainLooper()).idle();
+            ShadowProcess.clearKilledProcesses();
+            controller.destroy();
+            remove(directory);
+        }
+    }
+
+    private static Message resourceRequest(Path directory, File source, File report, String token)
+            throws Exception {
+        Message request = guardedRequest(directory, source, report);
+        request.getData().putString("engine", "resources");
+        request.getData().putString("token", token);
+        for (String unused : new String[] {"payload", "raster"}) {
+            ((ParcelFileDescriptor) request.getData().getParcelable(unused)).close();
+            request.getData().remove(unused);
+        }
+        return request;
+    }
+
+    private static void cancel(BinaryWorkerService service, String token) throws Exception {
+        Message cancel = Message.obtain(null, BinaryWorkerService.CANCEL);
+        cancel.getData().putString("token", token);
+        new Messenger(service.onBind(new Intent())).send(cancel);
+        Shadows.shadowOf(Looper.getMainLooper()).idle();
     }
 
     private static Message guardedRequest(Path directory, File source, File report)
