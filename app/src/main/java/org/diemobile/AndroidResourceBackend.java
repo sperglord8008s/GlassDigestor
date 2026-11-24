@@ -188,7 +188,7 @@ final class AndroidResourceBackend extends InvestigationBackend {
         return document!=null&&!document.header.optBoolean("semanticCoverageComplete")?"PARTIAL SEMANTIC COVERAGE • opaque chunks retain original ranges.":"";
     }
     @Override String help(String request) {
-        return "Compiled Android XML/resources • actual source-built Google parser plus bounded wire evidence. Every table is available in Root views. Resource IDs, pool indices and UTF-16 positions are distinct from physical offsets. Search covers complete decoded values; previews are bounded and complete records export to JSON. Declarations do not prove platform acceptance or live component behavior. Tap for source/coverage details.";
+        return "Compiled Android XML/resources • actual source-built Google parser plus bounded wire inventory. Every table is available in Views. Resource IDs, pool indices and UTF-16 positions are distinct from physical offsets. Search covers complete decoded values; previews are bounded and complete records export to JSON. Declarations do not prove platform acceptance or live component behavior. Tap for source/coverage details.";
     }
     @Override public void close() throws Exception {
         try { runner.close(); } finally { if(extraction!=null) extraction.file.delete();if(parent!=null) parent.close(); }

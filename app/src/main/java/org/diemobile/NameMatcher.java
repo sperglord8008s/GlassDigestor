@@ -12,6 +12,10 @@ import org.json.*;
 final class NameMatcher {
     static final int MAX_NAME_UNITS=16384,MAX_RULES=20000;
     static final String[] TYPES={"Native library name","Declared service","Declared activity","Declared receiver","Declared provider","DEX package evidence","Declared shared/static library","Permission name","Manifest metadata name","Intent action"};
+    /** Preserve exported typeName values; neutral wording belongs to the display label only. */
+    static String displayTypeLabel(int type) {
+        return type == 5 ? "DEX package names" : TYPES[type];
+    }
     static final class Rule {
         final int id,type,priority,index;
         final String name;

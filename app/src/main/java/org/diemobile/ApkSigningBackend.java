@@ -288,7 +288,7 @@ final class ApkSigningBackend extends InvestigationBackend {
             case "stamp":
                 return "distribution source stamp / signer / timestamp";
             default:
-                return "complete signing evidence";
+                return "complete signing information";
         }
     }
 
@@ -300,11 +300,11 @@ final class ApkSigningBackend extends InvestigationBackend {
             result.add(Link.view(title(table), request("selected", table)));
         result.add(
                 Link.view(
-                        "All collected signing evidence (complete combined export)",
+                        "All collected signing information (complete combined export)",
                         request("selected", "all")));
         result.add(
                 Link.view(
-                        "Embedded APK evidence without detached signature",
+                        "Embedded APK information without detached signature",
                         request("embedded", "all")));
         result.add(Link.input("Select / replace detached v4 .idsig (offline)", "idsig"));
         if (idsig != null) {
@@ -319,7 +319,7 @@ final class ApkSigningBackend extends InvestigationBackend {
                             "selected-signature.idsig"));
             result.add(
                     Link.input(
-                            "Clear detached signature; keep embedded APK evidence", "clear-idsig"));
+                            "Clear detached signature; keep embedded APK information", "clear-idsig"));
         }
         return result;
     }

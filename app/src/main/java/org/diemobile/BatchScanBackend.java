@@ -387,7 +387,7 @@ final class BatchScanBackend extends InvestigationBackend {
                                + " report hashes remain available. Duplicate parent"
                                + " insertion/reordering can change alignment. Failed scans have"
                                + " unknown coverage; records remain uncompared."
-                               + " Left-only/right-only describes returned evidence, never file"
+                               + " Left-only/right-only describes returned records, never file"
                                + " absence or behavior. Captured native options/rule/engine"
                                + " differences are separate from preview-only settings. This view"
                                + " does not reread input bytes or infer physical offsets.";

@@ -260,8 +260,8 @@ final class DexBackend extends InvestigationBackend {
         DexSmali.write(document, DexQuery.parse(value.getJSONObject("dex").toString()), output, cancelled);
     }
     @Override String help(String request) {
-        if(definitionView||definitions!=null&&listing) return "Captured multidex declaration evidence • exact declared owner and full signature; every duplicate is retained. Partial sources/lookup errors leave absence and uniqueness unknown. Target offsets belong to the stated DEX SHA-256, so open its declaration before byte actions. No inheritance, framework/split linkage, dispatch, loading or execution is inferred. Tap for acquisition identity, limits and diagnostics.";
-        return "Static DEX evidence • code-unit addresses count 16-bit units relative to a method; physical offsets locate the selected DEX snapshot/container. Identifier tables can reference external definitions. Tap a record for raw fields, relationships and byte actions. Root views select every pool/container entry.";
+        if(definitionView||definitions!=null&&listing) return "Captured multidex declaration information • exact declared owner and full signature; every duplicate is retained. Partial sources/lookup errors leave absence and uniqueness unknown. Target offsets belong to the stated DEX SHA-256, so open its declaration before byte actions. No inheritance, framework/split linkage, dispatch, loading or execution is inferred. Tap for acquisition identity, limits and diagnostics.";
+        return "Static DEX information • code-unit addresses count 16-bit units relative to a method; physical offsets locate the selected DEX snapshot/container. Identifier tables can reference external definitions. Tap a record for raw fields, relationships and byte actions. Views select every pool/container entry.";
     }
     @Override public void close() { if (selected != null&&!selectedBorrowed) selected.delete();if(definitions!=null) definitions.close(); }
 }

@@ -128,7 +128,7 @@ final class NativeArchiveGalleryAdapter extends BaseAdapter implements AutoClose
             tile.addView(export);
             if (observation != null && observation.archive)
                 tile.addView(button("Browse archive", () -> browse.accept(member)));
-            tile.addView(text("Tap to preview · hold for full evidence and tools", 11));
+            tile.addView(text("Tap to preview · hold for full details and tools", 11));
         }
         return tile;
     }

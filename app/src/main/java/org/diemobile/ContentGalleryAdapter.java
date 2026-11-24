@@ -109,7 +109,7 @@ final class ContentGalleryAdapter extends BaseAdapter implements AutoCloseable {
                                 ? media.get(index).description()
                                 : pdf.containsKey(index)
                                         ? pdf.get(index).description()
-                                        : "Platform decoded thumbnail · tap for preview/evidence");
+                                        : "Platform decoded thumbnail · tap for preview/details");
             } else if (media.containsKey(index)) status.setText(media.get(index).description());
             else if (failures.containsKey(index))
                 status.setText("Thumbnail unavailable: " + failures.get(index));

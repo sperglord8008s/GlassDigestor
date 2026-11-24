@@ -22,7 +22,7 @@ final class MetadataBackend extends InvestigationBackend {
             case "errors": return document.errors(selected);
             case "xmp": return document.xmp(selected);
             case "value": return document.value(selected,query.getInt("tag"));
-            case "summary": return new EvidenceRows("metadata-summary","Metadata source / scope / engine evidence") {
+            case "summary": return new EvidenceRows("metadata-summary","Metadata source / scope / engine details") {
                 int size() { return 1; }
                 Row row(int i, BooleanSupplier cancelled) throws Exception { EvidenceRows.check(cancelled); return new Row(0,name,document.detectedType+" • "+document.parseStatus,0L,document.snapshot.size,document.metadata()); }
                 JSONObject metadata() throws Exception { return document.metadata(); }

@@ -84,6 +84,10 @@ public final class KnowledgeWorkbenchTest {
         choose("Every matcher for this library UUID");settle();assertTrue(list().getAdapter().getCount()>0);
         controller.recreate();activity=controller.get();settle();button("back").performClick();settle();assertEquals(1,list().getAdapter().getCount());assertEquals(71,row(0).json().getInt("matcherId"));
         root("Unsupported regex diagnostics");assertEquals(0,list().getAdapter().getCount());
+        root("DEX package names");assertTrue(list().getAdapter().getCount()>0);
+        assertTrue(ReflectionHelpers.<TextView>getField(activity,"title").getText().toString().endsWith("DEX package names"));
+        assertEquals(5,row(0).json().getInt("type"));
+        assertEquals("DEX package evidence",row(0).json().getString("typeName"));
     }
     @Test public void completeCatalogExportAndReloadAreIndependentOfSelectedFileExpiry() throws Exception {
         search("libflutter.so");button("export").performClick();settle();

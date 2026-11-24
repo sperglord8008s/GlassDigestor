@@ -161,7 +161,7 @@ final class GalleryDiscovery {
     String status() {
         return rows != null
                 ? backend.statusSummary()
-                : failure != null ? failure : "Native content evidence has not completed";
+                : failure != null ? failure : "Native content analysis has not completed";
     }
 
     void close(boolean retain) throws Exception {

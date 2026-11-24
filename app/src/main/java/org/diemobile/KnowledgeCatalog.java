@@ -81,7 +81,7 @@ final class KnowledgeCatalog {
     EvidenceRows rows(int type,boolean errorsOnly,String uuid) {
         List<NameMatcher.Rule> selected=new ArrayList<>();
         for(NameMatcher.Rule rule:matcher.rules) if((type<0||rule.type==type)&&(!errorsOnly||!rule.error.isEmpty())&&(uuid.isEmpty()||uuid.equals(rule.original.optString("uuid")))) selected.add(rule);
-        return new EvidenceRows("sdk-rule-catalog","Canonical LibChecker matchers • "+(errorsOnly?"unsupported regex":type<0?"every type":NameMatcher.TYPES[type])) {
+        return new EvidenceRows("sdk-rule-catalog","Canonical LibChecker matchers • "+(errorsOnly?"unsupported regex":type<0?"every type":NameMatcher.displayTypeLabel(type))) {
             int size() { return selected.size(); }
             Row row(int index,BooleanSupplier stop) throws Exception {
                 EvidenceRows.check(stop);NameMatcher.Rule rule=selected.get(index);
