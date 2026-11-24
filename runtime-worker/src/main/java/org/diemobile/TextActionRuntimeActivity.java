@@ -2,7 +2,11 @@
 package org.diemobile;
 
 import android.app.Activity;
+import android.app.KeyguardManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import java.util.concurrent.CountDownLatch;
@@ -15,6 +19,18 @@ public final class TextActionRuntimeActivity extends Activity {
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
+        // Native large-file checks can outlast the emulator's idle display timeout.
+        // Keep the real foreground/focus requirement; wake only this trusted test window.
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        if (Build.VERSION.SDK_INT >= 27) {
+            setShowWhenLocked(true);
+            setTurnScreenOn(true);
+        } else {
+            getWindow()
+                    .addFlags(
+                            WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                                    | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        }
         TextView label = new TextView(this);
         label.setText("GlassDigestor: trusted text-action runtime fixture");
         setContentView(label);
@@ -28,5 +44,16 @@ public final class TextActionRuntimeActivity extends Activity {
 
     public boolean awaitFocus() throws InterruptedException {
         return focused.await(10, TimeUnit.SECONDS);
+    }
+
+    public String focusState() {
+        PowerManager power = (PowerManager) getSystemService(POWER_SERVICE);
+        KeyguardManager keyguard = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
+        return "focused="
+                + hasWindowFocus()
+                + ", interactive="
+                + (power != null && power.isInteractive())
+                + ", keyguardLocked="
+                + (keyguard != null && keyguard.isKeyguardLocked());
     }
 }

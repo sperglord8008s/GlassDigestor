@@ -209,3 +209,12 @@ contract is pending; the ten published pre-alpha.17 contracts above retain
 their separate verified status. This laboratory does not execute the full
 archive UI, a real SAF destination or the production ARM64 build. Fixtures are
 owned Python-standard-library output; external NIST media are not packaged.
+
+
+The foreground clipboard fixture explicitly wakes/shows its trusted test-only
+window and keeps the display on. Large native checks can outlast an emulator's
+idle display timeout; focus is still required and clipboard assertions are not
+relaxed. Focus failure now includes interactive/keyguard/window state. At source
+486e822 the PR run passed all eleven on both APIs, while the push API 35 run
+failed this prerequisite after its ten native/media checks passed. Fresh runs
+of the wake-handling correction are required; a failed run remains failed.

@@ -1637,3 +1637,23 @@ inputs remain byte-identical. Full [host NIST decoding receipt](verification/nis
 Both rebuilt CDiE/hash host libraries match the libraries used by the passing
 UI suite byte-for-byte. Clean source CI and actual eleventh Android contract
 execution remain required before publication.
+
+
+At source `486e822`, the clean push runtime run `45407914666` passed all eleven
+contracts on API 26. API 35 completed ten contracts, including exact large
+BZip2 decoding/alias/origin checks, then failed the existing clipboard fixture's
+window-focus prerequisite. Independent PR run `45407985732` passed all eleven
+on both APIs, confirming an intermittent foreground-fixture issue. The trusted
+test-only window now explicitly wakes/shows itself and keeps the display on,
+with interactive/keyguard/focus diagnostics on failure. Clipboard byte, focus,
+sensitive-flag and URI assertions remain intact. Both fixture source sets compile;
+the corrected source must pass fresh clean CI before publication. Production
+code is unchanged by this harness fix.
+
+The numbered local ARM64 `486e822` build passes assembly/lint and all fifteen
+library, signature, no-INTERNET, identity, notice and 16 KiB static checks.
+The separate local x86 lab also assembles/static-checks successfully. Local
+builds reuse independently revalidated unchanged CDiE/hash libraries because
+of constrained storage; clean CI rebuilds normally. The frozen local APK is
+52,837,161 bytes, SHA-256
+`dd2491ab14928da8848758e3edea153aa4da98121768e3d01ec03786d39423f4`.

@@ -309,7 +309,9 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
         AtomicReference<Boolean> sensitive = new AtomicReference<>(false);
         String raw = "研究 😀 &?#/\n" + (char) 0 + (char) 0x202e + (char) 0xd800;
         try {
-            require(activity.awaitFocus(), "Clipboard fixture never obtained window focus");
+            require(
+                    activity.awaitFocus(),
+                    "Clipboard fixture never obtained window focus: " + activity.focusState());
             waitForIdleSync();
             runOnMainSync(
                     () -> {
