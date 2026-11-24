@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.AbsListView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -241,6 +242,53 @@ public final class WorkbenchControlsTest {
             int position = list.getFirstVisiblePosition();
             list.performItemClick(first, position, list.getAdapter().getItemId(position));
             assertEquals(position, selected.get());
+        }
+    }
+
+    @Test
+    public void nativeThumbTracksActualOverflowIncludingShortPagesAndAdapterReplacement() {
+        for (AbsListView list : new AbsListView[] {new ListView(activity), new GridView(activity)}) {
+            if (list instanceof GridView) ((GridView) list).setNumColumns(2);
+            // Repeated shared styling must not install duplicate lifecycle/layout bindings.
+            WorkbenchUi.fastScroll(list);
+            WorkbenchUi.fastScroll(list);
+            ArrayAdapter<String> adapter = WorkbenchUi.adapter(activity, new ArrayList<>(), value -> value);
+            adapter.setNotifyOnChange(false);
+            for (int i = 0; i < 1000; i++) adapter.add("Record " + i);
+            list.setAdapter(adapter);
+            activity.setContentView(list);
+            layout(list, 360, 240);
+            Object scroller = ReflectionHelpers.getField(list, "mFastScroll");
+            assertTrue(ReflectionHelpers.<Boolean>callInstanceMethod(scroller, "isEnabled"));
+
+            adapter.clear();
+            adapter.addAll("Record 0", "Record 1", "Record 2");
+            adapter.notifyDataSetChanged();
+            layout(list, 360, 240);
+            assertFalse(list.canScrollList(-1) || list.canScrollList(1));
+            assertFalse(list.isFastScrollAlwaysVisible());
+            assertFalse("Fitting rows retained an active native thumb",
+                    ReflectionHelpers.<Boolean>callInstanceMethod(scroller, "isEnabled"));
+            assertEquals(0, ReflectionHelpers.<Integer>getField(scroller, "mState").intValue());
+            assertEquals(3, list.getAdapter().getCount());
+
+            adapter.clear();
+            for (int i = 0; i < 12; i++) adapter.add("Record " + i);
+            adapter.notifyDataSetChanged();
+            layout(list, 360, 240);
+            assertTrue(list.canScrollList(1));
+            assertTrue(ReflectionHelpers.<Boolean>callInstanceMethod(scroller, "isEnabled"));
+            ImageView thumb = ReflectionHelpers.getField(scroller, "mThumbImage");
+            float x = thumb.getX() + thumb.getWidth() / 2f;
+            float y = thumb.getY() + thumb.getHeight() / 2f;
+            touch(list, MotionEvent.ACTION_DOWN, x, y);
+            touch(list, MotionEvent.ACTION_MOVE, x, 239);
+            touch(list, MotionEvent.ACTION_UP, x, 239);
+            layout(list, 360, 240);
+            assertTrue("Short overflowing page did not respond to its native thumb",
+                    list.getFirstVisiblePosition() > 0);
+            assertEquals(12, list.getAdapter().getCount());
+            assertEquals("Record 11", list.getAdapter().getItem(11));
         }
     }
 }
