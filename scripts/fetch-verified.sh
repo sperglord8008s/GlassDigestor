@@ -27,3 +27,22 @@ fetch_verified_dependency() {
   fi
   if ! mv -f "$stage" "$destination"; then rm -f "$stage"; return 1; fi
 }
+
+# Build/test-only Central coordinates. Every origin must satisfy the same pin.
+fetch_verified_maven_dependency() {
+  local destination="$1" checksum="$2" relative="$3" maximum="${4:-16777216}" base
+  if [[ -e "$destination" || -L "$destination" || "${DIE_OFFLINE:-false}" = true ]]; then
+    # A corrupt existing cache is evidence of a local change, not a mirror miss.
+    fetch_verified_dependency "$destination" "$checksum" \
+      "https://repo.maven.apache.org/maven2/$relative" "$maximum"
+    return
+  fi
+  for base in https://maven-central.storage-download.googleapis.com/maven2 \
+              https://repo.maven.apache.org/maven2; do
+    if fetch_verified_dependency "$destination" "$checksum" "$base/$relative" "$maximum"; then
+      return 0
+    fi
+  done
+  echo "Pinned Maven dependency unavailable: $relative" >&2
+  return 1
+}

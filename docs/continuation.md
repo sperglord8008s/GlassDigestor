@@ -1507,3 +1507,24 @@ changes, and publish the exact successful source run as pre-alpha.17. Preserve
 pre-alpha.16 and all older immutable fallbacks. Download/audit new runtime and
 release identities before recording verified claims. Actual ARM64 UI/SAF,
 font-scale/screen-reader and external browser/provider acceptance remain pending.
+
+
+### Accepted local build and observed CI acquisition fix
+
+Clean source `95d9afa5a2dfc4ee23abbccb385e63e6c04613d4` locally assembles,
+lints (zero errors) and passes APK/signature/offline/native-notice/static-16-KiB
+checks. Its immutable local checkpoint is
+`/workspace/work/checkpoints/0.6.0-pre-alpha.17-local`, 52,837,161 bytes,
+SHA-256 `23459fa3cd0f1edf7675c8712e0128c8dea6d620ce27574657b44f9fefb4e562`.
+Local unchanged-native reuse is explicit; production ARM64 runtime is unverified.
+
+The exact-source push runtime run `45386601672` passed all ten contracts on
+both actual x86 API 26/35. Downloaded report auditing is pending. Source push
+run `45386601799` hit HTTP 429 acquiring the unchanged pinned host JSON jar;
+the equivalent PR binary job passed. The follow-up routes fresh JSON test
+acquisition through a fixed Central mirror/canonical fallback with the same
+SHA-256 and limits. Existing edited caches and missing offline inputs still
+fail without network or replacement. Authored interrupted/corrupt/fallback/
+cache fixtures, original SDK acquisition regressions, standalone strings,
+publication contracts and a fresh real pinned mirror download pass. New clean
+source/runtime CI must pass on this follow-up before release.
