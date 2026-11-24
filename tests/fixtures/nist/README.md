@@ -17,21 +17,29 @@ identity exactly matches the reported `L0_Video.dd.bz2` screenshot. Complete
 archive decoding has passed through the actual host libarchive JNI and a
 symlinked trusted cache ancestor, producing 62,578,688 bytes with the pinned
 independently calculated SHA-256. Binwalk and PhotoRec also produce real
-discovery reports. Discovery counts are separate from recovered-file acceptance. A subsequent host
-replay of those complete native captures through the unchanged production
-evidence/content-map/export models produced an actual ZIP. Independent streaming
-ZIP/CRC/SHA-256 checks confirm **five of six** reference files byte-for-byte,
-including two exact copies of the AVI. MPEG is missing: its first native
-candidate exhausts the current 8 MiB streaming-callback budget. Another 79
-exported entries remain additional, unscored findings; they are not discarded.
-This baseline does not execute Android UI or SAF.
+discovery reports. Discovery counts are separate from recovered-file acceptance.
+
+The current real-native host run acquires the archive, executes both FD-based
+engines through production Gallerize and exports **all six** reference files
+byte-for-byte. Independent ZIP/CRC/size/offset/SHA-256 scoring passes. The 86
+actual files include a duplicate exact AVI and 79 additional unscored exports.
+All 28,890 original PhotoRec occurrences, ordering and header acceptance counts
+are preserved; 11,024 in-stream MPEG pack rows retain unknown independent
+extents while their redundant optional callbacks are explicitly omitted. Native
+callback work totals 47,972,352 bytes with no exhausted data-work budgets.
+[Current receipt](../../../docs/verification/nist-L0-video-native-export.json).
+
+The historical pre-alpha.19 baseline was 5/6 because MPEG exceeded the old
+8 MiB data-work cap. A fresh before/after real-native run confirms that gap and
+its closure. This is host file recovery, not Android gallery/SAF acceptance or
+NIST certification; other images and fragment recovery remain unscored.
 
 | Gate | L0_Video | Other 29 images |
 | --- | --- | --- |
 | Reference layout recorded | Yes, with one flagged Fill-row inconsistency | Yes, with six flagged inconsistencies |
 | Compressed and decoded identity pinned | Yes | Pending acquisition |
 | Entire archive decoded byte-for-byte | Passed on host JNI | Unverified |
-| Every expected file recovered and exported byte-for-byte | **5/6** exact on host; MPEG missing; additional exports unscored | Unverified |
+| Every expected file recovered and exported byte-for-byte | **6/6** exact on host; duplicate/additional exports retained and unscored | Unverified |
 | Android gallery, preview and real destination export | Unverified for this corpus | Unverified |
 
 For a complete contiguous recovery, compare the **actual exported bytes** with
@@ -92,5 +100,5 @@ bounded native/Java reports and the resulting ZIP. Run native builds/tests
 serially: never replace a library while a test JVM has it loaded. This checks
 host engines/models/file bytes; Android UI and SAF acceptance stay separate.
 
-The pre-alpha.20 implementation is under verification. The published baseline
-above remains 5/6 until the actual run and independent score pass.
+The pre-alpha.20 actual host native/export run passes 6/6; full build/CI and
+actual Android regression gates are still pending. [Receipt](../../../docs/verification/nist-L0-video-native-export.json).
