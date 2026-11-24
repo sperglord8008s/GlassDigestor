@@ -81,8 +81,8 @@ def main():
             'The debug signing configuration is unchanged; independently built CI debug keys may differ.\n\n'
             'Build, host simulation and static alignment checks do not establish handset/SAF/'
             'isolated-UID/crash/cancellation/16 KiB runtime behavior or full desktop parity.\n\n'
-            '[Source and build instructions](https://github.com/sperglord8008s/DiE-Android-/tree/' + head + ')\n\n'
-            '[Feature parity](https://github.com/sperglord8008s/DiE-Android-/blob/' + head + '/docs/FEATURE-PARITY.md)\n',
+            '[Source and build instructions](https://github.com/sperglord8008s/GlassDigestor/tree/' + head + ')\n\n'
+            '[Feature parity](https://github.com/sperglord8008s/GlassDigestor/blob/' + head + '/docs/FEATURE-PARITY.md)\n',
             encoding='utf-8')
         entries = sorted(staging.iterdir(), key=lambda item: item.name)
         (staging / 'SHA256SUMS').write_text(''.join(digest(item) + '  ' + item.name + '\n' for item in entries), encoding='utf-8')
