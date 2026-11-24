@@ -167,7 +167,9 @@ public final class GallerizeActivity extends Activity {
                     + " every rejection and the full catalog. Text candidates are strict printable"
                     + " UTF-8 runs outside bounded artifacts; other encodings and text within"
                     + " artifacts remain in Classified strings. Thumbnail/preview decoding is a"
-                    + " separate platform observation. Grid resolution partitions all bytes without"
+                    + " separate decoder observation: platform first, with an isolated MPV still"
+                    + " image after decoder refusal when the exact range permits it. A still image"
+                    + " does not verify playback or every frame. Grid resolution partitions all bytes without"
                     + " sampling; entropy from one byte is always zero. Tools and view modes remain"
                     + " manually selectable.",
                 true,
@@ -875,6 +877,10 @@ public final class GallerizeActivity extends Activity {
             if (galleryAdapter != null) {
                 JSONObject observation = galleryAdapter.platformObservation(card);
                 if (observation != null) details.put("transientPlatformPreview", observation);
+                JSONObject mpv = galleryAdapter.mpvObservation(card);
+                if (mpv != null) details.put("transientMpvStillPreview", mpv);
+                String refusal = galleryAdapter.platformFailure(card);
+                if (!refusal.isEmpty()) details.put("platformDecoderFailure", refusal);
             }
             TextView value = text(details.toString(2), 13);
             value.setTextIsSelectable(true);

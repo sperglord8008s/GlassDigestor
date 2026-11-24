@@ -4,6 +4,10 @@ package org.diemobile;
 import android.app.Service;
 import android.content.Intent;
 import android.os.*;
+import android.system.ErrnoException;
+import android.system.Os;
+import android.system.OsConstants;
+import android.system.StructStat;
 
 import org.json.*;
 
@@ -39,11 +43,13 @@ public final class BinaryWorkerService extends Service {
                                     if (message.what != RUN) return false;
                                     ParcelFileDescriptor input = data.getParcelable("input"),
                                             output = data.getParcelable("output"),
-                                            payload = data.getParcelable("payload");
+                                            payload = data.getParcelable("payload"),
+                                            raster = data.getParcelable("raster");
                                     if (input == null || output == null || token == null) {
                                         close(input);
                                         close(output);
                                         close(payload);
+                                        close(raster);
                                         return true;
                                     }
                                     String engine = data.getString("engine", "binwalk");
@@ -55,6 +61,7 @@ public final class BinaryWorkerService extends Service {
                                                     : !engine.equals("binwalk")
                                                                     && !engine.equals("photorec")
                                                                     && !engine.equals("mpv")
+                                                                    && !engine.equals("mpv-frame")
                                                                     && !engine.equals("resources")
                                                                     && !engine.equals("hashes")
                                                                     && !engine.equals("archive")
@@ -74,6 +81,36 @@ public final class BinaryWorkerService extends Service {
                                                                                     != null))))))
                                         rejection =
                                                 "Unexpected or missing archive payload descriptor";
+                                    int maximumDimensionPixels =
+                                            engine.equals("mpv-frame")
+                                                            && data.get("maximumDimensionPixels")
+                                                                    instanceof Integer
+                                                    ? (Integer) data.get("maximumDimensionPixels")
+                                                    : 0;
+                                    if (rejection == null) {
+                                        try {
+                                            if (engine.equals("mpv-frame")) {
+                                                maximumDimensionPixels = frameMaximum(data);
+                                                if (raster == null
+                                                        || payload != null
+                                                        || data.getInt("member", -1) != -1
+                                                        || data.getLong("offset", 0) != 0
+                                                        || data.getLong("length", -1)
+                                                                != input.getStatSize())
+                                                    throw new IOException(
+                                                            "MPV frame requires one whole input and"
+                                                                + " a separate raster descriptor");
+                                                validateFrameDescriptors(input, raster, output);
+                                            } else if (raster != null
+                                                    || data.containsKey("maximumDimensionPixels")) {
+                                                throw new IOException(
+                                                        "Unexpected MPV frame descriptor or"
+                                                                + " dimension parameter");
+                                            }
+                                        } catch (IOException invalidFrame) {
+                                            rejection = invalidFrame.getMessage();
+                                        }
+                                    }
                                     AnalysisTimeLimits.Request limits = null;
                                     try {
                                         limits = AnalysisTimeLimits.fromMessage(data, engine);
@@ -90,16 +127,19 @@ public final class BinaryWorkerService extends Service {
                                     long offset = data.getLong("offset", 0),
                                             length = data.getLong("length", -1);
                                     int member = data.getInt("member", -1);
+                                    int frameMaximum = maximumDimensionPixels;
                                     if (rejection != null)
                                         execute(
                                                 token,
                                                 input,
                                                 output,
                                                 payload,
+                                                raster,
                                                 engine,
                                                 offset,
                                                 length,
                                                 member,
+                                                frameMaximum,
                                                 requestLimits,
                                                 rejection);
                                     else
@@ -110,10 +150,12 @@ public final class BinaryWorkerService extends Service {
                                                                 input,
                                                                 output,
                                                                 payload,
+                                                                raster,
                                                                 engine,
                                                                 offset,
                                                                 length,
                                                                 member,
+                                                                frameMaximum,
                                                                 requestLimits,
                                                                 null));
                                     return true;
@@ -125,14 +167,17 @@ public final class BinaryWorkerService extends Service {
             ParcelFileDescriptor input,
             ParcelFileDescriptor output,
             ParcelFileDescriptor payload,
+            ParcelFileDescriptor raster,
             String engine,
             long offset,
             long length,
             int member,
+            int maximumDimensionPixels,
             AnalysisTimeLimits.Request limits,
             String rejection) {
         try (ParcelFileDescriptor source = input;
                 ParcelFileDescriptor destination = payload;
+                ParcelFileDescriptor pixels = raster;
                 OutputStream target = new ParcelFileDescriptor.AutoCloseOutputStream(output)) {
             String result;
             try {
@@ -174,10 +219,14 @@ public final class BinaryWorkerService extends Service {
                                                         || SystemClock.elapsedRealtime()
                                                                 > deadline);
                     }
-                } else if (engine.equals("mpv")) {
+                } else if (engine.equals("mpv") || engine.equals("mpv-frame")) {
                     if (!MpvEngine.AVAILABLE)
                         throw new IOException("MPV native library unavailable: " + MpvEngine.ERROR);
-                    result = MpvEngine.scanFd(source.getFd());
+                    result =
+                            engine.equals("mpv-frame")
+                                    ? MpvEngine.captureFd(
+                                            source.getFd(), pixels.getFd(), maximumDimensionPixels)
+                                    : MpvEngine.scanFd(source.getFd());
                 } else {
                     if (!BinwalkEngine.AVAILABLE)
                         throw new IOException(
@@ -204,6 +253,12 @@ public final class BinaryWorkerService extends Service {
                                     + isolated
                                     + ",\"engine\":"
                                     + JSONObject.quote(engine)
+                                    + (engine.equals("mpv-frame")
+                                            ? ",\"requestToken\":"
+                                                    + JSONObject.quote(token)
+                                                    + ",\"maximumDimensionPixels\":"
+                                                    + maximumDimensionPixels
+                                            : "")
                                     + (limits == null
                                             ? ""
                                             : ",\"analysisDeadlineMs\":"
@@ -231,6 +286,54 @@ public final class BinaryWorkerService extends Service {
                 value.close();
             } catch (IOException ignored) {
             }
+    }
+
+    static int frameMaximum(Bundle message) throws IOException {
+        Object value = message.get("maximumDimensionPixels");
+        if (!(value instanceof Integer))
+            throw new IOException("MPV frame requires an integer maximumDimensionPixels parameter");
+        int maximum = (Integer) value;
+        MpvFrameRunner.requireMaximum(maximum);
+        return maximum;
+    }
+
+    /** Refuse aliases and stale output before loading or invoking the frame engine. */
+    static void validateFrameDescriptors(
+            ParcelFileDescriptor input, ParcelFileDescriptor raster, ParcelFileDescriptor report)
+            throws IOException {
+        try {
+            StructStat source = Os.fstat(input.getFileDescriptor());
+            StructStat pixels = Os.fstat(raster.getFileDescriptor());
+            StructStat envelope = Os.fstat(report.getFileDescriptor());
+            int sourceFlags = Os.fcntlInt(input.getFileDescriptor(), OsConstants.F_GETFL, 0);
+            int pixelFlags = Os.fcntlInt(raster.getFileDescriptor(), OsConstants.F_GETFL, 0);
+            validateFrameDescriptorFacts(source, sourceFlags, pixels, pixelFlags, envelope);
+        } catch (ErrnoException | IllegalStateException invalid) {
+            throw new IOException("MPV frame descriptor validation failed", invalid);
+        }
+    }
+
+    /** Android supplies these facts; this rule does not simulate OS fstat or fcntl. */
+    static void validateFrameDescriptorFacts(
+            StructStat source,
+            int sourceFlags,
+            StructStat pixels,
+            int pixelFlags,
+            StructStat envelope)
+            throws IOException {
+        if (!OsConstants.S_ISREG(source.st_mode)
+                || source.st_size <= 0
+                || source.st_size > MpvFrameRunner.MAXIMUM_INPUT_BYTES
+                || (sourceFlags & OsConstants.O_ACCMODE) != OsConstants.O_RDONLY
+                || !OsConstants.S_ISREG(pixels.st_mode)
+                || pixels.st_size != 0
+                || (pixelFlags & OsConstants.O_ACCMODE) == OsConstants.O_RDONLY
+                || (pixelFlags & OsConstants.O_APPEND) != 0
+                || source.st_dev == pixels.st_dev && source.st_ino == pixels.st_ino
+                || envelope.st_dev == pixels.st_dev && envelope.st_ino == pixels.st_ino)
+            throw new IOException(
+                    "MPV frame needs read-only bounded input and a fresh separate writable"
+                            + " regular raster");
     }
 
     @Override

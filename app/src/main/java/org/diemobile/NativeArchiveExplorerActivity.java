@@ -632,6 +632,19 @@ public final class NativeArchiveExplorerActivity extends Activity {
                 content,
                 "Full entry metadata / raw returned fields",
                 () -> raw("Entry #" + member.index, member.raw));
+        if (galleryAdapter != null) try {
+            org.json.JSONObject decoderInfo = galleryAdapter.previewInformation(member);
+            if (decoderInfo != null && decoderInfo.length() > 0) {
+                String information = new org.json.JSONObject()
+                        .put("transientDecoderPreview", decoderInfo).toString(2);
+                addAction(content, "Thumbnail decoder information",
+                        () -> raw("Separate decoder observation · entry #" + member.index,
+                                information));
+            }
+        } catch (Exception error) {
+            content.addView(WorkbenchUi.prose(this,
+                    "Thumbnail decoder information unavailable: " + error.getMessage()));
+        }
         addAction(
                 content,
                 "Definitions and limits",

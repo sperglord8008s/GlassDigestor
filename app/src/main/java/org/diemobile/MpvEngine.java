@@ -21,8 +21,8 @@ final class MpvEngine {
         byte[] bytes = probeFd(descriptor);
         return bytes == null ? null : new String(bytes, StandardCharsets.UTF_8);
     }
-    static String captureFd(int descriptor, int output, int maximum) {
-        byte[] bytes = frameFd(descriptor, output, maximum);
+    static String captureFd(int descriptor, int output, int maximumDimensionPixels) {
+        byte[] bytes = frameFd(descriptor, output, maximumDimensionPixels);
         return bytes == null ? null : new String(bytes, StandardCharsets.UTF_8);
     }
     private MpvEngine() {}

@@ -20,6 +20,7 @@ final class ContentGalleryAdapter extends BaseAdapter implements AutoCloseable {
     private final Map<Integer, Bitmap> thumbnails = new HashMap<>();
     private final Map<Integer, String> failures = new HashMap<>();
     private final Map<Integer, MediaFrame.Result> media = new HashMap<>();
+    private final Map<Integer, StillImagePreview.Result> stills = new HashMap<>();
     private final Map<Integer, PdfPagePreview.Result> pdf = new HashMap<>();
     private final Set<Integer> pending = new HashSet<>();
     private volatile boolean closed;
@@ -100,17 +101,19 @@ final class ContentGalleryAdapter extends BaseAdapter implements AutoCloseable {
             Bitmap bitmap = thumbnails.get(index);
             if (bitmap == null
                     && (media.containsKey(index)
+                            || stills.containsKey(index)
                             || failures.containsKey(index)
                             || card.kind == ContentMap.Kind.AUDIO)) image.setVisibility(View.GONE);
             if (bitmap != null) {
                 image.setImageBitmap(bitmap);
                 status.setText(
-                        media.containsKey(index)
-                                ? media.get(index).description()
+                        stills.containsKey(index)
+                                ? stills.get(index).description()
                                 : pdf.containsKey(index)
                                         ? pdf.get(index).description()
                                         : "Platform decoded thumbnail · tap for preview/details");
-            } else if (media.containsKey(index)) status.setText(media.get(index).description());
+            } else if (stills.containsKey(index)) status.setText(stills.get(index).description());
+            else if (media.containsKey(index)) status.setText(media.get(index).description());
             else if (failures.containsKey(index))
                 status.setText("Thumbnail unavailable: " + failures.get(index));
             else if (!closed && pending.add(index)) thumbnail(index, card);
@@ -151,11 +154,15 @@ final class ContentGalleryAdapter extends BaseAdapter implements AutoCloseable {
                     if (closed) return;
                     Bitmap bitmap = null;
                     MediaFrame.Result observation = null;
+                    StillImagePreview.Result still = null;
                     PdfPagePreview.Result document = null;
                     String error = "";
                     try {
-                        if (card.kind == ContentMap.Kind.IMAGE)
-                            bitmap = ContentPreview.image(input.file, card.range(input.size), 256);
+                        if (card.kind == ContentMap.Kind.IMAGE) {
+                            still = StillImagePreview.image(context, input, card.range(input.size),
+                                    256, true, () -> closed);
+                            bitmap = still.bitmap;
+                        }
                         else if (isPdf(card)) {
                             document =
                                     PdfPagePreview.thumbnail(
@@ -167,16 +174,17 @@ final class ContentGalleryAdapter extends BaseAdapter implements AutoCloseable {
                                             () -> closed);
                             bitmap = document.bitmap;
                         } else {
-                            observation =
-                                    MediaFrame.read(
-                                            input, card.range(input.size), 256, () -> closed);
-                            bitmap = observation.bitmap;
+                            still = StillImagePreview.media(context, input, card.range(input.size),
+                                    256, true, card.kind == ContentMap.Kind.VIDEO, () -> closed);
+                            observation = still.platform;
+                            bitmap = still.bitmap;
                         }
                     } catch (Exception failure) {
                         error = failure.toString();
                     }
                     Bitmap result = bitmap;
                     MediaFrame.Result captured = observation;
+                    StillImagePreview.Result capturedStill = still;
                     PdfPagePreview.Result capturedPdf = document;
                     String failure = error;
                     main.post(
@@ -187,9 +195,11 @@ final class ContentGalleryAdapter extends BaseAdapter implements AutoCloseable {
                                 }
                                 pending.remove(index);
                                 if (captured != null) media.put(index, captured);
+                                if (capturedStill != null) stills.put(index, capturedStill);
                                 if (capturedPdf != null) pdf.put(index, capturedPdf);
                                 if (result != null) thumbnails.put(index, result);
-                                else if (captured == null) failures.put(index, failure);
+                                else if (captured == null && capturedStill == null)
+                                    failures.put(index, failure);
                                 notifyDataSetChanged();
                             });
                 });
@@ -203,11 +213,22 @@ final class ContentGalleryAdapter extends BaseAdapter implements AutoCloseable {
         return document == null ? null : document.report();
     }
 
+    org.json.JSONObject mpvObservation(ContentMap.Card card) throws Exception {
+        StillImagePreview.Result result = stills.get(cards.indexOf(card));
+        return result == null || result.mpv == null ? null : result.mpv.json();
+    }
+
+    String platformFailure(ContentMap.Card card) {
+        StillImagePreview.Result result = stills.get(cards.indexOf(card));
+        return result == null ? "" : result.platformFailure;
+    }
+
     @Override
     public void close() {
         closed = true;
         thumbnails.clear();
         media.clear();
+        stills.clear();
         pdf.clear();
         failures.clear();
         pending.clear();

@@ -8,6 +8,11 @@ import java.io.*;
 
 /** Local bounded image decoding; unknown extents are never passed to a decoder. */
 final class ContentPreview {
+    /** Only a platform decoder refusal admits a different decoder; IO/policy failures do not. */
+    static final class DecoderUnavailableException extends IOException {
+        DecoderUnavailableException(String message) { super(message); }
+        DecoderUnavailableException(String message, RuntimeException cause) { super(message, cause); }
+    }
     static boolean looksLikeText(byte[] header) {
         return looksLikeText(header, true);
     }
@@ -44,10 +49,10 @@ final class ContentPreview {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         try (InputStream stream = stream(source, range)) {
-            BitmapFactory.decodeStream(stream, null, options);
+            decode(stream, options);
         }
         if (options.outWidth <= 0 || options.outHeight <= 0)
-            throw new IOException("Platform image decoder could not read these bytes");
+            throw new DecoderUnavailableException("Platform image decoder could not read these bytes");
         int sample = 1;
         while ((options.outWidth + (long) sample - 1) / sample > target
                 || (options.outHeight + (long) sample - 1) / sample > target) {
@@ -59,14 +64,26 @@ final class ContentPreview {
         options.inSampleSize = sample;
         Bitmap bitmap;
         try (InputStream stream = stream(source, range)) {
-            bitmap = BitmapFactory.decodeStream(stream, null, options);
+            bitmap = decode(stream, options);
         }
-        if (bitmap == null) throw new IOException("Platform image decoder returned no image");
-        if ((long) bitmap.getWidth() * bitmap.getHeight() > (long) target * target) {
+        if (bitmap == null) throw new DecoderUnavailableException("Platform image decoder returned no image");
+        if (bitmap.getWidth() <= 0 || bitmap.getHeight() <= 0
+                || bitmap.getWidth() > target || bitmap.getHeight() > target
+                || (long) bitmap.getWidth() * bitmap.getHeight() > (long) target * target) {
             bitmap.recycle();
             throw new IOException("Decoded image exceeded its pixel budget");
         }
         return bitmap;
+    }
+
+    private static Bitmap decode(InputStream stream, BitmapFactory.Options options)
+            throws DecoderUnavailableException {
+        try { return BitmapFactory.decodeStream(stream, null, options); }
+        catch (RuntimeException refusal) {
+            if (refusal instanceof android.os.OperationCanceledException
+                    || refusal instanceof SecurityException) throw refusal;
+            throw new DecoderUnavailableException("Platform image decoder refused these bytes", refusal);
+        }
     }
 
     static InputStream stream(File source, FileRange range) throws IOException {

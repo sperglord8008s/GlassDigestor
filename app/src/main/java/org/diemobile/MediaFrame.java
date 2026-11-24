@@ -16,6 +16,11 @@ import java.util.function.BooleanSupplier;
 
 /** Platform preview observations of one exact stored interval, separate from native findings. */
 final class MediaFrame {
+    static final class DecoderUnavailableException extends IOException {
+        DecoderUnavailableException(RuntimeException cause) {
+            super("Platform media decoder refused these bytes", cause);
+        }
+    }
     private static final Map<String, Integer> KEYS;
 
     static {
@@ -37,14 +42,17 @@ final class MediaFrame {
         final Bitmap bitmap;
         final Map<String, String> metadata;
         final String frameStatus;
+        final boolean framePolicyRefused;
         private final String report;
 
         private Result(
-                Bitmap bitmap, Map<String, String> metadata, String status, JSONObject report)
+                Bitmap bitmap, Map<String, String> metadata, String status,
+                boolean framePolicyRefused, JSONObject report)
                 throws Exception {
             this.bitmap = bitmap;
             this.metadata = Collections.unmodifiableMap(new LinkedHashMap<>(metadata));
             frameStatus = status;
+            this.framePolicyRefused = framePolicyRefused;
             this.report = report.toString();
         }
 
@@ -87,18 +95,26 @@ final class MediaFrame {
         boolean success = false;
         String status;
         String frameError = null;
+        boolean framePolicyRefused = false;
         try {
             try (FileInputStream source = new FileInputStream(input.file)) {
                 MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                 try {
                     // No path/URI overload: the decoder receives only the selected stored bytes.
-                    retriever.setDataSource(source.getFD(), range.offset, range.length);
+                    try { retriever.setDataSource(source.getFD(), range.offset, range.length); }
+                    catch (RuntimeException refusal) {
+                        if (refusal instanceof android.os.OperationCanceledException
+                                || refusal instanceof SecurityException) throw refusal;
+                        throw new DecoderUnavailableException(refusal);
+                    }
                     EvidenceRows.check(stop);
                     for (Map.Entry<String, Integer> key : KEYS.entrySet()) {
                         String value = null;
                         try {
                             value = retriever.extractMetadata(key.getValue());
                         } catch (RuntimeException unavailable) {
+                            if (unavailable instanceof android.os.OperationCanceledException
+                                    || unavailable instanceof SecurityException) throw unavailable;
                             errors.put(key.getKey(), unavailable.toString());
                         }
                         metadata.put(key.getKey(), value);
@@ -119,6 +135,8 @@ final class MediaFrame {
                                             target,
                                             target);
                         } catch (RuntimeException unsupported) {
+                            if (unsupported instanceof android.os.OperationCanceledException
+                                    || unsupported instanceof SecurityException) throw unsupported;
                             frameError = unsupported.toString();
                         }
                         if (bitmap == null) {
@@ -136,6 +154,7 @@ final class MediaFrame {
                                     || (long) bitmap.getWidth() * bitmap.getHeight()
                                             > (long) target * target) {
                                 frameError = "Decoded media frame exceeded its pixel budget";
+                                framePolicyRefused = true;
                                 bitmap.recycle();
                                 bitmap = null;
                                 status =
@@ -170,6 +189,7 @@ final class MediaFrame {
                             .put("metadata", values)
                             .put("metadataErrors", errors)
                             .put("frameError", frameError == null ? JSONObject.NULL : frameError)
+                            .put("framePolicyRefused", framePolicyRefused)
                             .put("frameStatus", status)
                             .put("requestedTimeUs", 0)
                             .put("selection", "OPTION_CLOSEST_SYNC")
@@ -190,7 +210,7 @@ final class MediaFrame {
                                         + " support, complete validity or safety. Full media"
                                         + " evidence remains available in MPV codecs / streams /"
                                         + " tags.");
-            Result result = new Result(bitmap, metadata, status, report);
+            Result result = new Result(bitmap, metadata, status, framePolicyRefused, report);
             success = true;
             return result;
         } finally {
