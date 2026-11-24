@@ -80,7 +80,7 @@ public final class MpvArchivePreviewWorkbenchTest {
             assertTrue(worker.awaitTermination(30, TimeUnit.SECONDS));
             Shadows.shadowOf(Looper.getMainLooper()).idle();
         }
-        try (var paths = Files.walk(temporary)) {
+        if (temporary != null) try (var paths = Files.walk(temporary)) {
             for (Path path : paths.sorted(Comparator.reverseOrder()).toList())
                 Files.deleteIfExists(path);
         }

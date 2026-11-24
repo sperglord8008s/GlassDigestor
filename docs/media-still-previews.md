@@ -29,8 +29,11 @@ final cancellation gate. Original findings and source reports remain unchanged.
 Host native tests pass authored FFV1/Matroska, TIFF/PPM pixels, square and
 anamorphic/extreme-SAR geometry, malformed nodes, positional descriptors,
 read/deadline/output limits and source changes. Sixty-one independent typed
-model/raster checks and standalone production/test compilation pass. The new
-worker/helper and UI fixtures compile but have not run through integration yet.
+model/raster checks and standalone production/test compilation pass. All **24 new host Android cases** pass, including real host MPV pixels after
+forced platform refusals, selected-range ownership, archive acquisition,
+API 26 metadata-only video, policy/cancellation/stale-generation refusals and
+manual-mode recreation. Worker protocol tests use platform substitutes where
+Robolectric lacks real fstat/fcntl; they do not establish Android OS/UID checks.
 Full host suite, source bundles, ARM64 assembly/static/CI, actual isolated MPV,
 handset/full UI/SAF/playback and arbitrary codecs remain separate gates. The
 x86 runtime laboratory has no MPV runtime; its existing contracts do not

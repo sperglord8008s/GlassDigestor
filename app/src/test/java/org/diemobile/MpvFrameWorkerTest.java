@@ -134,7 +134,7 @@ public final class MpvFrameWorkerTest {
             throws Exception {
         new Messenger(controller.get().onBind(new Intent())).send(message);
         Shadows.shadowOf(Looper.getMainLooper()).idle();
-        return new JSONObject(Files.readString(report.toPath(), StandardCharsets.UTF_8));
+        return new JSONObject(new String(Files.readAllBytes(report.toPath()), StandardCharsets.UTF_8));
     }
 
     @Test

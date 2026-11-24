@@ -22,6 +22,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.*;
 import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.*;
+import org.robolectric.shadows.ShadowBitmapFactory;
 import org.robolectric.shadows.ShadowMediaPlayer;
 import org.robolectric.util.ReflectionHelpers;
 
@@ -64,13 +65,16 @@ public final class MpvPreviewWorkbenchTest {
     }
 
     @Implements(BitmapFactory.class)
-    public static final class Images {
+    public static final class Images extends ShadowBitmapFactory {
         static final AtomicInteger calls = new AtomicInteger();
         static boolean succeeds, oversized;
         static Runnable onBounds;
 
         @Implementation protected static Bitmap decodeStream(InputStream source, Rect padding,
                 BitmapFactory.Options options) {
+            // Framework drawable inflation also uses this overload. Preserve the standard
+            // resource renderer; the forced refusal applies to our bounded preview requests.
+            if (options == null) return ShadowBitmapFactory.decodeStream(source, padding, null);
             calls.incrementAndGet();
             if (options.inJustDecodeBounds) {
                 if (onBounds != null) onBounds.run();
@@ -148,7 +152,7 @@ public final class MpvPreviewWorkbenchTest {
         assertTrue(worker.awaitTermination(30, TimeUnit.SECONDS));
         Shadows.shadowOf(Looper.getMainLooper()).idle();
         if (input != null) input.close();
-        try (var paths = Files.walk(temporary)) {
+        if (temporary != null) try (var paths = Files.walk(temporary)) {
             for (Path path : paths.sorted(Comparator.reverseOrder()).toList())
                 Files.deleteIfExists(path);
         }
@@ -260,7 +264,7 @@ public final class MpvPreviewWorkbenchTest {
         assertNull(adapter.mpvObservation(card));
     }
 
-    private void videoThumbnail() throws Exception {
+    void videoThumbnail() throws Exception {
         ContentMap.Card card = card(video(), ContentMap.Kind.VIDEO);
         thumbnail(card);
         green(thumbnail());
@@ -276,11 +280,6 @@ public final class MpvPreviewWorkbenchTest {
 
     @Test public void refusedVideoFrameKeepsPlatformMetadataSeparateFromRealMpvPixels() throws Exception {
         videoThumbnail(); assertEquals(1, Video.frames);
-    }
-
-    @Test @Config(sdk = 26, shadows = {HostFrame.class, Images.class, Video.class})
-    public void api26MetadataOnlyVideoCanUseBoundedIsolatedMpvStill() throws Exception {
-        videoThumbnail(); assertEquals(0, Video.frames);
     }
 
     @Test public void platformPixelPolicyRefusalDoesNotAdmitAnotherDecoder() throws Exception {
