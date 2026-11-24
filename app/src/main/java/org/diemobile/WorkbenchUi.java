@@ -13,6 +13,8 @@ import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -20,10 +22,14 @@ import android.widget.TextView;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.function.Function;
 
 /** Shared dense hierarchy: section, record identity, labelled facts, then explanatory prose. */
 final class WorkbenchUi {
+    private static final Map<AbsListView, Boolean> fastScrollBindings = new WeakHashMap<>();
+
     private WorkbenchUi() {}
 
     static int dp(Context context, int value) {
@@ -68,6 +74,53 @@ final class WorkbenchUi {
         list.setDivider(new ColorDrawable(context.getColor(R.color.workbench_divider)));
         list.setDividerHeight(Math.max(1, dp(context, 1)));
         list.setCacheColorHint(context.getColor(R.color.workbench_background));
+        fastScroll(list);
+    }
+
+    /** Native fast-scroll uses adapter positions, retaining paging and every supplied row. */
+    static void fastScroll(AbsListView list) {
+        list.setVerticalScrollBarEnabled(true);
+        list.setScrollbarFadingEnabled(false);
+        list.setFastScrollEnabled(true);
+        list.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+        if (fastScrollBindings.put(list, Boolean.TRUE) == null) {
+            list.addOnLayoutChangeListener(
+                    (view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) ->
+                            updateFastScroll(list));
+            ViewTreeObserver.OnGlobalLayoutListener layout = () -> updateFastScroll(list);
+            list.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View view) {
+                    view.getViewTreeObserver().addOnGlobalLayoutListener(layout);
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View view) {
+                    view.getViewTreeObserver().removeOnGlobalLayoutListener(layout);
+                }
+            });
+            if (list.isAttachedToWindow())
+                list.getViewTreeObserver().addOnGlobalLayoutListener(layout);
+        }
+        updateFastScroll(list);
+    }
+
+    private static void updateFastScroll(AbsListView list) {
+        // Android's default fast-scroll threshold is four screens. Force its real thumb for
+        // shorter overflowing pages too, while leaving fitting content free of an idle track.
+        boolean overflow = list.canScrollList(-1) || list.canScrollList(1);
+        if (list.isFastScrollAlwaysVisible() != overflow)
+            list.setFastScrollAlwaysVisible(overflow);
+    }
+
+    static <T extends AbsListView> T scrolling(T list) {
+        fastScroll(list);
+        return list;
+    }
+
+    /** Generated columns and detail pages get a thumb which changes the actual scroll position. */
+    static DraggableScrollView scroll(Context context) {
+        return new DraggableScrollView(context);
     }
 
     static TextView row(Context context, View recycled, CharSequence value) {

@@ -425,3 +425,17 @@ exact-image decoding test pass locally. [Full host receipt](verification/nist-L0
 The eleventh lab case compiles locally; source CI and actual API 26/35
 execution remain pending. Full gallery/SAF/production ARM64
 acceptance and arbitrary fragmentation/deobfuscation remain unverified.
+
+
+## Current pre-alpha.19 implementation, pending complete gates
+
+Configurable Binwalk/worker limits, Strings minimum/search/Categories, compact
+definitions, functional list/detail thumbs, zoom/contiguous grid ranges and
+private diagnostics/About are implemented. The focused host suite passes 62
+cases, including late completion cancellation/deadline races; eight Rust and
+all configured-limit/ownership/64 MiB JNI regressions pass and ARM64 Binwalk
+compiles. Full-suite, assembly/lint/static, clean CI and actual Android
+regressions are pending. [Current control contract](workbench-usability.md).
+Existing data/source ownership, raw fields, native catalogs, schemas and offline
+operation are preserved. The NIST exact-export baseline remains 5/6 on host,
+with all additional exports visible; [method](../tests/fixtures/nist/README.md).

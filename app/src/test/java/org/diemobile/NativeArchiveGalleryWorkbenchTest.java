@@ -349,11 +349,11 @@ public final class NativeArchiveGalleryWorkbenchTest {
         assertTrue(
                 "Gallery has only " + grid().getHeight() + " px on a 360×640 phone",
                 grid().getHeight() >= 200);
-        click("Tools / evidence");
+        click("Tools / details");
         View tools = ShadowAlertDialog.getLatestAlertDialog().getWindow().getDecorView();
         for (String label :
                 new String[] {
-                    "Evidence",
+                    "Information",
                     "Export report",
                     "Parsing interval",
                     "Reload",

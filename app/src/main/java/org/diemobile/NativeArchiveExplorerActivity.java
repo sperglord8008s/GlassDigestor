@@ -167,7 +167,7 @@ public final class NativeArchiveExplorerActivity extends Activity {
                             render();
                         });
         button(files, "Export files ZIP", () -> stageExport(1, null));
-        button(files, "Tools / evidence", this::tools);
+        button(files, "Tools / details", this::tools);
         filter = new EditText(this);
         filter.setSingleLine();
         filter.setHint("Filter names / entry indices in this view");
@@ -208,10 +208,10 @@ public final class NativeArchiveExplorerActivity extends Activity {
         status.setContentDescription("Archive status. Tap for complete source, scope and limits.");
         status.setOnClickListener(view -> statusDetails());
         root.addView(status);
-        list = new ListView(this);
+        list = WorkbenchUi.scrolling(new ListView(this));
         root.addView(list, new LinearLayout.LayoutParams(-1, 0, 1));
         actions.add(list);
-        gallery = new GridView(this);
+        gallery = WorkbenchUi.scrolling(new GridView(this));
         gallery.setColumnWidth(dp(180));
         gallery.setNumColumns(GridView.AUTO_FIT);
         gallery.setStretchMode(GridView.STRETCH_COLUMN_WIDTH);
@@ -465,7 +465,7 @@ public final class NativeArchiveExplorerActivity extends Activity {
                         .field("Declared bytes", member.size == null ? "unknown" : member.size.toString(), true)
                         .muted((member.encrypted ? "Encrypted · " : "")
                                 + (!member.treeName() ? "Name outside virtual tree · " : "")
-                                + "Tap for member actions / complete evidence").build();
+                                + "Tap for member actions / complete information").build();
             }));
         previous.setEnabled(!busy && location.page > 0);
         next.setEnabled(!busy && location.page + 1 < pages);
@@ -547,7 +547,7 @@ public final class NativeArchiveExplorerActivity extends Activity {
 
     private void backArchive() {
         if (busy || session == null || session.depth() < 2) return;
-        int ticket = begin("Returning to retained parent evidence…");
+        int ticket = begin("Returning to retained parent information…");
         worker.execute(
                 () -> {
                     session.back();
@@ -581,11 +581,11 @@ public final class NativeArchiveExplorerActivity extends Activity {
                                 ? "Eligible for checked acquisition by exact index."
                                 : "Acquisition unavailable: incomplete inventory, link/special"
                                         + " type, encryption or size budget."));
-        ScrollView detailScroll = new ScrollView(this);
+        ScrollView detailScroll = WorkbenchUi.scroll(this);
         detailScroll.addView(content);
         AlertDialog dialog =
                 new AlertDialog.Builder(this)
-                        .setTitle("Archive member evidence")
+                        .setTitle("Archive member details")
                         .setView(detailScroll)
                         .setNegativeButton("Close", null)
                         .create();
@@ -626,7 +626,7 @@ public final class NativeArchiveExplorerActivity extends Activity {
                             select(member, 2);
                         });
         nested.setEnabled(allowed);
-        content.addView(WorkbenchUi.section(this, "Original member evidence"));
+        content.addView(WorkbenchUi.section(this, "Original member information"));
         content.addView(facts);
         addAction(
                 content,
@@ -637,7 +637,7 @@ public final class NativeArchiveExplorerActivity extends Activity {
                 "Definitions and limits",
                 () ->
                         new AlertDialog.Builder(this)
-                                .setTitle("Archive evidence explained")
+                                .setTitle("Archive information explained")
                                 .setMessage(
                                         "A member is a logical byte stream decoded from an archive."
                                             + " Its stored bytes may be compressed, sparse or"
@@ -653,7 +653,7 @@ public final class NativeArchiveExplorerActivity extends Activity {
                                             + " member, 20,000 entries, 16 nested levels, 512 MiB"
                                             + " retained nested bytes, 64 MiB reports; native"
                                             + " decoder/work/deadline limits are recorded in full"
-                                            + " evidence. Password support and external programs"
+                                            + " information. Password support and external programs"
                                             + " are disabled.")
                                 .setPositiveButton("Close", null)
                                 .show());
@@ -816,16 +816,16 @@ public final class NativeArchiveExplorerActivity extends Activity {
         if (busy || session == null) return;
         LinearLayout content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
-        ScrollView scroll = new ScrollView(this);
+        ScrollView scroll = WorkbenchUi.scroll(this);
         scroll.addView(content);
         AlertDialog dialog =
                 new AlertDialog.Builder(this)
-                        .setTitle("Archive tools / evidence")
+                        .setTitle("Archive tools / details")
                         .setView(scroll)
                         .setNegativeButton("Close", null)
                         .create();
         String[] labels = {
-            "Evidence",
+            "Information",
             "Export report",
             "Parsing interval",
             "Reload",
@@ -874,7 +874,7 @@ public final class NativeArchiveExplorerActivity extends Activity {
         page.setTextSize(12);
         TextView range = new TextView(this);
         content.addView(range);
-        ScrollView scroll = new ScrollView(this);
+        ScrollView scroll = WorkbenchUi.scroll(this);
         scroll.addView(page);
         content.addView(scroll, new LinearLayout.LayoutParams(-1, dp(320)));
         LinearLayout controls = new LinearLayout(this);
@@ -974,7 +974,7 @@ public final class NativeArchiveExplorerActivity extends Activity {
                                                         if (failure != null)
                                                             status.setText(
                                                                     "Interval failed; previous"
-                                                                            + " evidence retained: "
+                                                                            + " information retained: "
                                                                             + failure);
                                                     }
                                                 });

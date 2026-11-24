@@ -59,7 +59,7 @@ public final class ScanProfilesActivity extends Activity {
                 text(
                         "Capture the shared flags, tag filters and string minimum. Applying a"
                             + " profile updates Scan and the laboratory; rescan to collect new"
-                            + " evidence. Engine/database identities are captured when scanning.",
+                            + " information. Engine/database identities are captured when scanning.",
                         13));
         save = button("Save current shared settings", () -> edit(null, false));
         root.addView(save);
@@ -73,7 +73,7 @@ public final class ScanProfilesActivity extends Activity {
         root.addView(reloadButton);
         status = text("Loading private profile catalog…", 12);
         root.addView(status);
-        list = new ListView(this);
+        list = WorkbenchUi.scrolling(new ListView(this));
         root.addView(list, new LinearLayout.LayoutParams(-1, 0, 1));
         setContentView(root);
         list.setOnItemClickListener(
@@ -221,7 +221,7 @@ public final class ScanProfilesActivity extends Activity {
                                                     this,
                                                     "Applied "
                                                             + profile.name
-                                                            + " • rescan to refresh evidence",
+                                                            + " • rescan to refresh information",
                                                     Toast.LENGTH_LONG)
                                             .show();
                                     finish();
@@ -328,7 +328,7 @@ public final class ScanProfilesActivity extends Activity {
     }
 
     private void show(String title, String value) {
-        ScrollView scroll = new ScrollView(this);
+        ScrollView scroll = WorkbenchUi.scroll(this);
         TextView content =
                 text(
                         value.length() > 65536

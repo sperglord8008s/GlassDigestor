@@ -125,6 +125,10 @@ public final class StringWorkbenchTest {
         assertNotNull(why);
         assertEquals(android.view.View.VISIBLE, why.getVisibility());
         assertTrue(why.getText().toString().contains("does not show that this file contains"));
+        Button whyToggle = dialog.findViewById(android.R.id.content).findViewWithTag("string-why-toggle-" + cve);
+        assertTrue(whyToggle.getText().toString().contains("Why this classification?"));
+        whyToggle.performClick(); assertEquals(android.view.View.GONE, why.getVisibility());
+        whyToggle.performClick(); assertEquals(android.view.View.VISIBLE, why.getVisibility());
         assertFalse(new JSONObject(ReflectionHelpers.<String>getField(activity, "provenance")).getBoolean("vulnerabilityVerified"));
         assertEquals(encoded, captured.encoded);
         assertEquals(fields.getJSONArray("groups").length(), fields.getJSONArray("categoryRationales").length());

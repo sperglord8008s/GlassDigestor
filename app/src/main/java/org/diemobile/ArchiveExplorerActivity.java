@@ -82,7 +82,7 @@ public final class ArchiveExplorerActivity extends Activity {
         }
         title = new TextView(this); title.setTextSize(17); title.setMaxLines(3); title.setEllipsize(TextUtils.TruncateAt.MIDDLE); root.addView(title);
         TextView help = new TextView(this);
-        help.setText("ZIP directory evidence: sizes, method and CRC32 are declarations until extraction checks them. Nested ZIPs use private snapshots. No member is installed or executed; names are never output paths."); root.addView(help);
+        help.setText("ZIP directory information: sizes, method and CRC32 are declarations until extraction checks them. Nested ZIPs use private snapshots. No member is installed or executed; names are never output paths."); root.addView(help);
         LinearLayout navigation = new LinearLayout(this);
         parent = button("Parent folder", this::parentFolder); addButton(navigation, parent);
         containerBack = button("Back archive", this::backArchive); addButton(navigation, containerBack);
@@ -93,7 +93,7 @@ public final class ArchiveExplorerActivity extends Activity {
         LinearLayout pages = new LinearLayout(this);
         previous = button("Previous 50", () -> { if (!busy) { current().page--; render(); } }); addButton(pages, previous);
         next = button("Next 50", () -> { if (!busy) { current().page++; render(); } }); addButton(pages, next); root.addView(pages);
-        status = new TextView(this); root.addView(status); list = new ListView(this); root.addView(list, new LinearLayout.LayoutParams(-1, 0, 1)); setContentView(root);
+        status = new TextView(this); root.addView(status); list = WorkbenchUi.scrolling(new ListView(this)); root.addView(list, new LinearLayout.LayoutParams(-1, 0, 1)); setContentView(root);
         filter.addTextChangedListener(new TextWatcher() {
             public void beforeTextChanged(CharSequence s, int a, int before, int after) {}
             public void afterTextChanged(Editable value) {}
@@ -177,7 +177,7 @@ public final class ArchiveExplorerActivity extends Activity {
             return new WorkbenchUi.Lines(this).heading("#" + member.index + " " + WorkbenchUi.preview(member.name, 160))
                     .field("Decoded / compressed bytes", member.size + " / " + member.compressedSize, true)
                     .field("ZIP method / CRC32", member.method + " / " + String.format(Locale.ROOT, "%08X", member.crc32), true)
-                    .muted(member.occurrences > 1 ? "Duplicate name · " + member.occurrences + " occurrences" : "Tap for complete member evidence").build();
+                    .muted(member.occurrences > 1 ? "Duplicate name · " + member.occurrences + " occurrences" : "Tap for complete member information").build();
         })); list.setSelection(0);
         previous.setEnabled(!busy && current().page > 0); next.setEnabled(!busy && current().page + 1 < pages);
         if (!busy) status.setText(rows.size() + " folder matches • page " + (current().page + 1) + "/" + pages + " • " + inventory.members.size()
@@ -201,8 +201,8 @@ public final class ArchiveExplorerActivity extends Activity {
             + (member.method == 0 ? " (stored)" : member.method == 8 ? " (deflate)" : " (not supported by this reader)")
             + "\nDeclared CRC32: " + String.format(Locale.ROOT, "%08X", member.crc32) + "\nName occurrences: " + member.occurrences
             + "\n\nExtraction checks the complete directory, expanded length and CRC32, and computes SHA-256. CRC32 does not authenticate a publisher. Duplicate names cannot be selected unambiguously. Stored/compressed sizes do not establish behavior.");
-        ScrollView scroll = new ScrollView(this); scroll.addView(fields);
-        AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Archive member evidence").setView(scroll).setNegativeButton("Close", null)
+        ScrollView scroll = WorkbenchUi.scroll(this); scroll.addView(fields);
+        AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Archive member details").setView(scroll).setNegativeButton("Close", null)
             .setNeutralButton("Browse nested ZIP", (d, which) -> select(member, true)).setPositiveButton("Analyze member", (d, which) -> select(member, false)).show();
         boolean allowed = member.occurrences == 1 && member.size >= 0 && member.size <= ArchiveStore.MAX_MEMBER
             && member.crc32 >= 0 && (member.method == 0 || member.method == 8);

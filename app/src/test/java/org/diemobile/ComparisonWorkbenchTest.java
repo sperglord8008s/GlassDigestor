@@ -319,7 +319,7 @@ public final class ComparisonWorkbenchTest {
                 },
                 "failed.bin");
         settle();
-        assertTrue(status(), status().contains("prior captured evidence retained"));
+        assertTrue(status(), status().contains("prior captured information retained"));
         assertEquals(prior, backend().provenance().getString("pairId"));
         CountDownLatch entered = new CountDownLatch(1), release = new CountDownLatch(1);
         select(
@@ -374,7 +374,7 @@ public final class ComparisonWorkbenchTest {
         assertTrue(rows().row(0, () -> false).json().getBoolean("identicalBytes"));
         assertTrue(status(), status().contains("was adopted"));
         assertTrue(status(), status().contains("close failure"));
-        assertFalse(status(), status().contains("prior captured evidence retained"));
+        assertFalse(status(), status().contains("prior captured information retained"));
         controller.recreate();
         activity = controller.get();
         settle();

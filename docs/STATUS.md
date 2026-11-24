@@ -42,8 +42,10 @@ The user has authorized parallel implementation of:
 5. A bounded private debug log and About page with actual version/source/links.
 6. Consistent Information / Details / Source wording throughout the interface.
 
-These changes are **in development until their compile/test/CI results are
-recorded**. Parallel agents have disjoint file ownership; integration and builds
+These changes are implemented on the working branch. **62 focused host
+Android cases**, eight Rust checks and Binwalk JNI/64 MiB/configured-limit
+fixtures pass; its ARM64 bridge compiles. Full-suite/build/CI/actual Android
+regression gates remain pending. [Controls and precise scope](workbench-usability.md). Parallel agents have disjoint file ownership; integration and builds
 are serialized on the one working branch.
 
 ## Recovery work continues

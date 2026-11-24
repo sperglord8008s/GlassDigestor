@@ -108,7 +108,7 @@ final class PagedTextDialog {
         HorizontalScrollView horizontal = new HorizontalScrollView(owner);
         horizontal.addView(body);
         scroll =
-                new ScrollView(owner) {
+                new DraggableScrollView(owner) {
                     @Override
                     protected void onMeasure(int width, int height) {
                         int screen = owner.getResources().getConfiguration().screenHeightDp;

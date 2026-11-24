@@ -165,7 +165,7 @@ public final class SystemExplorerActivity extends Activity {
         count = WorkbenchUi.text(this, "", 12);
         count.setTag("explore-count");
         root.addView(count);
-        list = new ListView(this);
+        list = WorkbenchUi.scrolling(new ListView(this));
         list.setTag("explore-records");
         WorkbenchUi.list(this, list);
         root.addView(list, new LinearLayout.LayoutParams(-1, 0, 1));
@@ -299,7 +299,7 @@ public final class SystemExplorerActivity extends Activity {
         if (!entry.description.isEmpty()) body.addView(WorkbenchUi.prose(this, entry.description));
         for (Fact fact : entry.facts)
             body.addView(WorkbenchUi.fact(this, fact.key, fact.value, fact.code));
-        android.widget.ScrollView scroll = new android.widget.ScrollView(this);
+        android.widget.ScrollView scroll = WorkbenchUi.scroll(this);
         scroll.addView(body);
         AlertDialog.Builder dialog =
                 new AlertDialog.Builder(this)
@@ -318,7 +318,7 @@ public final class SystemExplorerActivity extends Activity {
     }
 
     private void message(String title, String value) {
-        android.widget.ScrollView scroll = new android.widget.ScrollView(this);
+        android.widget.ScrollView scroll = WorkbenchUi.scroll(this);
         TextView body = WorkbenchUi.prose(this, value);
         int pad = WorkbenchUi.dp(this, 12);
         body.setPadding(pad, pad, pad, pad);
@@ -452,7 +452,7 @@ public final class SystemExplorerActivity extends Activity {
         return new Entry(
                 section,
                 component.name,
-                "Manifest declaration, not evidence that the component is running. Exported"
+                "Manifest declaration, not information that the component is running. Exported"
                         + " components may be addressable by other apps subject to permissions and"
                         + " platform rules.",
                 null,
@@ -599,7 +599,7 @@ public final class SystemExplorerActivity extends Activity {
                                         "APK files",
                                         "Investigate captured base + split APK set",
                                         "Compiled declarations, dependencies and independent"
-                                                + " signing evidence",
+                                                + " signing information",
                                         () -> {
                                             if (paths.isEmpty()) {
                                                 toast(

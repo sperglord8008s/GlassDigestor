@@ -193,7 +193,7 @@ public final class BatchScanActivity extends Activity {
                     + " MiB/report, 64 MiB stored reports. Cancellation is cooperative. Results are"
                     + " static observations, not safety or execution verdicts. Saved batches keep"
                     + " their inputs until you delete them; exports contain sensitive local"
-                    + " evidence.");
+                    + " information.");
         root.addView(context);
         settings = WorkbenchUi.text(this, "", 13);
         root.addView(settings);
@@ -225,7 +225,7 @@ public final class BatchScanActivity extends Activity {
         status = WorkbenchUi.text(this, "", 13);
         status.setTextIsSelectable(true);
         root.addView(status);
-        ScrollView scroll = new ScrollView(this);
+        ScrollView scroll = WorkbenchUi.scroll(this);
         scroll.addView(root);
         if (Build.VERSION.SDK_INT >= 30) {
             getWindow().setDecorFitsSystemWindows(false);
@@ -397,7 +397,7 @@ public final class BatchScanActivity extends Activity {
         }
         if (result != RESULT_OK || data == null || data.getData() == null) {
             captured.discard();
-            state.changed("Batch export cancelled; saved evidence retained");
+            state.changed("Batch export cancelled; saved information retained");
             return;
         }
         Uri destination = data.getData();
@@ -593,7 +593,7 @@ public final class BatchScanActivity extends Activity {
     private void delete(String id) {
         State owner = state;
         owner.busy = true;
-        owner.changed("Deleting this saved batch's owned evidence…");
+        owner.changed("Deleting this saved batch's owned information…");
         owner.worker.execute(
                 () -> {
                     try {

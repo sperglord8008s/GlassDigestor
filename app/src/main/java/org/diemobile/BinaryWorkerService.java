@@ -50,8 +50,8 @@ public final class BinaryWorkerService extends Service {
                                     String rejection =
                                             !isolated
                                                     ? "The binary worker does not have an isolated"
-                                                          + " UID; in-process fallback is"
-                                                          + " prohibited"
+                                                            + " UID; in-process fallback is"
+                                                            + " prohibited"
                                                     : !engine.equals("binwalk")
                                                                     && !engine.equals("photorec")
                                                                     && !engine.equals("mpv")
@@ -61,8 +61,8 @@ public final class BinaryWorkerService extends Service {
                                                             ? "Unsupported worker engine"
                                                             : activeToken != null
                                                                     ? "Binary worker is already"
-                                                                          + " serving another"
-                                                                          + " request"
+                                                                            + " serving another"
+                                                                            + " request"
                                                                     : null;
                                     if (rejection == null
                                             && ((!engine.equals("archive") && payload != null)
@@ -74,6 +74,14 @@ public final class BinaryWorkerService extends Service {
                                                                                     != null))))))
                                         rejection =
                                                 "Unexpected or missing archive payload descriptor";
+                                    AnalysisTimeLimits.Request limits = null;
+                                    try {
+                                        limits = AnalysisTimeLimits.fromMessage(data, engine);
+                                    } catch (IOException invalidLimits) {
+                                        if (rejection == null)
+                                            rejection = invalidLimits.getMessage();
+                                    }
+                                    AnalysisTimeLimits.Request requestLimits = limits;
                                     if (rejection == null) activeToken = token;
                                     // A rejected second client must not queue behind a slow first
                                     // job.
@@ -84,14 +92,29 @@ public final class BinaryWorkerService extends Service {
                                     int member = data.getInt("member", -1);
                                     if (rejection != null)
                                         execute(
-                                                token, input, output, payload, engine, offset,
-                                                length, member, rejection);
+                                                token,
+                                                input,
+                                                output,
+                                                payload,
+                                                engine,
+                                                offset,
+                                                length,
+                                                member,
+                                                requestLimits,
+                                                rejection);
                                     else
                                         worker.execute(
                                                 () ->
                                                         execute(
-                                                                token, input, output, payload,
-                                                                engine, offset, length, member,
+                                                                token,
+                                                                input,
+                                                                output,
+                                                                payload,
+                                                                engine,
+                                                                offset,
+                                                                length,
+                                                                member,
+                                                                requestLimits,
                                                                 null));
                                     return true;
                                 }));
@@ -106,6 +129,7 @@ public final class BinaryWorkerService extends Service {
             long offset,
             long length,
             int member,
+            AnalysisTimeLimits.Request limits,
             String rejection) {
         try (ParcelFileDescriptor source = input;
                 ParcelFileDescriptor destination = payload;
@@ -158,7 +182,9 @@ public final class BinaryWorkerService extends Service {
                     if (!BinwalkEngine.AVAILABLE)
                         throw new IOException(
                                 "Binwalk native library unavailable: " + BinwalkEngine.ERROR);
-                    result = BinwalkEngine.scanFd(source.getFd());
+                    result =
+                            BinwalkEngine.scanFdWithDeadline(
+                                    source.getFd(), limits.analysisDeadlineMs);
                 }
                 if (result == null)
                     throw new IOException("Native parser returned no complete report");
@@ -178,6 +204,12 @@ public final class BinaryWorkerService extends Service {
                                     + isolated
                                     + ",\"engine\":"
                                     + JSONObject.quote(engine)
+                                    + (limits == null
+                                            ? ""
+                                            : ",\"analysisDeadlineMs\":"
+                                                    + limits.analysisDeadlineMs
+                                                    + ",\"requestDeadlineMs\":"
+                                                    + limits.requestDeadlineMs)
                                     + ",\"report\":")
                             .getBytes(StandardCharsets.UTF_8));
             target.write(result.getBytes(StandardCharsets.UTF_8));

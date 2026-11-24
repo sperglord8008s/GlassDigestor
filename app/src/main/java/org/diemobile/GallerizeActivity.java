@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/** Content-first view over one owned input, complete native evidence and exact byte grids. */
+/** Content-first view over one owned input, complete native reports and exact byte grids. */
 public final class GallerizeActivity extends Activity {
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private ContentGalleryAdapter galleryAdapter;
@@ -27,12 +27,25 @@ public final class GallerizeActivity extends Activity {
     private boolean busy, pickerOpen;
     private AtomicBoolean cancellation = new AtomicBoolean();
     private TextView title, summary, status, cellInfo;
-    private LinearLayout content, gridControls, pager;
-    private Button cancel, previous, next, apply;
+    private LinearLayout content, gridControls, gridDimensions, pager;
+    private Button cancel,
+            previous,
+            next,
+            apply,
+            gridOut,
+            gridFit,
+            gridIn,
+            gridPrevious,
+            gridNext,
+            gridRange,
+            gridNew;
+    private CheckBox gridExtend;
     private EditText width, height;
     private Spinner groups;
     private PreparedExport prepared;
     private ByteGrid.Result grid;
+    private ByteGridView gridView;
+    private Bundle gridInteraction;
     private File exportDirectory, previewDirectory;
     private final List<ContentMap.Card> selected = new ArrayList<>();
     private android.content.SharedPreferences preferences;
@@ -76,6 +89,7 @@ public final class GallerizeActivity extends Activity {
             mode = saved.getString("mode", "gallery");
             group = saved.getString("group", "Files");
             page = Math.max(0, saved.getInt("page"));
+            gridInteraction = saved.getBundle("gridInteraction");
             if (saved.getString("prepared") != null)
                 try {
                     prepared =
@@ -128,7 +142,7 @@ public final class GallerizeActivity extends Activity {
         root.addView(summary);
         LinearLayout tools = new LinearLayout(this);
         add(tools, button("Views", this::chooseView));
-        add(tools, button("Tools / evidence", this::tools));
+        add(tools, button("Tools / details", this::tools));
         add(tools, button("Export files (ZIP)", this::exportFiles));
         cancel =
                 button(
@@ -146,7 +160,7 @@ public final class GallerizeActivity extends Activity {
                 this,
                 root,
                 "gallerize.scope",
-                "Evidence and presentation limits",
+                "Information",
                 "Files combine PhotoRec and Binwalk recoveries. Cards retain every accepted header,"
                     + " reported bounded artifact, nested/overlapping range and unassigned gap."
                     + " Header acceptance is not complete-file validation. Raw findings include"
@@ -160,7 +174,7 @@ public final class GallerizeActivity extends Activity {
                 false);
         gridControls = new LinearLayout(this);
         gridControls.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout dimensions = new LinearLayout(this);
+        gridDimensions = new LinearLayout(this);
         width = new EditText(this);
         height = new EditText(this);
         for (EditText value : new EditText[] {width, height}) {
@@ -170,14 +184,99 @@ public final class GallerizeActivity extends Activity {
         }
         width.setHint("Width");
         height.setHint("Height");
+        width.setContentDescription("Grid columns");
+        height.setContentDescription("Grid rows");
         width.setText(Integer.toString(preferences.getInt("width", 640)));
         height.setText(Integer.toString(preferences.getInt("height", 640)));
-        add(dimensions, width);
-        add(dimensions, height);
+        add(gridDimensions, width);
+        add(gridDimensions, height);
         apply = button("Apply", () -> showGrid(false));
-        add(dimensions, apply);
-        add(dimensions, button("Sizes / Auto", this::gridSizes));
-        gridControls.addView(dimensions);
+        add(gridDimensions, apply);
+        add(gridDimensions, button("Sizes / Auto", this::gridSizes));
+        gridDimensions.setVisibility(View.GONE);
+        LinearLayout zoom = new LinearLayout(this);
+        gridOut =
+                button(
+                        "−",
+                        () -> {
+                            if (gridView != null && !busy) gridView.zoomBy(0.5);
+                        });
+        gridOut.setContentDescription("Zoom grid out");
+        gridOut.setTag("grid-zoom-out");
+        gridFit =
+                button(
+                        "Fit",
+                        () -> {
+                            if (gridView != null && !busy) gridView.fit();
+                        });
+        gridFit.setTag("grid-fit");
+        gridIn =
+                button(
+                        "+",
+                        () -> {
+                            if (gridView != null && !busy) gridView.zoomBy(2);
+                        });
+        gridIn.setContentDescription("Zoom grid in");
+        gridIn.setTag("grid-zoom-in");
+        add(zoom, gridOut);
+        add(zoom, gridFit);
+        add(zoom, gridIn);
+        add(
+                zoom,
+                button(
+                        "Layout",
+                        () ->
+                                gridDimensions.setVisibility(
+                                        gridDimensions.getVisibility() == View.VISIBLE
+                                                ? View.GONE
+                                                : View.VISIBLE)));
+        add(zoom, button("Details", this::gridDetails));
+        gridControls.addView(zoom);
+        LinearLayout selection = new LinearLayout(this);
+        gridNew =
+                button(
+                        "New",
+                        () -> {
+                            if (gridView != null && !busy) gridView.clearSelection();
+                        });
+        gridNew.setTag("grid-new-range");
+        gridNew.setContentDescription("Start a new block range");
+        gridPrevious =
+                button(
+                        "◀",
+                        () -> {
+                            if (gridView != null && !busy) gridView.step(-1);
+                        });
+        gridPrevious.setContentDescription("Previous selection endpoint block");
+        gridPrevious.setTag("grid-previous-block");
+        gridNext =
+                button(
+                        "▶",
+                        () -> {
+                            if (gridView != null && !busy) gridView.step(1);
+                        });
+        gridNext.setContentDescription("Next selection endpoint block");
+        gridNext.setTag("grid-next-block");
+        gridExtend = new CheckBox(this);
+        gridExtend.setText("Extend");
+        gridExtend.setTextColor(0xffe8edf2);
+        gridExtend.setTextSize(12);
+        gridExtend.setChecked(true);
+        gridExtend.setTag("grid-extend");
+        gridExtend.setContentDescription("Keep the anchor and extend the selection endpoint");
+        gridExtend.setOnCheckedChangeListener(
+                (view, checked) -> {
+                    if (gridView != null) gridView.setExtendsSelection(checked);
+                });
+        gridRange = button("Range…", this::gridRangeActions);
+        gridRange.setTag("grid-range-actions");
+        add(selection, gridNew);
+        add(selection, gridPrevious);
+        add(selection, gridNext);
+        selection.addView(gridExtend, new LinearLayout.LayoutParams(0, -2, 1.3f));
+        add(selection, gridRange);
+        gridControls.addView(selection);
+        gridControls.addView(gridDimensions);
         cellInfo = text("", 12);
         cellInfo.setTextIsSelectable(true);
         gridControls.addView(cellInfo);
@@ -246,6 +345,11 @@ public final class GallerizeActivity extends Activity {
     }
 
     private void clearContent() {
+        if (gridView != null) {
+            gridInteraction = gridView.saveInteractionState();
+            gridView.dispose();
+            gridView = null;
+        }
         content.removeAllViews();
         if (galleryAdapter != null) {
             galleryAdapter.close();
@@ -263,6 +367,7 @@ public final class GallerizeActivity extends Activity {
         apply.setEnabled(false);
         groups.setEnabled(false);
         status.setText(message);
+        gridChanged();
         return ++generation;
     }
 
@@ -275,6 +380,7 @@ public final class GallerizeActivity extends Activity {
             previous.setEnabled(page > 0);
             next.setEnabled((long) (page + 1) * 24 < selected.size());
         }
+        gridChanged();
     }
 
     private void load(File input, boolean autoView) {
@@ -398,7 +504,8 @@ public final class GallerizeActivity extends Activity {
         List<ContentMap.Card> shown =
                 new ArrayList<>(
                         selected.subList(page * 24, Math.min(selected.size(), (page + 1) * 24)));
-        GridView gallery = new GridView(this);
+        GridView gallery = WorkbenchUi.scrolling(new GridView(this));
+        WorkbenchUi.fastScroll(gallery);
         gallery.setTag("gallerize-gallery");
         gallery.setNumColumns(GridView.AUTO_FIT);
         gallery.setColumnWidth(dp(156));
@@ -546,15 +653,13 @@ public final class GallerizeActivity extends Activity {
                                     if (isDestroyed() || ticket != generation) return;
                                     end();
                                     grid = result;
-                                    ByteGridView view = new ByteGridView(this, grid, this::cell);
-                                    view.setTag("gallerize-grid");
-                                    content.addView(view, new LinearLayout.LayoutParams(-1, -1));
-                                    cellInfo.setText(
-                                            gridMode.legend
-                                                    + "\n"
-                                                    + "Magenta unused cells have no bytes."
-                                                    + " Row-major exact partitions; tap for"
-                                                    + " range/hex.");
+                                    gridView = new ByteGridView(this, grid, this::gridChanged);
+                                    gridView.setTag("gallerize-grid");
+                                    gridView.restoreInteractionState(gridInteraction);
+                                    gridExtend.setChecked(gridView.extendsSelection());
+                                    content.addView(
+                                            gridView, new LinearLayout.LayoutParams(-1, -1));
+                                    gridChanged();
                                     status.setText(
                                             layout.width
                                                     + " × "
@@ -563,8 +668,7 @@ public final class GallerizeActivity extends Activity {
                                                     + layout.used
                                                     + " populated cells · all "
                                                     + session.input.size
-                                                    + " bytes accounted\nSHA-256 "
-                                                    + result.sha256);
+                                                    + " bytes accounted");
                                 });
                     } catch (Exception failure) {
                         failed(ticket, failure);
@@ -572,45 +676,177 @@ public final class GallerizeActivity extends Activity {
                 });
     }
 
-    private void cell(int index) {
-        if (grid == null || busy) return;
-        FileRange range = grid.layout.range(index);
+    private void gridChanged() {
+        if (gridRange == null) return;
+        boolean ready = gridView != null && grid != null && !busy;
+        if (gridView != null) gridView.setEnabled(ready);
+        FileRange range = ready ? gridView.selection() : null;
+        gridOut.setEnabled(ready && gridView.viewport.zoom > 1);
+        gridIn.setEnabled(ready && gridView.viewport.zoom < ByteGrid.Viewport.MAX_ZOOM);
+        gridFit.setEnabled(ready);
+        gridExtend.setEnabled(ready);
+        gridNew.setEnabled(range != null);
+        gridRange.setEnabled(range != null);
+        gridPrevious.setEnabled(range != null && gridView.end() > 0);
+        gridNext.setEnabled(range != null && gridView.end() + 1 < grid.layout.used);
+        if (!ready) return;
+        String zoom = String.format(Locale.ROOT, "%.1f×", gridView.viewport.zoom);
+        gridFit.setContentDescription("Fit grid; current zoom " + zoom);
+        if (range == null) {
+            cellInfo.setText(
+                    zoom
+                            + " · Tap or drag blocks; further taps extend.\n"
+                            + "Two fingers move / pinch. New starts another range.");
+            return;
+        }
+        int first = Math.min(gridView.anchor(), gridView.end());
+        int last = Math.max(gridView.anchor(), gridView.end());
         cellInfo.setText(
-                "Cell ("
-                        + index % grid.layout.width
-                        + ", "
-                        + index / grid.layout.width
-                        + ") · "
-                        + (range.length == 0
-                                ? "unused; no range"
-                                : "[0x"
-                                        + Long.toHexString(range.offset)
-                                        + ", 0x"
-                                        + Long.toHexString(range.offset + range.length)
-                                        + ") · "
-                                        + range.length
-                                        + " bytes · "
-                                        + grid.values[index]));
-        if (range.length == 0) return;
+                zoom
+                        + " · Blocks "
+                        + first
+                        + "–"
+                        + last
+                        + " · "
+                        + (last - first + 1)
+                        + " selected\n"
+                        + physicalRange(range));
+    }
+
+    private static String physicalRange(FileRange range) {
+        return "[0x"
+                + Long.toHexString(range.offset)
+                + ", 0x"
+                + Long.toHexString(range.offset + range.length)
+                + ") · "
+                + range.length
+                + " bytes";
+    }
+
+    private ContentMap.Card gridRangeCard() {
+        if (gridView == null) return null;
+        FileRange range = gridView.selection();
+        if (range == null) return null;
+        int first = Math.min(gridView.anchor(), gridView.end());
+        int last = Math.max(gridView.anchor(), gridView.end());
+        return new ContentMap.Card(
+                ContentMap.Kind.OTHER,
+                "Grid blocks " + first + "–" + last,
+                "bytes",
+                range.offset,
+                range.length,
+                "",
+                -1,
+                true);
+    }
+
+    private void gridRangeActions() {
+        if (grid == null || gridView == null || busy) return;
+        ContentMap.Card card = gridRangeCard();
+        if (card == null) return;
         new AlertDialog.Builder(this)
-                .setTitle("Exact grid cell")
-                .setMessage(cellInfo.getText())
+                .setTitle(card.label)
+                .setItems(
+                        new String[] {
+                            "Preview / analyze exact range",
+                            "Export exact bytes",
+                            "Inspect archive / compressed stream in range",
+                            "Selection / source details"
+                        },
+                        (dialog, which) -> {
+                            if (which == 0) preview(card);
+                            else if (which == 1) exportRange(card);
+                            else if (which == 2) openArchive(card);
+                            else gridDetails();
+                        })
                 .setPositiveButton(
-                        "Hex at original offset", (dialog, which) -> nativeHex(range.offset))
-                .setNeutralButton(
-                        "Preview exact bytes",
-                        (dialog, which) ->
-                                preview(
-                                        new ContentMap.Card(
-                                                ContentMap.Kind.OTHER,
-                                                "Grid cell " + index,
-                                                "bytes",
-                                                range.offset,
-                                                range.length,
-                                                "",
-                                                -1,
-                                                true)))
+                        "Hex at original offset", (dialog, which) -> nativeHex(card.offset))
                 .setNegativeButton("Close", null)
+                .show();
+    }
+
+    private void gridDetails() {
+        if (grid == null || gridView == null || busy) return;
+        StringBuilder details =
+                new StringBuilder(grid.mode.legend)
+                        .append(
+                                "\n\n"
+                                    + "Tap a block to start a range. With Extend checked, further"
+                                    + " taps or drags")
+                        .append(
+                                " move its endpoint; every block between anchor and endpoint is"
+                                    + " selected")
+                        .append(
+                                " in row-major byte order, including across rows. New clears the"
+                                    + " range.")
+                        .append(
+                                " The arrow buttons step one block. Turn Extend off to select a"
+                                    + " new")
+                        .append(
+                                " single block with each tap. Drag still selects a continuous"
+                                    + " range.")
+                        .append(
+                                " Two fingers pan or pinch; + / − zoom about the selected"
+                                    + " endpoint.")
+                        .append(" Fit shows the entire grid. Zoom changes display size only.")
+                        .append("\n\nLayout: ")
+                        .append(grid.layout.width)
+                        .append(" × ")
+                        .append(grid.layout.height)
+                        .append("; ")
+                        .append(grid.layout.used)
+                        .append(
+                                " populated blocks. Magenta unused blocks have no bytes and cannot"
+                                    + " be")
+                        .append(
+                                " selected. Each populated block covers its original exact byte"
+                                    + " partition;")
+                        .append(
+                                " no source bytes are sampled away. Entropy of a one-byte block is"
+                                    + " zero.")
+                        .append(
+                                " High entropy alone does not identify a format or establish"
+                                    + " behavior.");
+        FileRange range = gridView.selection();
+        if (range != null) {
+            int anchor = gridView.anchor(), end = gridView.end();
+            details.append("\n\nSelection: ")
+                    .append(physicalRange(range))
+                    .append("\nAnchor block ")
+                    .append(anchor)
+                    .append(" (column ")
+                    .append(anchor % grid.layout.width)
+                    .append(", row ")
+                    .append(anchor / grid.layout.width)
+                    .append(") = ")
+                    .append(grid.values[anchor])
+                    .append("\nEndpoint block ")
+                    .append(end)
+                    .append(" (column ")
+                    .append(end % grid.layout.width)
+                    .append(", row ")
+                    .append(end / grid.layout.width)
+                    .append(") = ")
+                    .append(grid.values[end])
+                    .append("\nValues belong to individual blocks; the selected range has not")
+                    .append(" been remeasured as one block. Preview / analyze opens every tool")
+                    .append(" on an independently owned copy of exactly these bytes. Selected")
+                    .append(" bytes are an inspection interval, not a recovered-file boundary.");
+        }
+        details.append("\n\nSource: ")
+                .append(name)
+                .append("\nSize: ")
+                .append(grid.layout.size)
+                .append(" bytes\nSHA-256: ")
+                .append(grid.sha256);
+        TextView value = text(details.toString(), 13);
+        value.setTextIsSelectable(true);
+        ScrollView scroll = WorkbenchUi.scroll(this);
+        scroll.addView(value);
+        new AlertDialog.Builder(this)
+                .setTitle("Grid details")
+                .setView(scroll)
+                .setPositiveButton("Close", null)
                 .show();
     }
 
@@ -642,7 +878,7 @@ public final class GallerizeActivity extends Activity {
             }
             TextView value = text(details.toString(2), 13);
             value.setTextIsSelectable(true);
-            ScrollView scroll = new ScrollView(this);
+            ScrollView scroll = WorkbenchUi.scroll(this);
             scroll.addView(value);
             new AlertDialog.Builder(this)
                     .setTitle(card.label)
@@ -812,7 +1048,7 @@ public final class GallerizeActivity extends Activity {
                                         end();
                                         TextView value = text(raw, 13);
                                         value.setTextIsSelectable(true);
-                                        ScrollView scroll = new ScrollView(this);
+                                        ScrollView scroll = WorkbenchUi.scroll(this);
                                         scroll.addView(value);
                                         new AlertDialog.Builder(this)
                                                 .setTitle(
@@ -1188,6 +1424,8 @@ public final class GallerizeActivity extends Activity {
         saved.putInt("page", page);
         saved.putString("width", width.getText().toString());
         saved.putString("height", height.getText().toString());
+        if (gridView != null) gridInteraction = gridView.saveInteractionState();
+        if (gridInteraction != null) saved.putBundle("gridInteraction", gridInteraction);
         if (prepared != null) {
             saved.putString("prepared", prepared.file.getAbsolutePath());
             saved.putString("exportName", prepared.name);
@@ -1219,6 +1457,7 @@ public final class GallerizeActivity extends Activity {
         worker.shutdown();
         if (prepared != null && !isChangingConfigurations()) prepared.discard();
         if (galleryAdapter != null) galleryAdapter.close();
+        if (gridView != null) gridView.dispose();
         super.onDestroy();
     }
 }

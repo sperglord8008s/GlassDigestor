@@ -181,7 +181,7 @@ public final class NativeArchiveWorkbenchTest {
     private void click(String label) throws Exception {
         Button target = button(activity.getWindow().getDecorView(), label);
         if (target == null) {
-            Button tools = button(activity.getWindow().getDecorView(), "Tools / evidence");
+            Button tools = button(activity.getWindow().getDecorView(), "Tools / details");
             assertNotNull("Missing tools menu", tools);
             tools.performClick();
             target =

@@ -218,3 +218,35 @@ relaxed. Focus failure now includes interactive/keyguard/window state. At source
 486e822 the PR run passed all eleven on both APIs, while the push API 35 run
 failed this prerequisite after its ten native/media checks passed. Fresh runs
 of the wake-handling correction are required; a failed run remains failed.
+
+
+## Captured analysis limits and private diagnostics
+
+A twelfth `captured-analysis-limits-and-private-diagnostics` contract exercises
+the unchanged `AnalysisTimeLimits` and `DebugJournal` helpers in the actual
+normal Android target UID. Its isolated real SharedPreferences fixture checks
+120-second default and 240-second custom analysis limits, each with a separate
+30-second worker margin. Real Bundle/Parcel marshalling must retain integer
+millisecond types and the captured values after preferences change. Invalid
+settings, partial/coerced/mismatched/out-of-range messages and a foreign-engine
+message are refused. Corrupt stored settings and legacy empty messages retain
+their explicit default behavior. Deadline/cancellation boundaries are checked
+without waiting for a multi-minute deadline.
+
+The diagnostics contract uses the target's actual no-backup directory and an
+Android-created trusted ancestor symlink. Record/read/clear must accept that
+ancestor alias while refusing a generated linked journal leaf and preserving
+an outside sentinel. Owned synthetic strings and an exception verify omission
+of paths, contents, queries, exception messages and source filenames while
+retaining safe app class/method/line metadata. Row and byte retention are tested
+separately: bounded fixtures repeat valid lines first emitted by the real
+journal, then the unchanged `record` method crosses each limit and must remove
+the oldest entries. This avoids hundreds of synchronous durable writes. Clear
+must leave a readable empty journal. The complete report stores only small
+flags/counts/byte sizes/timing for this contract, with no raw private log body.
+
+This adds no assets, native engines, browser launch or waiting period. It does
+not execute Binwalk JNI, a Binwalk worker request, the full app UI or SAF, and
+does not verify ARM64 or handset behavior. Actual API 26/35 execution of the
+twelfth contract is pending until fresh clean-source runtime jobs pass; all
+eleven preceding checks and their assertions remain intact.

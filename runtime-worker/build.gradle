@@ -23,6 +23,8 @@ def stageWorkerSources = tasks.register('stageWorkerSources', Sync) {
         include 'org/diemobile/NativeArchiveSession.java', 'org/diemobile/ArchiveLaunch.java',
                 'org/diemobile/ContentOrigin.java'
         include 'org/diemobile/TextActions.java', 'org/diemobile/WorkbenchUi.java'
+        include 'org/diemobile/AnalysisTimeLimits.java', 'org/diemobile/DebugJournal.java',
+                'org/diemobile/DraggableScrollView.java'
     }
     into layout.buildDirectory.dir('shared-worker-sources')
 }
