@@ -21,4 +21,6 @@ The CI-only Android emulator action is not packaged in either application.
 Its Apache-2.0 source is pinned at
 https://github.com/ReactiveCircus/android-emulator-runner/tree/a421e43855164a8197daf9d8d40fe71c6996bb0d
 
-PhotoRec adapter 4 adds a PDF-only read-only Bionic stdio recovery check. This does not execute the PDF renderer or inspected applications.
+PhotoRec adapter 5 supports the selected original PDF file checks through read-only Bionic stdio. The laboratory separately tests the unchanged platform PDF renderer with independently known recovered pages. Inspected applications are never executed.
+
+Unchanged production TextActions/WorkbenchUi and their required resources are staged for a normal-UID clipboard/URI test. A private test-only foreground window satisfies platform clipboard policy. No browser is launched and no external search/translation service is contacted.

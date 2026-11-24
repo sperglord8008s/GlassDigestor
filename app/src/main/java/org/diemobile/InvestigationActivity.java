@@ -9,12 +9,13 @@ import android.os.*;
 import android.text.*;
 import android.view.*;
 import android.widget.*;
+
+import org.json.*;
+
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.json.*;
 
 /** Shared lazy-table navigation/export UI; binary/metadata logic lives in providers. */
 public final class InvestigationActivity extends Activity {
@@ -49,19 +50,50 @@ public final class InvestigationActivity extends Activity {
         final String request, filter, draft;
         final int page, pageSize;
         Location(String request, String filter, String draft, int page, int pageSize) {
-            if (request != null && request.length() > 16384 || filter.length() > 1024 || draft.length() > 1024 || page < 0 || !(pageSize == 1 || pageSize == 10 || pageSize == 50)) throw new IllegalArgumentException("Invalid investigation location");
+            if (request != null && request.length() > 16384
+                    || filter.length() > 1024
+                    || draft.length() > 1024
+                    || page < 0
+                    || !(pageSize == 1 || pageSize == 10 || pageSize == 50))
+                throw new IllegalArgumentException("Invalid investigation location");
             this.request = request; this.filter = filter; this.draft = draft; this.page = page; this.pageSize = pageSize;
         }
         Bundle bundle() {
-            Bundle value = new Bundle(); value.putString("request", request); value.putString("filter", filter); value.putString("draft", draft); value.putInt("page", page); value.putInt("pageSize", pageSize); return value;
+            Bundle value = new Bundle();
+            value.putString("request", request);
+            value.putString("filter", filter);
+            value.putString("draft", draft);
+            value.putInt("page", page);
+            value.putInt("pageSize", pageSize);
+            return value;
         }
         static Location restore(Bundle value) {
-            return new Location(value.getString("request"), value.getString("filter", ""), value.getString("draft", ""), Math.max(0, value.getInt("page")), value.getInt("pageSize", 50));
+            return new Location(
+                    value.getString("request"),
+                    value.getString("filter", ""),
+                    value.getString("draft", ""),
+                    Math.max(0, value.getInt("page")),
+                    value.getInt("pageSize", 50));
         }
     }
-    private int dp(int value) { return Math.round(value * getResources().getDisplayMetrics().density); }
-    private TextView text(String value, int size) { TextView view = new TextView(this); view.setText(value); view.setTextSize(size); view.setTextColor(0xffe5eaf0); return view; }
-    private Button button(String label, Runnable action) { Button view = new Button(this); view.setText(label); view.setAllCaps(false); view.setTextSize(12); view.setOnClickListener(v -> action.run()); return view; }
+
+    private int dp(int value) {
+        return Math.round(value * getResources().getDisplayMetrics().density);
+    }
+
+    private TextView text(String value, int size) {
+        return WorkbenchUi.text(this, value, size);
+    }
+
+    private Button button(String label, Runnable action) {
+        Button view = new Button(this);
+        view.setText(label);
+        view.setAllCaps(false);
+        view.setTextSize(12);
+        view.setOnClickListener(v -> action.run());
+        return view;
+    }
+
     private void add(LinearLayout row, View view) { row.addView(view, new LinearLayout.LayoutParams(0, -2, 1)); }
 
     @Override public void onCreate(Bundle state) {
@@ -69,44 +101,174 @@ public final class InvestigationActivity extends Activity {
         explanations = new ExpandableHelp(this);
         communityAttempted = state != null && state.getBoolean("communityAttempted");
         String path = getIntent().getStringExtra("path"); if (path == null) { finish(); return; }
-        File root = new File(path); inputName = getIntent().getStringExtra("name"); if (inputName == null) inputName = root.getName();
-        if(state!=null) { retentionState=state.getString("providerState");pendingInputRequest=state.getString("pendingInputRequest");if(pendingInputRequest!=null)pickerOpen=true; }
+        File root = new File(path);
+        inputName = getIntent().getStringExtra("name");
+        if (inputName == null) inputName = root.getName();
+        if(state!=null) {
+            retentionState = state.getString("providerState");
+            pendingInputRequest = state.getString("pendingInputRequest");
+            if(pendingInputRequest!=null)pickerOpen=true; }
         exportDirectory = new File(getCacheDir(), "tool-exports");
-        if ("comparison".equals(getIntent().getStringExtra("provider"))) backend = new ComparisonBackend(root,new File(getCacheDir(),"comparison-snapshots"),inputName,getIntent().getStringExtra("sha256"),getIntent().getLongExtra("sourceSize",-1),retentionState);
-        else if ("desktop-batch".equals(getIntent().getStringExtra("provider"))) backend = new BatchScanBackend(new File(getFilesDir(),"desktop-batches"),new File(getCacheDir(),"batch-view-snapshots"),getIntent().getStringExtra("batchId"));
-        else if ("binder-registry".equals(getIntent().getStringExtra("provider"))) backend = new BinderRegistryBackend(root,new File(getCacheDir(),"binder-registry-snapshots"),BinderServiceCapture.directory(this),getIntent().getStringExtra("sha256"),getIntent().getLongExtra("sourceSize",-1),()->getAssets().open("references/android-15-service.cpp"));
-        else if ("binwalk".equals(getIntent().getStringExtra("provider"))) backend = new BinwalkBackend(root,new File(getCacheDir(),"binary-snapshots"),inputName,new BinaryWorkerClient(this));
-        else if ("photorec".equals(getIntent().getStringExtra("provider"))) backend = new PhotoRecBackend(root,new File(getCacheDir(),"carving-snapshots"),inputName,new BinaryWorkerClient(this,"photorec"));
-        else if ("mpv".equals(getIntent().getStringExtra("provider"))) backend = new MpvBackend(root,new File(getCacheDir(),"media-snapshots"),inputName,new BinaryWorkerClient(this,"mpv"));
-        else if ("resources".equals(getIntent().getStringExtra("provider"))) backend = new AndroidResourceBackend(root,new File(getCacheDir(),"resource-snapshots"),inputName,new BinaryWorkerClient(this,"resources"));
-        else if ("hashes".equals(getIntent().getStringExtra("provider"))) backend = new HashBackend(root,new File(getCacheDir(),"hash-snapshots"),inputName,new BinaryWorkerClient(this,"hashes"));
-        else if ("apk-signing".equals(getIntent().getStringExtra("provider"))) backend = new ApkSigningBackend(root,new File(getCacheDir(),"signing-snapshots"),inputName,
-            getIntent().getStringExtra("sha256"),getIntent().getLongExtra("sourceSize",-1),retentionState);
-        else if ("package-set".equals(getIntent().getStringExtra("provider"))) backend = new PackageSetBackend(root,new File(getCacheDir(),"package-snapshots"),inputName,
-            getIntent().getStringExtra("sha256"),getIntent().getLongExtra("sourceSize",-1),getIntent().getStringArrayListExtra("packagePaths"),getIntent().getStringExtra("inventoryPackage"),retentionState,new BinaryWorkerClient(this,"resources"));
-        else if ("package-knowledge".equals(getIntent().getStringExtra("provider"))) backend = new PackageKnowledgeBackend(()->getAssets().open("knowledge/uad.json"), new File(getCacheDir(),"package-knowledge-snapshots"),getIntent().getStringExtra("knowledgePackageId"),retentionState,new File(getCacheDir(),"package-knowledge-subjects"),getIntent().getStringExtra("knowledgeSubject"));
-        else if ("sdk-rules".equals(getIntent().getStringExtra("provider"))) backend = new SdkCatalogBackend(()->getAssets().open("knowledge/libchecker-v5.json"),new File(getCacheDir(),"knowledge-snapshots"));
-        else if ("tracker-rules".equals(getIntent().getStringExtra("provider"))) backend = new TrackerCatalogBackend(()->new FileInputStream(new File(getFilesDir(),"exodus-trackers.json")),new File(getCacheDir(),"tracker-snapshots"));
-        else if ("metadata".equals(getIntent().getStringExtra("provider"))) backend = new MetadataBackend(root,new File(getCacheDir(),"metadata-snapshots"),inputName);
-        else if ("strings".equals(getIntent().getStringExtra("provider"))) backend = new StringBackend(root,new File(getCacheDir(),"string-snapshots"),inputName,ScanPreferences.load(this).minimumStringLength);
-        else backend = new DexBackend(root, new File(getCacheDir(), "investigation-inputs"), inputName,
-            getIntent().getStringExtra("sha256"), getIntent().getLongExtra("sourceSize", root.length()));
+        if ("comparison".equals(getIntent().getStringExtra("provider")))
+            backend =
+                    new ComparisonBackend(
+                            root,
+                            new File(getCacheDir(), "comparison-snapshots"),
+                            inputName,
+                            getIntent().getStringExtra("sha256"),
+                            getIntent().getLongExtra("sourceSize", -1),
+                            retentionState);
+        else if ("desktop-batch".equals(getIntent().getStringExtra("provider")))
+            backend =
+                    new BatchScanBackend(
+                            new File(getFilesDir(), "desktop-batches"),
+                            new File(getCacheDir(), "batch-view-snapshots"),
+                            getIntent().getStringExtra("batchId"));
+        else if ("binder-registry".equals(getIntent().getStringExtra("provider")))
+            backend =
+                    new BinderRegistryBackend(
+                            root,
+                            new File(getCacheDir(), "binder-registry-snapshots"),
+                            BinderServiceCapture.directory(this),
+                            getIntent().getStringExtra("sha256"),
+                            getIntent().getLongExtra("sourceSize", -1),
+                            () -> getAssets().open("references/android-15-service.cpp"));
+        else if ("binwalk".equals(getIntent().getStringExtra("provider")))
+            backend =
+                    new BinwalkBackend(
+                            root,
+                            new File(getCacheDir(), "binary-snapshots"),
+                            inputName,
+                            new BinaryWorkerClient(this));
+        else if ("photorec".equals(getIntent().getStringExtra("provider")))
+            backend =
+                    new PhotoRecBackend(
+                            root,
+                            new File(getCacheDir(), "carving-snapshots"),
+                            inputName,
+                            new BinaryWorkerClient(this, "photorec"));
+        else if ("mpv".equals(getIntent().getStringExtra("provider")))
+            backend =
+                    new MpvBackend(
+                            root,
+                            new File(getCacheDir(), "media-snapshots"),
+                            inputName,
+                            new BinaryWorkerClient(this, "mpv"));
+        else if ("resources".equals(getIntent().getStringExtra("provider")))
+            backend =
+                    new AndroidResourceBackend(
+                            root,
+                            new File(getCacheDir(), "resource-snapshots"),
+                            inputName,
+                            new BinaryWorkerClient(this, "resources"));
+        else if ("hashes".equals(getIntent().getStringExtra("provider")))
+            backend =
+                    new HashBackend(
+                            root,
+                            new File(getCacheDir(), "hash-snapshots"),
+                            inputName,
+                            new BinaryWorkerClient(this, "hashes"));
+        else if ("apk-signing".equals(getIntent().getStringExtra("provider")))
+            backend =
+                    new ApkSigningBackend(
+                            root,
+                            new File(getCacheDir(), "signing-snapshots"),
+                            inputName,
+                            getIntent().getStringExtra("sha256"),
+                            getIntent().getLongExtra("sourceSize", -1),
+                            retentionState);
+        else if ("package-set".equals(getIntent().getStringExtra("provider")))
+            backend =
+                    new PackageSetBackend(
+                            root,
+                            new File(getCacheDir(), "package-snapshots"),
+                            inputName,
+                            getIntent().getStringExtra("sha256"),
+                            getIntent().getLongExtra("sourceSize", -1),
+                            getIntent().getStringArrayListExtra("packagePaths"),
+                            getIntent().getStringExtra("inventoryPackage"),
+                            retentionState,
+                            new BinaryWorkerClient(this, "resources"));
+        else if ("package-knowledge".equals(getIntent().getStringExtra("provider")))
+            backend =
+                    new PackageKnowledgeBackend(
+                            () -> getAssets().open("knowledge/uad.json"),
+                            new File(getCacheDir(), "package-knowledge-snapshots"),
+                            getIntent().getStringExtra("knowledgePackageId"),
+                            retentionState,
+                            new File(getCacheDir(), "package-knowledge-subjects"),
+                            getIntent().getStringExtra("knowledgeSubject"));
+        else if ("sdk-rules".equals(getIntent().getStringExtra("provider")))
+            backend =
+                    new SdkCatalogBackend(
+                            () -> getAssets().open("knowledge/libchecker-v5.json"),
+                            new File(getCacheDir(), "knowledge-snapshots"));
+        else if ("tracker-rules".equals(getIntent().getStringExtra("provider")))
+            backend =
+                    new TrackerCatalogBackend(
+                            () ->
+                                    new FileInputStream(
+                                            new File(getFilesDir(), "exodus-trackers.json")),
+                            new File(getCacheDir(), "tracker-snapshots"));
+        else if ("metadata".equals(getIntent().getStringExtra("provider")))
+            backend =
+                    new MetadataBackend(
+                            root, new File(getCacheDir(), "metadata-snapshots"), inputName);
+        else if ("strings".equals(getIntent().getStringExtra("provider")))
+            backend =
+                    new StringBackend(
+                            root,
+                            new File(getCacheDir(), "string-snapshots"),
+                            inputName,
+                            ScanPreferences.load(this).minimumStringLength);
+        else
+            backend =
+                    new DexBackend(
+                            root,
+                            new File(getCacheDir(), "investigation-inputs"),
+                            inputName,
+                            getIntent().getStringExtra("sha256"),
+                            getIntent().getLongExtra("sourceSize", root.length()));
         if (state != null) inputNotice = state.getString("inputNotice", "");
         createViews(); location = new Location(null, "", "", 0, 50);
         if (state != null) {
             try {
-                Bundle saved = state.getBundle("location"); if (saved != null) location = Location.restore(saved);
+                Bundle saved = state.getBundle("location");
+                if (saved != null) location = Location.restore(saved);
                 ArrayList<Bundle> trail = state.getParcelableArrayList("history");
                 if (trail != null && trail.size() <= HISTORY_LIMIT) for (Bundle item : trail) history.addLast(Location.restore(item));
                 expired = state.getBoolean("expired");
-            } catch (RuntimeException e) { history.clear(); status.setText("Navigation state expired; reopening input"); }
+            } catch (RuntimeException e) { history.clear();
+                status.setText("Navigation state expired; reopening input");
+            }
             if (state.getString("prepared") != null) try {
-                prepared = PreparedExport.restore(exportDirectory, state.getString("prepared"), state.getString("exportName"), state.getString("exportMime"), state.getLong("exportSize")); pickerOpen = true;
+                    prepared =
+                            PreparedExport.restore(
+                                    exportDirectory,
+                                    state.getString("prepared"),
+                                    state.getString("exportName"),
+                                    state.getString("exportMime"),
+                                    state.getLong("exportSize"));
+                    pickerOpen = true;
             } catch (IOException e) { status.setText("Prepared export expired; prepare it again"); }
         }
         bind(location);
-        if (root.isFile()||"comparison".equals(getIntent().getStringExtra("provider"))&&retentionState!=null||"desktop-batch".equals(getIntent().getStringExtra("provider"))||"package-set".equals(getIntent().getStringExtra("provider"))||"apk-signing".equals(getIntent().getStringExtra("provider"))&&retentionState!=null||"sdk-rules".equals(getIntent().getStringExtra("provider"))||"tracker-rules".equals(getIntent().getStringExtra("provider"))||"package-knowledge".equals(getIntent().getStringExtra("provider"))) load(location, false);
-        else { status.setText("Input snapshot expired; reopen it from Scan. An available prepared export can still finish."); controls(); }
+        if (root.isFile()
+                || "comparison".equals(getIntent().getStringExtra("provider"))
+                        && retentionState != null
+                || "desktop-batch".equals(getIntent().getStringExtra("provider"))
+                || "package-set".equals(getIntent().getStringExtra("provider"))
+                || "apk-signing".equals(getIntent().getStringExtra("provider"))
+                        && retentionState != null
+                || "sdk-rules".equals(getIntent().getStringExtra("provider"))
+                || "tracker-rules".equals(getIntent().getStringExtra("provider"))
+                || "package-knowledge".equals(getIntent().getStringExtra("provider")))
+            load(location, false);
+        else {
+            status.setText(
+                    "Input snapshot expired; reopen it from Scan. An available prepared export can"
+                        + " still finish.");
+            controls(); }
     }
     private void createViews() {
         LinearLayout root = new LinearLayout(this); root.setOrientation(LinearLayout.VERTICAL); root.setBackgroundColor(0xff15191e); root.setPadding(dp(8), dp(8), dp(8), dp(8));
@@ -118,30 +280,93 @@ public final class InvestigationActivity extends Activity {
             });
         }
         title = text(inputName, 17); title.setMaxLines(2); title.setEllipsize(TextUtils.TruncateAt.MIDDLE); root.addView(title);
-        context = text("Loading investigation…", 12); context.setMaxLines(3); context.setEllipsize(TextUtils.TruncateAt.END);
-        context.setOnClickListener(v -> showText("Scope / provenance / interpretation", context.getText() + "\n\n" + mechanism.getText() + "\n\n" + pretty(metadata) + "\n\n" + pretty(provenance))); root.addView(context);
+        context = text("Loading investigation…", 12);
+        context.setMaxLines(3); context.setEllipsize(TextUtils.TruncateAt.END);
+        context.setOnClickListener(
+                v ->
+                        showText(
+                                "Scope / provenance / interpretation",
+                                context.getText()
+                                        + "\n\n"
+                                        + mechanism.getText()
+                                        + "\n\n"
+                                        + pretty(metadata)
+                                        + "\n\n"
+                                        + pretty(provenance)));
+        root.addView(context);
         root.addView(explanations.controls(this));
-        mechanismToggle = button("Scope and interpretation", () -> {}); root.addView(mechanismToggle);
-        mechanism = text("", 12); mechanism.setTextIsSelectable(true); mechanism.setTag("explanation:investigation.scope"); root.addView(mechanism);
+        mechanismToggle = button("Scope and interpretation", () -> {});
+        root.addView(mechanismToggle);
+        mechanism = text("", 12);
+        mechanism.setTextIsSelectable(true);
+        mechanism.setTag("explanation:investigation.scope");
+        root.addView(mechanism);
         LinearLayout navigation = new LinearLayout(this);
-        back = button("Back", this::goBack); add(navigation, back); views = button("Root views", this::rootViews); add(navigation, views);
+        back = button("Back", this::goBack);
+        add(navigation, back);
+        views = button("Root views", this::rootViews);
+        add(navigation, views);
         reload = button("Reload view", () -> load(capture(), false)); add(navigation, reload);
-        cancel = button("Cancel", () -> { cancellation.set(true); status.setText("Cancellation requested • waiting for current engine/I/O operation"); }); add(navigation, cancel); root.addView(navigation);
-        LinearLayout filtering = new LinearLayout(this); filter = new EditText(this); filter.setSingleLine(); filter.setHint("Search current evidence (press Search)");
+        cancel =
+                button(
+                        "Cancel",
+                        () -> {
+                            cancellation.set(true);
+                            status.setText(
+                                    "Cancellation requested • waiting for current engine/I/O"
+                                        + " operation");
+                        });
+        add(navigation, cancel); root.addView(navigation);
+        LinearLayout filtering = new LinearLayout(this); filter = new EditText(this); filter.setSingleLine();
+        filter.setHint("Search current evidence (press Search)");
         filter.setFilters(new InputFilter[]{new InputFilter.LengthFilter(1024)}); filtering.addView(filter, new LinearLayout.LayoutParams(0, -2, 3));
-        search = button("Search", () -> { Location current = capture(); load(new Location(current.request, current.draft, current.draft, 0, current.pageSize), true); }); add(filtering, search); root.addView(filtering);
+        search =
+                button(
+                        "Search",
+                        () -> {
+                            Location current = capture();
+                            load(
+                                    new Location(
+                                            current.request,
+                                            current.draft,
+                                            current.draft,
+                                            0,
+                                            current.pageSize),
+                                    true);
+                        });
+        add(filtering, search); root.addView(filtering);
         LinearLayout paging = new LinearLayout(this);
-        previous = button("Previous", () -> page(-1)); add(paging, previous); next = button("Next", () -> page(1)); add(paging, next);
-        pageSize = new Spinner(this); pageSize.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, new String[]{"50 rows", "10 rows", "1 row"})); add(paging, pageSize);
+        previous = button("Previous", () -> page(-1));
+        add(paging, previous);
+        next = button("Next", () -> page(1));
+        add(paging, next);
+        pageSize = new Spinner(this);
+        pageSize.setAdapter(
+                new ArrayAdapter<>(
+                        this,
+                        android.R.layout.simple_spinner_dropdown_item,
+                        new String[] {"50 rows", "10 rows", "1 row"}));
+        add(paging, pageSize);
         export = button("Export all", this::exportTable); add(paging, export); root.addView(paging);
-        status = text("Ready", 12); status.setMaxLines(3); status.setTextIsSelectable(true); root.addView(status);
+        status = text("Ready", 12);
+        status.setMaxLines(3); status.setTextIsSelectable(true); root.addView(status);
         records = new ListView(this); root.addView(records, new LinearLayout.LayoutParams(-1, 0, 1)); setContentView(root);
+        WorkbenchUi.list(this, records);
         filter.setId(R.id.investigation_filter); records.setId(R.id.investigation_records); status.setId(R.id.investigation_status);
-        filter.addTextChangedListener(new TextWatcher() {
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            public void onTextChanged(CharSequence s, int start, int before, int count) { if (!binding && !busy && produced != null) status.setText("Search text changed • press Search; displaying captured results"); }
-            public void afterTextChanged(Editable value) {}
-        });
+        filter.addTextChangedListener(
+                new TextWatcher() {
+                    public void beforeTextChanged(
+                            CharSequence s, int start, int count, int after) {}
+
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        if (!binding && !busy && produced != null)
+                            status.setText(
+                                    "Search text changed • press Search; displaying captured"
+                                        + " results");
+                    }
+
+                    public void afterTextChanged(Editable value) {}
+                });
         filter.setOnEditorActionListener((v, action, event) -> { if (!busy && !pickerOpen) search.performClick(); return true; });
         pageSize.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onNothingSelected(AdapterView<?> parent) {}
@@ -174,30 +399,71 @@ public final class InvestigationActivity extends Activity {
         if (pickerOpen && prepared == null) return;
         final EvidenceRows retained = reuse && produced != null && Objects.equals(produced.request, target.request) ? source : null;
         final EvidenceRows.Selection retainedSelection = retained != null && produced.filter.equals(target.filter) ? selection : null;
-        final int ticket = begin("Reading selected evidence scope…"); final AtomicBoolean stop = cancellation;
+        final int ticket = begin("Reading selected evidence scope…");
+        final AtomicBoolean stop = cancellation;
         location = target; produced = null; source = null; selection = null; shown = null; records.setAdapter(null); bind(target);
-        worker.execute(() -> {
-            try {
-                EvidenceRows.check(stop::get); String request = target.request == null ? backend.initialRequest(stop::get) : target.request;
-                EvidenceRows rows = retained == null ? backend.open(request, stop::get) : retained;
-                EvidenceRows.Selection selected = retainedSelection == null ? rows.select(target.filter, stop::get) : retainedSelection;
-                EvidenceRows.Page page = selected.page(target.page, target.pageSize, stop::get);
-                String origin = backend.provenance().toString(), meta = rows.metadata().toString(); File input = backend.byteSource(); String display = backend.sourceName(); long size = input.length();
-                String retainedState=backend.retentionState();
-                List<InvestigationBackend.Link> rootViews = backend.roots(request, stop::get); EvidenceRows.check(stop::get);
-                runOnUiThread(() -> {
-                    if (isDestroyed() || ticket != generation) return;
-                    busy = false; source = rows; selection = selected; shown = page; roots = rootViews; bytes = input; inputName = display; byteSize = size; provenance = origin; metadata = meta;
-                    retentionState=retainedState;
-                    produced = new Location(request, target.filter, target.draft, page.number, target.pageSize); location = produced; present();
-                    if (!communityAttempted && backend instanceof PackageSetBackend
-                            && getIntent().getBooleanExtra("openCapturedPackageKnowledge", false)) {
-                        communityAttempted = true;
-                        openCapturedPackageKnowledge(0);
+        worker.execute(
+                () -> {
+                    try {
+                        EvidenceRows.check(stop::get);
+                        String request =
+                                target.request == null
+                                        ? backend.initialRequest(stop::get)
+                                        : target.request;
+                        EvidenceRows rows =
+                                retained == null ? backend.open(request, stop::get) : retained;
+                        EvidenceRows.Selection selected =
+                                retainedSelection == null
+                                        ? rows.select(target.filter, stop::get)
+                                        : retainedSelection;
+                        EvidenceRows.Page page =
+                                selected.page(target.page, target.pageSize, stop::get);
+                        String origin = backend.provenance().toString(),
+                                meta = rows.metadata().toString();
+                        File input = backend.byteSource();
+                        String display = backend.sourceName();
+                        long size = input.length();
+                        String retainedState = backend.retentionState();
+                        List<InvestigationBackend.Link> rootViews =
+                                backend.roots(request, stop::get);
+                        EvidenceRows.check(stop::get);
+                        runOnUiThread(
+                                () -> {
+                                    if (isDestroyed() || ticket != generation) return;
+                                    busy = false;
+                                    source = rows;
+                                    selection = selected;
+                                    shown = page;
+                                    roots = rootViews;
+                                    bytes = input;
+                                    inputName = display;
+                                    byteSize = size;
+                                    provenance = origin;
+                                    metadata = meta;
+                                    retentionState = retainedState;
+                                    produced =
+                                            new Location(
+                                                    request,
+                                                    target.filter,
+                                                    target.draft,
+                                                    page.number,
+                                                    target.pageSize);
+                                    location = produced;
+                                    present();
+                                    if (!communityAttempted
+                                            && backend instanceof PackageSetBackend
+                                            && getIntent()
+                                                    .getBooleanExtra(
+                                                            "openCapturedPackageKnowledge",
+                                                            false)) {
+                                        communityAttempted = true;
+                                        openCapturedPackageKnowledge(0);
+                                    }
+                                });
+                    } catch (Exception | LinkageError | StackOverflowError error) {
+                        failed(ticket, "Investigation failed: " + error.getMessage());
                     }
                 });
-            } catch (Exception | LinkageError | StackOverflowError error) { failed(ticket, "Investigation failed: " + error.getMessage()); }
-        });
     }
     private void failed(int ticket, String message) { runOnUiThread(() -> { if (!isDestroyed() && ticket == generation) { busy = false; controls(); status.setText(message); } }); }
     private void present() {
@@ -233,42 +499,42 @@ public final class InvestigationActivity extends Activity {
                     }
 
                     public View getView(int i, View old, ViewGroup parent) {
-                        TextView view = old instanceof TextView ? (TextView) old : text("", 13);
-                        view.setTypeface(Typeface.SANS_SERIF);
-                        view.setTextSize(13);
-                        view.setPadding(dp(6), dp(8), dp(6), dp(8));
                         EvidenceRows.Row row = shown.rows.get(i);
-                        String name =
-                                row.name.length() > 180
-                                        ? row.name.substring(0, 180) + "… [full record on tap]"
-                                        : row.name;
-                        String description =
-                                row.description.length() > 300
-                                        ? row.description.substring(0, 300) + "…"
-                                        : row.description;
-                        String heading = "#" + row.index + " " + visible(name),
-                                body = visible(description),
-                                facts =
-                                        "physical="
-                                                + NativeTable.hexOffset(row.physicalOffset)
-                                                + " • bytes="
-                                                + (row.sizeBytes == null
-                                                        ? "unknown/associated location"
-                                                        : row.sizeBytes);
-                        SpannableString formatted =
-                                new SpannableString(heading + "\n" + body + "\n" + facts);
-                        formatted.setSpan(
-                                new android.text.style.StyleSpan(Typeface.BOLD),
-                                0,
-                                heading.length(),
-                                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        formatted.setSpan(
-                                new android.text.style.TypefaceSpan("monospace"),
-                                heading.length() + body.length() + 2,
-                                formatted.length(),
-                                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        view.setText(formatted);
-                        return view;
+                        WorkbenchUi.Lines lines =
+                                new WorkbenchUi.Lines(InvestigationActivity.this)
+                                        .heading(
+                                                "#"
+                                                        + row.index
+                                                        + " "
+                                                        + WorkbenchUi.preview(row.name, 180));
+                        // String summaries were produced with the evidence on the worker; do not
+                        // parse/reclassify potentially large match arrays on every UI row bind.
+                        String[] description = row.description.split("\n", 2);
+                        lines.line(WorkbenchUi.preview(description[0], 300));
+                        if (description.length > 1) {
+                            String why = WorkbenchUi.preview(description[1], 550);
+                            int colon = why.indexOf(':');
+                            if ((source.kind.startsWith("strings-")
+                                            || source.kind.equals("dex-classified-strings"))
+                                    && why.startsWith("Why ")
+                                    && colon > 0)
+                                lines.field(
+                                        why.substring(0, colon),
+                                        why.substring(colon + 1).trim(),
+                                        false);
+                            else lines.line(why);
+                        }
+                        lines.field(
+                                        "Physical offset",
+                                        NativeTable.hexOffset(row.physicalOffset),
+                                        true)
+                                .field(
+                                        "Stored bytes",
+                                        row.sizeBytes == null
+                                                ? "unknown / associated location"
+                                                : row.sizeBytes.toString(),
+                                        true);
+                        return WorkbenchUi.row(InvestigationActivity.this, old, lines.build());
                     }
                 });
         status.setText(
@@ -293,11 +559,14 @@ public final class InvestigationActivity extends Activity {
     private void navigate(InvestigationBackend.Link link) {
         if (busy || pickerOpen) return;
         if (history.size() == HISTORY_LIMIT) { history.removeFirst(); expired = true; } history.addLast(capture());
-        int rows = location.pageSize; load(new Location(link.request, "", "", link.row < 0 ? 0 : link.row / rows, rows), false);
+        int rows = location.pageSize;
+        load(new Location(link.request, "", "", link.row < 0 ? 0 : link.row / rows, rows), false);
     }
     private void goBack() { if (busy || pickerOpen) return; Location target = history.pollLast(); if (target == null) { finish(); return; } load(target, false); }
     @Override public void onBackPressed() {
-        if (busy) { cancellation.set(true); status.setText("Cancellation requested • wait for the operation to settle"); }
+        if (busy) { cancellation.set(true);
+            status.setText("Cancellation requested • wait for the operation to settle");
+        }
         else if (!history.isEmpty() && !pickerOpen) goBack(); else super.onBackPressed();
     }
     private void rootViews() {
@@ -392,11 +661,23 @@ public final class InvestigationActivity extends Activity {
                     } catch (Exception | LinkageError | StackOverflowError error) {
                         if (adopted) {
                             try {
-                                acceptedInput(ticket, "Selected input was adopted; provider close / follow-up failed: " + error.getMessage());
+                                acceptedInput(
+                                        ticket,
+                                        "Selected input was adopted; provider close / follow-up"
+                                            + " failed: "
+                                                + error.getMessage());
                             } catch (Exception recovery) {
-                                failed(ticket, "Selected input was adopted, but its new view could not be restored: " + recovery.getMessage());
+                                failed(
+                                        ticket,
+                                        "Selected input was adopted, but its new view could not be"
+                                            + " restored: "
+                                                + recovery.getMessage());
                             }
-                        } else failed(ticket, "Supplemental input failed; prior captured evidence retained: " + error.getMessage());
+                        } else
+                            failed(
+                                    ticket,
+                                    "Supplemental input failed; prior captured evidence retained: "
+                                            + error.getMessage());
                     }
                 });
     }
@@ -404,7 +685,10 @@ public final class InvestigationActivity extends Activity {
     /** Called only after the backend commit point, even if provider close subsequently fails. */
     private void acceptedInput(int ticket, String notice) throws Exception {
         String retained = backend.retentionState();
-        String capturedNotice = notice.length() > 16384 ? notice.substring(0, 16384) + " [diagnostic preview capped]" : notice;
+        String capturedNotice =
+                notice.length() > 16384
+                        ? notice.substring(0, 16384) + " [diagnostic preview capped]"
+                        : notice;
         runOnUiThread(() -> {
             if (isDestroyed() || ticket != generation) return;
             retentionState = retained;
@@ -417,21 +701,36 @@ public final class InvestigationActivity extends Activity {
     }
 
     private void showText(String caption, String value) {
-        ScrollView scroll = new ScrollView(this); String displayed = value.length() > 128 * 1024 ? value.substring(0,128 * 1024) + "\n\nDISPLAY PREVIEW: full scoped JSON remains available through export." : value;
+        ScrollView scroll = new ScrollView(this);
+        String displayed =
+                value.length() > 128 * 1024
+                        ? value.substring(0, 128 * 1024)
+                                + "\n\n"
+                                + "DISPLAY PREVIEW: full scoped JSON remains available through"
+                                + " export."
+                        : value;
         TextView body = text(displayed, 13); body.setTextIsSelectable(true); body.setPadding(dp(12),dp(8),dp(12),dp(8)); scroll.addView(body);
-        body.setText(visible(displayed)); new AlertDialog.Builder(this).setTitle(caption).setView(scroll).setPositiveButton("Close", null).show();
+        body.setText(visible(displayed));
+        new AlertDialog.Builder(this)
+                .setTitle(caption)
+                .setView(scroll)
+                .setPositiveButton("Close", null)
+                .show();
     }
-    private static String pretty(String value) { try { return new JSONObject(value).toString(2); } catch (JSONException e) { return value; } }
+
+    private static String pretty(String value) {
+        try {
+            return new JSONObject(value).toString(2);
+        } catch (JSONException e) {
+            return value;
+        }
+    }
+
     /** Keep invisible direction/control characters legible; exported values remain exact. */
     private static String visible(String value) {
-        StringBuilder result = new StringBuilder(value.length());
-        for (int i = 0; i < value.length(); i++) {
-            char c = value.charAt(i);
-            if (Character.getType(c) == Character.FORMAT || Character.isISOControl(c) && c != '\n' && c != '\t') result.append(String.format(Locale.ROOT,"\\u%04X",(int)c));
-            else result.append(c);
-        }
-        return result.toString();
+        return WorkbenchUi.visible(value);
     }
+
     private void details(EvidenceRows.Row row) {
         ScrollView scroll = new ScrollView(this);
         String value = pretty(row.encoded);
@@ -439,29 +738,47 @@ public final class InvestigationActivity extends Activity {
         body.setOrientation(LinearLayout.VERTICAL);
         body.setPadding(dp(12), dp(8), dp(12), dp(8));
         scroll.addView(body);
-        TextView name = text(visible(row.name), 16);
-        name.setTypeface(null, Typeface.BOLD);
-        name.setTextIsSelectable(true);
-        body.addView(name);
-        TextView facts =
-                text(
-                        "Physical offset: "
-                                + NativeTable.hexOffset(row.physicalOffset)
-                                + "\nStored bytes: "
-                                + (row.sizeBytes == null
-                                        ? "unknown / associated location"
-                                        : row.sizeBytes),
-                        13);
-        facts.setTypeface(Typeface.MONOSPACE);
-        facts.setTextIsSelectable(true);
-        body.addView(facts);
-        TextView description = text(visible(row.description), 13);
-        description.setTextIsSelectable(true);
-        description.setPadding(0, dp(8), 0, dp(8));
-        body.addView(description);
-        TextView fields = text("Original record fields", 14);
-        fields.setTypeface(null, Typeface.BOLD);
-        body.addView(fields);
+        body.addView(explanations.controls(this));
+        StringExplanation classification = null;
+        try {
+            classification =
+                    StringExplanation.read(
+                            row,
+                            source.kind,
+                            new JSONObject(metadata).optString("selectedGroup", ""));
+            if (classification != null)
+                StringFindingView.add(this, body, row, classification, explanations);
+        } catch (Exception error) {
+            body.addView(
+                    WorkbenchUi.prose(
+                            this,
+                            "Classification explanation unavailable: "
+                                    + error.getMessage()
+                                    + ". Original evidence is retained below."));
+        }
+        if (classification == null) {
+            TextView name = text(visible(row.name), 16);
+            name.setTypeface(null, Typeface.BOLD);
+            name.setTextIsSelectable(true);
+            body.addView(name);
+            TextView facts =
+                    text(
+                            "Physical offset: "
+                                    + NativeTable.hexOffset(row.physicalOffset)
+                                    + "\nStored bytes: "
+                                    + (row.sizeBytes == null
+                                            ? "unknown / associated location"
+                                            : row.sizeBytes),
+                            13);
+            facts.setTypeface(Typeface.MONOSPACE);
+            facts.setTextIsSelectable(true);
+            body.addView(facts);
+            TextView description = text(visible(row.description), 13);
+            description.setTextIsSelectable(true);
+            description.setPadding(0, dp(8), 0, dp(8));
+            body.addView(description);
+        }
+        body.addView(WorkbenchUi.section(this, "Original record fields"));
         TextView raw =
                 text(
                         visible(
@@ -474,8 +791,11 @@ public final class InvestigationActivity extends Activity {
                         12);
         raw.setTypeface(Typeface.MONOSPACE);
         raw.setTextIsSelectable(true);
+        Button rawToggle = button("Original record JSON", () -> {});
+        body.addView(rawToggle);
         body.addView(raw);
-        body.addView(explanations.controls(this));
+        explanations.bind(
+                "record.raw." + source.kind, "Original record JSON", rawToggle, raw, false, true);
         explanations.paragraph(
                 this,
                 body,
@@ -491,15 +811,29 @@ public final class InvestigationActivity extends Activity {
                 .setPositiveButton("Actions", (dialog, which) -> rowActions(row))
                 .show();
     }
+
     private void rowActions(EvidenceRows.Row row) {
         if (busy || pickerOpen || produced == null) return;
-        final String request = produced.request; final EvidenceRows captured = source; final int ticket = begin("Resolving record relationships…"); final AtomicBoolean stop = cancellation;
-        worker.execute(() -> {
-            try {
-                List<InvestigationBackend.Link> links = backend.related(request, captured, row, stop::get); EvidenceRows.check(stop::get);
-                runOnUiThread(() -> { if (isDestroyed() || ticket != generation) return; busy = false; controls(); actionDialog(row, links); });
-            } catch (Exception | StackOverflowError error) { failed(ticket, "Relationship lookup failed: " + error.getMessage()); }
-        });
+        final String request = produced.request; final EvidenceRows captured = source;
+        final int ticket = begin("Resolving record relationships…");
+        final AtomicBoolean stop = cancellation;
+        worker.execute(
+                () -> {
+                    try {
+                        List<InvestigationBackend.Link> links =
+                                backend.related(request, captured, row, stop::get);
+                        EvidenceRows.check(stop::get);
+                        runOnUiThread(
+                                () -> {
+                                    if (isDestroyed() || ticket != generation) return;
+                                    busy = false;
+                                    controls();
+                                    actionDialog(row, links);
+                                });
+                    } catch (Exception | StackOverflowError error) {
+                        failed(ticket, "Relationship lookup failed: " + error.getMessage());
+                    }
+                });
     }
     private void actionDialog(EvidenceRows.Row row, List<InvestigationBackend.Link> links) {
         List<String> labels = new ArrayList<>();
@@ -531,9 +865,11 @@ public final class InvestigationActivity extends Activity {
                         openHex(row.physicalOffset);
                     });
         }
-        if (row.physicalOffset != null && row.physicalOffset < byteSize
+        if (row.physicalOffset != null
+                && row.physicalOffset < byteSize
                 && backend.ownedByteSource() != null
-                && (source.kind.equals("binwalk-candidates") || source.kind.equals("photorec-candidates"))) {
+                && (source.kind.equals("binwalk-candidates")
+                        || source.kind.equals("photorec-candidates"))) {
             labels.add("Inspect archive / compressed stream at this offset (parsing interval)");
             actions.add(() -> openArchiveHypothesis(row));
         }
@@ -640,35 +976,55 @@ public final class InvestigationActivity extends Activity {
         PackageSetBackend capturedBackend = (PackageSetBackend) backend;
         int ticket = begin("Capturing the exact APK package declaration for community lookup…");
         AtomicBoolean stop = cancellation;
-        worker.execute(() -> {
-            try {
-                PackageKnowledgeSubject captured = capturedBackend.captureKnowledgeSubject(sourceIndex,
-                        new File(getCacheDir(), "package-knowledge-subjects"), stop::get);
-                runOnUiThread(() -> {
-                    if (isDestroyed() || ticket != generation || stop.get()) {
-                        captured.close();
-                        return;
-                    }
-                    busy = false;
-                    controls();
+        worker.execute(
+                () -> {
                     try {
-                        startActivity(new Intent(this, InvestigationActivity.class)
-                                .putExtra("provider", "package-knowledge")
-                                .putExtra("path", new File(getCacheDir(), "package-knowledge-catalog").getAbsolutePath())
-                                .putExtra("name", captured.packageId)
-                                .putExtra("knowledgePackageId", captured.packageId)
-                                .putExtra("knowledgeSubject", captured.descriptor()));
-                        status.setText("Community lookup for captured manifest ID " + visible(captured.packageId)
-                                + " · exact-ID association, not verified runtime behavior");
+                        PackageKnowledgeSubject captured =
+                                capturedBackend.captureKnowledgeSubject(
+                                        sourceIndex,
+                                        new File(getCacheDir(), "package-knowledge-subjects"),
+                                        stop::get);
+                        runOnUiThread(
+                                () -> {
+                                    if (isDestroyed() || ticket != generation || stop.get()) {
+                                        captured.close();
+                                        return;
+                                    }
+                                    busy = false;
+                                    controls();
+                                    try {
+                                        startActivity(
+                                                new Intent(this, InvestigationActivity.class)
+                                                        .putExtra("provider", "package-knowledge")
+                                                        .putExtra(
+                                                                "path",
+                                                                new File(
+                                                                                getCacheDir(),
+                                                                                "package-knowledge-catalog")
+                                                                        .getAbsolutePath())
+                                                        .putExtra("name", captured.packageId)
+                                                        .putExtra(
+                                                                "knowledgePackageId",
+                                                                captured.packageId)
+                                                        .putExtra(
+                                                                "knowledgeSubject",
+                                                                captured.descriptor()));
+                                        status.setText(
+                                                "Community lookup for captured manifest ID "
+                                                        + visible(captured.packageId)
+                                                        + " · exact-ID association, not verified"
+                                                        + " runtime behavior");
+                                    } catch (Exception error) {
+                                        captured.close();
+                                        status.setText(
+                                                "Community lookup could not open: "
+                                                        + error.getMessage());
+                                    }
+                                });
                     } catch (Exception error) {
-                        captured.close();
-                        status.setText("Community lookup could not open: " + error.getMessage());
+                        failed(ticket, "APK package association failed: " + error.getMessage());
                     }
                 });
-            } catch (Exception error) {
-                failed(ticket, "APK package association failed: " + error.getMessage());
-            }
-        });
     }
 
     private void openArchiveHypothesis(EvidenceRows.Row row) {
@@ -676,41 +1032,76 @@ public final class InvestigationActivity extends Activity {
         InputSnapshot input = backend.ownedByteSource();
         if (input == null) { status.setText("Captured input is unavailable"); return; }
         String kind = source.kind;
-        int ticket = begin("Checking the captured source for an explicit archive parsing interval…");
+        int ticket =
+                begin("Checking the captured source for an explicit archive parsing interval…");
         AtomicBoolean stop = cancellation;
-        worker.execute(() -> {
-            try {
-                input.checkIdentity(stop::get);
-                ArchiveLaunch launch = ArchiveLaunch.fromFinding(input, kind, row, backend.provenance());
-                EvidenceRows.check(stop::get);
-                runOnUiThread(() -> {
-                    if (isDestroyed() || ticket != generation) return;
-                    busy = false; pickerOpen = true; controls();
+        worker.execute(
+                () -> {
                     try {
-                        startActivityForResult(new Intent(this, NativeArchiveExplorerActivity.class)
-                                .putExtra("path", input.file.getAbsolutePath()).putExtra("name", inputName)
-                                .putExtra("sha256", input.sha256).putExtra("sourceSize", input.size)
-                                .putExtra("offset", launch.offset).putExtra("length", launch.length)
-                                .putExtra("archiveLaunch", launch.raw).putExtra("originPreviewResult", true), 3);
-                        status.setText("Opened an explicit parsing tail at 0x" + Long.toHexString(launch.offset)
-                                + "; the original finding's extent is unchanged");
-                    } catch (RuntimeException failure) {
-                        pickerOpen = false; controls(); status.setText("Archive browser could not open: " + failure);
+                        input.checkIdentity(stop::get);
+                        ArchiveLaunch launch =
+                                ArchiveLaunch.fromFinding(input, kind, row, backend.provenance());
+                        EvidenceRows.check(stop::get);
+                        runOnUiThread(
+                                () -> {
+                                    if (isDestroyed() || ticket != generation) return;
+                                    busy = false;
+                                    pickerOpen = true;
+                                    controls();
+                                    try {
+                                        startActivityForResult(
+                                                new Intent(
+                                                                this,
+                                                                NativeArchiveExplorerActivity.class)
+                                                        .putExtra(
+                                                                "path",
+                                                                input.file.getAbsolutePath())
+                                                        .putExtra("name", inputName)
+                                                        .putExtra("sha256", input.sha256)
+                                                        .putExtra("sourceSize", input.size)
+                                                        .putExtra("offset", launch.offset)
+                                                        .putExtra("length", launch.length)
+                                                        .putExtra("archiveLaunch", launch.raw)
+                                                        .putExtra("originPreviewResult", true),
+                                                3);
+                                        status.setText(
+                                                "Opened an explicit parsing tail at 0x"
+                                                        + Long.toHexString(launch.offset)
+                                                        + "; the original finding's extent is"
+                                                        + " unchanged");
+                                    } catch (RuntimeException failure) {
+                                        pickerOpen = false;
+                                        controls();
+                                        status.setText(
+                                                "Archive browser could not open: " + failure);
+                                    }
+                                });
+                    } catch (Exception failure) {
+                        failed(
+                                ticket,
+                                "Archive hypothesis could not open: " + failure.getMessage());
                     }
                 });
-            } catch (Exception failure) { failed(ticket, "Archive hypothesis could not open: " + failure.getMessage()); }
-        });
     }
 
     private void archiveResult(int result, Intent intent) {
         pickerOpen = false;
-        if (result != RESULT_OK || intent == null) { controls(); status.setText("Archive member selection cancelled"); return; }
+        if (result != RESULT_OK || intent == null) { controls();
+            status.setText("Archive member selection cancelled");
+            return; }
         String sha = intent.getStringExtra("archiveRootSha256");
         long size = intent.getLongExtra("archiveRootSize", -1);
-        if (sha == null || !sha.matches("[0-9a-f]{64}") || size < 0 || size > NativeArchiveStore.MAX_INPUT) {
+        if (sha == null
+                || !sha.matches("[0-9a-f]{64}")
+                || size < 0
+                || size > NativeArchiveStore.MAX_INPUT) {
             String path = intent.getStringExtra("path");
-            if (path != null) ArchiveMemberHandoff.discard(new File(path), new File(getCacheDir(), "archive-snapshots"));
-            controls(); status.setText("Archive result has no valid captured parent identity"); return;
+            if (path != null)
+                ArchiveMemberHandoff.discard(
+                        new File(path), new File(getCacheDir(), "archive-snapshots"));
+            controls();
+            status.setText("Archive result has no valid captured parent identity");
+            return;
         }
         int ticket = begin("Acquiring checked archive member for local preview…");
         AtomicBoolean stop = cancellation;
@@ -719,9 +1110,12 @@ public final class InvestigationActivity extends Activity {
                 () -> { busy = false; controls(); }, status::setText);
     }
 
-    private String capturedKind() { return source == null ? "selected-record" : source.kind + "-record"; }
+    private String capturedKind() {
+        return source == null ? "selected-record" : source.kind + "-record";
+    }
     private String recoveredName(EvidenceRows.Row row, FileRange range) throws Exception {
-        String extension = RecoveredFiles.extension(row.json().optString("reportedExtension", row.name));
+        String extension =
+                RecoveredFiles.extension(row.json().optString("reportedExtension", row.name));
         String engine = source.kind.startsWith("photorec") ? "photorec" : "binwalk";
         return engine
                 + "-"
@@ -766,13 +1160,27 @@ public final class InvestigationActivity extends Activity {
                                                 gallery ? "gallery-handoffs" : "content-previews"),
                                         stop::get);
                         if (!gallery && finding != null) {
-                            origin = ContentOrigin.create(new File(getCacheDir(), "content-origins"), staged,
-                                    ContentOrigin.stored(sourceInput, range), records ->
-                                            records.value("selectedFinding", new JSONObject()
-                                                    .put("kind", findingKind).put("index", finding.index)
-                                                    .put("originalRecordJson", finding.encoded)
-                                                    .put("provenanceJson", capturedProvenance)
-                                                    .put("metadataJson", capturedMetadata)), stop::get);
+                            origin =
+                                    ContentOrigin.create(
+                                            new File(getCacheDir(), "content-origins"),
+                                            staged,
+                                            ContentOrigin.stored(sourceInput, range),
+                                            records ->
+                                                    records.value(
+                                                            "selectedFinding",
+                                                            new JSONObject()
+                                                                    .put("kind", findingKind)
+                                                                    .put("index", finding.index)
+                                                                    .put(
+                                                                            "originalRecordJson",
+                                                                            finding.encoded)
+                                                                    .put(
+                                                                            "provenanceJson",
+                                                                            capturedProvenance)
+                                                                    .put(
+                                                                            "metadataJson",
+                                                                            capturedMetadata)),
+                                            stop::get);
                         }
                         EvidenceRows.check(stop::get);
                         ContentOrigin capturedOrigin = origin;
@@ -808,7 +1216,8 @@ public final class InvestigationActivity extends Activity {
                                                         .putExtra("originalOffset", range.offset)
                                                         .putExtra("originalKind", "stored-range");
                                         if (capturedOrigin != null)
-                                            intent.putExtra("contentOrigin", capturedOrigin.descriptor());
+                                            intent.putExtra(
+                                                    "contentOrigin", capturedOrigin.descriptor());
                                         if (gallery) intent.putExtra("ownedInputHandoff", true);
                                         if (suggestedName != null)
                                             intent.putExtra("exportName", suggestedName);
@@ -832,50 +1241,135 @@ public final class InvestigationActivity extends Activity {
                 });
     }
     private void openHex(long offset) {
-        File input = bytes; String name = inputName; int ticket = begin("Preparing independent byte view…"); AtomicBoolean stop = cancellation;
-        worker.execute(() -> {
-            InputSnapshot snapshot = null;
-            try {
-                snapshot = InputSnapshot.acquire(input,new File(getCacheDir(),"shared-analysis-inputs"),FileRange.MAX_OPERATION_BYTES,stop::get);
-                EvidenceRows.check(stop::get); final InputSnapshot owned = snapshot;
-                runOnUiThread(() -> {
-                    if (isDestroyed() || ticket != generation) { owned.close(); return; }
-                    busy = false; controls(); status.setText("Independent byte snapshot prepared");
-                    try { startActivity(new Intent(this,NativeToolsActivity.class).putExtra("path",owned.file.getAbsolutePath()).putExtra("name",name).putExtra("tool",9).putExtra("offset",offset)
-                        .putExtra("sha256",owned.sha256).putExtra("sourceSize",owned.size).putExtra("ownedSnapshot",true)); }
-                    catch (RuntimeException error) { owned.close(); status.setText("Cannot open byte viewer: " + error.getMessage()); }
+        File input = bytes; String name = inputName;
+        int ticket = begin("Preparing independent byte view…");
+        AtomicBoolean stop = cancellation;
+        worker.execute(
+                () -> {
+                    InputSnapshot snapshot = null;
+                    try {
+                        snapshot =
+                                InputSnapshot.acquire(
+                                        input,
+                                        new File(getCacheDir(), "shared-analysis-inputs"),
+                                        FileRange.MAX_OPERATION_BYTES,
+                                        stop::get);
+                        EvidenceRows.check(stop::get);
+                        final InputSnapshot owned = snapshot;
+                        runOnUiThread(
+                                () -> {
+                                    if (isDestroyed() || ticket != generation) {
+                                        owned.close();
+                                        return;
+                                    }
+                                    busy = false;
+                                    controls();
+                                    status.setText("Independent byte snapshot prepared");
+                                    try {
+                                        startActivity(
+                                                new Intent(this, NativeToolsActivity.class)
+                                                        .putExtra(
+                                                                "path",
+                                                                owned.file.getAbsolutePath())
+                                                        .putExtra("name", name)
+                                                        .putExtra("tool", 9)
+                                                        .putExtra("offset", offset)
+                                                        .putExtra("sha256", owned.sha256)
+                                                        .putExtra("sourceSize", owned.size)
+                                                        .putExtra("ownedSnapshot", true));
+                                    } catch (RuntimeException error) {
+                                        owned.close();
+                                        status.setText(
+                                                "Cannot open byte viewer: " + error.getMessage());
+                                    }
+                                });
+                    } catch (Exception error) {
+                        if (snapshot != null) snapshot.close();
+                        failed(ticket, "Byte view preparation failed: " + error.getMessage());
+                    }
                 });
-            } catch (Exception error) { if (snapshot != null) snapshot.close(); failed(ticket,"Byte view preparation failed: " + error.getMessage()); }
-        });
     }
     private void rangeAnalysis(FileRange range) {
-        File input = bytes; int ticket = begin("Measuring stored physical range…"); AtomicBoolean stop = cancellation;
-        worker.execute(() -> {
-            try { RangeAnalysis.Result result = RangeAnalysis.inspect(input, range, stop::get);
-                runOnUiThread(() -> { if (isDestroyed() || ticket != generation) return; busy = false; controls();
-                    showText("Range evidence", "Physical offset: " + NativeTable.hexOffset(range.offset) + "\nBytes: " + range.length + "\nSHA-256: " + result.sha256 + "\nCRC32: " + result.crc32
-                        + "\nShannon entropy: " + result.entropy + " bits/byte\n\nThese measurements identify stored bytes. Entropy alone does not establish encryption, packing or behavior."); });
-            } catch (Exception e) { failed(ticket, "Range analysis failed: " + e.getMessage()); }
-        });
+        File input = bytes;
+        int ticket = begin("Measuring stored physical range…");
+        AtomicBoolean stop = cancellation;
+        worker.execute(
+                () -> {
+                    try {
+                        RangeAnalysis.Result result =
+                                RangeAnalysis.inspect(input, range, stop::get);
+                        runOnUiThread(
+                                () -> {
+                                    if (isDestroyed() || ticket != generation) return;
+                                    busy = false;
+                                    controls();
+                                    showText(
+                                            "Range evidence",
+                                            "Physical offset: "
+                                                    + NativeTable.hexOffset(range.offset)
+                                                    + "\nBytes: "
+                                                    + range.length
+                                                    + "\nSHA-256: "
+                                                    + result.sha256
+                                                    + "\nCRC32: "
+                                                    + result.crc32
+                                                    + "\nShannon entropy: "
+                                                    + result.entropy
+                                                    + " bits/byte\n\n"
+                                                    + "These measurements identify stored bytes."
+                                                    + " Entropy alone does not establish"
+                                                    + " encryption, packing or behavior.");
+                                });
+                    } catch (Exception e) {
+                        failed(ticket, "Range analysis failed: " + e.getMessage());
+                    }
+                });
     }
     private interface Preparation { PreparedExport create(AtomicBoolean stop) throws Exception; }
     private void prepare(Preparation preparation) {
-        if (busy || pickerOpen) return; int ticket = begin("Preparing immutable export…"); AtomicBoolean stop = cancellation;
-        worker.execute(() -> {
-            PreparedExport result = null;
-            try { result = preparation.create(stop); EvidenceRows.check(stop::get); }
-            catch (Exception | StackOverflowError e) { if (result != null) result.discard(); failed(ticket, "Export preparation failed: " + e.getMessage()); return; }
-            final PreparedExport staged = result;
-            runOnUiThread(() -> {
-                if (isDestroyed() || ticket != generation) { staged.discard(); return; }
-                busy = false; launchExport(staged);
-            });
-        });
+        if (busy || pickerOpen) return;
+        int ticket = begin("Preparing immutable export…");
+        AtomicBoolean stop = cancellation;
+        worker.execute(
+                () -> {
+                    PreparedExport result = null;
+                    try {
+                        result = preparation.create(stop);
+                        EvidenceRows.check(stop::get);
+                    } catch (Exception | StackOverflowError e) {
+                        if (result != null) result.discard();
+                        failed(ticket, "Export preparation failed: " + e.getMessage());
+                        return;
+                    }
+                    final PreparedExport staged = result;
+                    runOnUiThread(
+                            () -> {
+                                if (isDestroyed() || ticket != generation) {
+                                    staged.discard();
+                                    return;
+                                }
+                                busy = false;
+                                launchExport(staged);
+                            });
+                });
     }
     private void exportTable() {
         if (source == null || produced == null) return; EvidenceRows captured = source; Location view = produced; String origin = provenance;
-        prepare(stop -> PreparedExport.stream(exportDirectory, "evidence-" + captured.kind + ".json", "application/json",
-            out -> captured.writeReport(out, new JSONObject(origin), view.filter, view.page, view.pageSize, stop::get), stop::get));
+        prepare(
+                stop ->
+                        PreparedExport.stream(
+                                exportDirectory,
+                                "evidence-" + captured.kind + ".json",
+                                "application/json",
+                                out ->
+                                        captured.writeReport(
+                                                out,
+                                                new JSONObject(origin),
+                                                view.filter,
+                                                view.page,
+                                                view.pageSize,
+                                                stop::get),
+                                stop::get));
     }
     private void launchExport(PreparedExport staged) {
         if (prepared != null) prepared.discard(); prepared = staged; pickerOpen = true; controls();
@@ -883,26 +1377,68 @@ public final class InvestigationActivity extends Activity {
     }
     private void renderText(InvestigationBackend.Link link) {
         int ticket = begin("Rendering complete text…"); AtomicBoolean stop = cancellation;
-        worker.execute(() -> {
-            PreparedExport staged = null;
-            try {
-                String mime = link.textName.toLowerCase(Locale.ROOT).endsWith(".json") ? "application/json" : "text/plain";
-                staged = PreparedExport.stream(exportDirectory, link.textName, mime, out -> backend.writeText(link.request, out, stop::get), stop::get);
-                final PreparedExport ready = staged;
-                runOnUiThread(() -> {
-                    if (isDestroyed() || ticket != generation) { ready.discard(); return; }
-                    if (preview != null) preview.discard(); preview = ready;
-                    PagedTextDialog.show(this, worker, "Rendered text • " + ready.size + " UTF-8 bytes",
-                            ready.file, ready.size, this::isDestroyed,
-                            () -> { if (!isDestroyed() && ticket == generation) { busy = false; controls(); status.setText("Captured complete text • " + ready.size + " UTF-8 bytes"); } },
-                            () -> { busy = false; preview = null; launchExport(ready); },
-                            () -> {
-                                if (preview == ready) { preview.discard(); preview = null; }
-                                if (!isDestroyed() && ticket == generation) { busy = false; controls(); }
-                            });
+        worker.execute(
+                () -> {
+                    PreparedExport staged = null;
+                    try {
+                        String mime =
+                                link.textName.toLowerCase(Locale.ROOT).endsWith(".json")
+                                        ? "application/json"
+                                        : "text/plain";
+                        staged =
+                                PreparedExport.stream(
+                                        exportDirectory,
+                                        link.textName,
+                                        mime,
+                                        out -> backend.writeText(link.request, out, stop::get),
+                                        stop::get);
+                        final PreparedExport ready = staged;
+                        runOnUiThread(
+                                () -> {
+                                    if (isDestroyed() || ticket != generation) {
+                                        ready.discard();
+                                        return;
+                                    }
+                                    if (preview != null) preview.discard();
+                                    preview = ready;
+                                    PagedTextDialog.show(
+                                            this,
+                                            worker,
+                                            "Rendered text • " + ready.size + " UTF-8 bytes",
+                                            ready.file,
+                                            ready.size,
+                                            this::isDestroyed,
+                                            () -> {
+                                                if (!isDestroyed() && ticket == generation) {
+                                                    busy = false;
+                                                    controls();
+                                                    status.setText(
+                                                            "Captured complete text • "
+                                                                    + ready.size
+                                                                    + " UTF-8 bytes");
+                                                }
+                                            },
+                                            () -> {
+                                                busy = false;
+                                                preview = null;
+                                                launchExport(ready);
+                                            },
+                                            () -> {
+                                                if (preview == ready) {
+                                                    preview.discard();
+                                                    preview = null;
+                                                }
+                                                if (!isDestroyed() && ticket == generation) {
+                                                    busy = false;
+                                                    controls();
+                                                }
+                                            });
+                                });
+                    } catch (Exception | StackOverflowError e) {
+                        if (staged != null) staged.discard();
+                        failed(ticket, "Text rendering failed: " + e.getMessage());
+                    }
                 });
-            } catch (Exception | StackOverflowError e) { if (staged != null) staged.discard(); failed(ticket, "Text rendering failed: " + e.getMessage()); }
-        });
     }
     @Override protected void onActivityResult(int request, int result, Intent intent) {
         super.onActivityResult(request,result,intent);
@@ -910,29 +1446,71 @@ public final class InvestigationActivity extends Activity {
         if(request==2) {
             String pending=pendingInputRequest;pendingInputRequest=null;pickerOpen=false;
             if(pending==null||result!=RESULT_OK||intent==null||intent.getData()==null) {
-                controls();status.setText("Supplemental input selection cancelled; prior evidence retained");
+                controls();
+                status.setText("Supplemental input selection cancelled; prior evidence retained");
                 if(source==null)load(location,false);return;
             }
             acceptAdditionalInput(pending,intent.getData());return;
         }
         if (request != 1) return; pickerOpen = false;
         PreparedExport staged = prepared; prepared = null;
-        if (staged == null) { controls(); status.setText("Prepared export expired; prepare it again"); return; }
-        if (result != RESULT_OK || intent == null || intent.getData() == null) { staged.discard(); controls(); status.setText("Export cancelled"); return; }
-        int ticket = begin("Writing prepared export…"); AtomicBoolean stop = cancellation; Uri destination = intent.getData();
-        worker.execute(() -> {
-            String message;
-            try (OutputStream out = getContentResolver().openOutputStream(destination,"wt")) { if (out == null) throw new IOException("Destination unavailable"); staged.copyTo(out,stop::get); message = "Export saved • " + staged.size + " bytes"; }
-            catch (Exception e) { message = "Export failed; destination may contain partial data: " + e.getMessage(); } finally { staged.discard(); }
-            final String response = message; runOnUiThread(() -> { if (!isDestroyed() && ticket == generation) { busy = false; controls(); status.setText(response + (source == null ? "\nReload view to resume investigation" : "")); } });
-        });
+        if (staged == null) { controls();
+            status.setText("Prepared export expired; prepare it again");
+            return; }
+        if (result != RESULT_OK || intent == null || intent.getData() == null) { staged.discard(); controls();
+            status.setText("Export cancelled");
+            return; }
+        int ticket = begin("Writing prepared export…");
+        AtomicBoolean stop = cancellation; Uri destination = intent.getData();
+        worker.execute(
+                () -> {
+                    String message;
+                    try (OutputStream out =
+                            getContentResolver().openOutputStream(destination, "wt")) {
+                        if (out == null) throw new IOException("Destination unavailable");
+                        staged.copyTo(out, stop::get);
+                        message = "Export saved • " + staged.size + " bytes";
+                    } catch (Exception e) {
+                        message =
+                                "Export failed; destination may contain partial data: "
+                                        + e.getMessage();
+                    } finally {
+                        staged.discard();
+                    }
+                    final String response = message;
+                    runOnUiThread(
+                            () -> {
+                                if (!isDestroyed() && ticket == generation) {
+                                    busy = false;
+                                    controls();
+                                    status.setText(
+                                            response
+                                                    + (source == null
+                                                            ? "\n"
+                                                                  + "Reload view to resume"
+                                                                  + " investigation"
+                                                            : ""));
+                                }
+                            });
+                });
     }
     @Override protected void onSaveInstanceState(Bundle state) {
-        super.onSaveInstanceState(state); state.putBoolean("communityAttempted", communityAttempted); if (location == null) return; state.putBundle("location", capture().bundle()); ArrayList<Bundle> trail = new ArrayList<>(); for (Location value : history) trail.add(value.bundle()); state.putParcelableArrayList("history",trail); state.putBoolean("expired",expired);
+        super.onSaveInstanceState(state);
+        state.putBoolean("communityAttempted", communityAttempted);
+        if (location == null) return;
+        state.putBundle("location", capture().bundle());
+        ArrayList<Bundle> trail = new ArrayList<>(); for (Location value : history) trail.add(value.bundle());
+        state.putParcelableArrayList("history", trail);
+        state.putBoolean("expired", expired);
         state.putString("inputNotice", inputNotice);
         if(retentionState!=null)state.putString("providerState",retentionState);
         if(pendingInputRequest!=null)state.putString("pendingInputRequest",pendingInputRequest);
-        if (prepared != null && pickerOpen) { state.putString("prepared",prepared.file.getAbsolutePath()); state.putString("exportName",prepared.name); state.putString("exportMime",prepared.mime); state.putLong("exportSize",prepared.size); }
+        if (prepared != null && pickerOpen) {
+            state.putString("prepared", prepared.file.getAbsolutePath());
+            state.putString("exportName", prepared.name);
+            state.putString("exportMime", prepared.mime);
+            state.putLong("exportSize", prepared.size);
+        }
     }
     @Override protected void onDestroy() {
         generation++; cancellation.set(true); if (preview != null) preview.discard(); if (!pickerOpen && prepared != null) prepared.discard();

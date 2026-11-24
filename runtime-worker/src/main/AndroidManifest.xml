@@ -2,6 +2,8 @@
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application android:label="GlassDigestor worker runtime checks" android:allowBackup="false" android:testOnly="true">
+        <!-- Clipboard reads require a focused normal-UID window on modern Android. No launcher. -->
+        <activity android:name="org.diemobile.TextActionRuntimeActivity" android:exported="false" android:theme="@android:style/Theme.Material.NoActionBar" />
         <!-- Same private isolated declaration as the production app; verified by the runtime script. -->
         <service android:name="org.diemobile.BinaryWorkerService" android:exported="false" android:isolatedProcess="true" android:process=":binary_worker" android:stopWithTask="true" />
     </application>

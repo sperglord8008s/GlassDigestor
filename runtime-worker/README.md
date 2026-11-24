@@ -25,8 +25,10 @@ checked; [retained summary](../docs/verification/android-worker-runtime-26ad7d6.
 All six contracts also passed at `8f2ab38af319a02c85618a0f398d654c1b48c15a`
 in run [`44733208678`](https://github.com/sperglord8008s/DiE-Android-/actions/runs/44733208678);
 [download-verified summary](../docs/verification/android-worker-runtime-8f2ab38.json).
-All seven contracts passed on source 123193d in run 44776359034. The new eighth
-PDF recovery case is compiled/static-checked; actual Android execution is pending.
+All nine contracts passed at `04e93c0` on actual API 26/35 in run
+44967525584, including >9 MiB native PDF recovery and exact recovered two-page
+rendering. [Download-verified summary](../docs/verification/android-worker-runtime-04e93c0.json).
+Pre-alpha.17 adds a tenth clipboard/URI contract; its new execution is pending.
 
 ## Reproduce
 
@@ -61,7 +63,7 @@ gate. A workflow file or successful APK compilation is not runtime evidence.
 
 ## What is checked
 
-The first six below passed at the exact recorded sources. The sixth exercises
+The first nine below passed at the exact recorded sources. The sixth exercises
 the production gallery helper in the normal target UID, separately from the
 isolated worker. No host codec shadow counts as platform runtime verification.
 
@@ -106,6 +108,20 @@ isolated worker. No host codec shadow counts as platform runtime verification.
    unresolved without crashing the worker. This exercises Bionic `funopen`,
    relative seek/read and the original callback; it does not execute a PDF renderer.
 
+9. A two-page red/green PDF is recovered from a prefixed mixed blob through the
+   actual isolated PhotoRec worker, compared byte-for-byte, and rendered by the
+   unchanged production `PdfPagePreview` helper. Known page colors, point/pixel
+   geometry, exact descriptor scope, cleanup and out-of-range refusal are checked.
+10. A non-exported test-only foreground window satisfies Android clipboard focus
+    policy. Unchanged production `TextActions` copies exact UTF-16 including NUL,
+    bidi controls, supplementary text and an isolated surrogate. The platform
+    clipboard must return identical units; API 35 must retain the sensitive flag.
+    Oversized refusal preserves the previous clip. All seven browser-engine URI
+    encodings must round-trip the valid query and use English translation targets;
+    isolated surrogates are refused. The test never launches a browser or contacts
+    a provider. No full production UI/service-availability claim follows. Shared
+    helper sources and required resources are statically compared byte-for-byte.
+
 The instrumentation writes a complete private JSON report even on failure.
 The runner retains that report, instrumentation/install logs, emulator
 properties and Android process logs. `runtime-build.json` records source-file
@@ -118,7 +134,7 @@ CI uploads these with the signed test APKs under
 The original five checks verify the stated x86 Android worker contracts at the
 exact recorded source. Additional cases need their own successful execution.
 They do not verify production ARM64, a physical handset, SAF grants/providers,
-UI/accessibility, other engines, playback/PDF, arbitrary hostile-input
+full UI/accessibility, external browser/translation services, other engines, arbitrary PDF or playback, hostile-input
 resilience, all crash modes or 16 KiB-page execution. See
 [feature parity](../docs/FEATURE-PARITY.md) for current results and gaps.
 
@@ -151,8 +167,7 @@ All eight contracts and bounded completion passed on actual API 26/35 in run
 APK/native-library identity were independently checked;
 [summary](../docs/verification/android-worker-runtime-431f98d.json).
 The next adapter-5 source extends the PDF case to a file larger than 9 MiB,
-checking its exact native bytes and explicit optional-date work limit. That new
-large-file Android execution is pending.
+checking its exact native bytes and explicit optional-date work limit. That large-file contract later passed at `04e93c0`, as recorded above.
 
 
 ## PDF rasterization extension (published pre-alpha.16)

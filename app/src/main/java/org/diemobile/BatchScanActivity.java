@@ -183,11 +183,9 @@ public final class BatchScanActivity extends Activity {
         root.setOrientation(LinearLayout.VERTICAL);
         int padding = Math.round(12 * getResources().getDisplayMetrics().density);
         root.setPadding(padding, padding, padding, padding);
-        TextView title = new TextView(this);
-        title.setText("Desktop batch scanning");
-        title.setTextSize(20);
+        TextView title = WorkbenchUi.section(this, "Desktop batch scanning");
         root.addView(title);
-        TextView context = new TextView(this);
+        TextView context = WorkbenchUi.prose(this, "");
         context.setText(
                 "Serial CDiE signature scans, native facts, whole-file SHA-256 and bounded generic"
                     + " previews. Options and database revisions are captured once. Each document"
@@ -197,7 +195,7 @@ public final class BatchScanActivity extends Activity {
                     + " their inputs until you delete them; exports contain sensitive local"
                     + " evidence.");
         root.addView(context);
-        settings = new TextView(this);
+        settings = WorkbenchUi.text(this, "", 13);
         root.addView(settings);
         interpretation = button("Next batch interpretation", this::chooseInterpretation);
         root.addView(interpretation);
@@ -224,7 +222,7 @@ public final class BatchScanActivity extends Activity {
         root.addView(export);
         saved = button("Saved batches / open / delete", this::savedBatches);
         root.addView(saved);
-        status = new TextView(this);
+        status = WorkbenchUi.text(this, "", 13);
         status.setTextIsSelectable(true);
         root.addView(status);
         ScrollView scroll = new ScrollView(this);
@@ -295,7 +293,7 @@ public final class BatchScanActivity extends Activity {
         form.setOrientation(LinearLayout.VERTICAL);
         int padding = Math.round(16 * getResources().getDisplayMetrics().density);
         form.setPadding(padding, padding, padding, padding);
-        TextView explanation = new TextView(this);
+        TextView explanation = WorkbenchUi.prose(this, "");
         explanation.setText(
                 "Automatic lets CDiE choose for every file. A required exact native format name"
                     + " (for example Binary) is resolved separately against each acquired input's"

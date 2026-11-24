@@ -60,11 +60,7 @@ public final class ContentPreviewActivity extends Activity {
     }
 
     private TextView text(String value, int size) {
-        TextView view = new TextView(this);
-        view.setText(value);
-        view.setTextSize(size);
-        view.setTextColor(0xffe5eaf0);
-        return view;
+        return WorkbenchUi.text(this, value, size);
     }
 
     private Button button(String label, Runnable action) {

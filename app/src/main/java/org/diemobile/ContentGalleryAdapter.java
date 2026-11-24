@@ -64,11 +64,7 @@ final class ContentGalleryAdapter extends BaseAdapter implements AutoCloseable {
     }
 
     private TextView text(String value, int size) {
-        TextView view = new TextView(context);
-        view.setText(value);
-        view.setTextSize(size);
-        view.setTextColor(0xffe5eaf0);
-        return view;
+        return WorkbenchUi.text(context, value, size);
     }
 
     @Override

@@ -42,9 +42,7 @@ public final class ScanProfilesActivity extends Activity {
     }
 
     private TextView text(String value, int size) {
-        TextView view = new TextView(this);
-        view.setText(value);
-        view.setTextSize(size);
+        TextView view = WorkbenchUi.text(this,value,size);
         view.setTextIsSelectable(true);
         return view;
     }

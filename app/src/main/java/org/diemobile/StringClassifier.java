@@ -11,18 +11,29 @@ import org.json.*;
 
 /** Offline, explainable string observations. A pattern match is never a verdict. */
 final class StringClassifier {
-    static final String ENGINE = "DiE Android string classifier", VERSION = "1.0.0";
+    static final String ENGINE = "DiE Android string classifier", VERSION = "1.1.0";
     static final int MAX_MATCHES = 2048, MAX_TEXT_UNITS = 1024 * 1024;
     enum Group {
-        URLS("URLs / URIs"), ENDPOINTS("Service / API endpoints"), DOMAINS("Domain candidates"), ADDRESSES("IP address literals"),
-        EMAILS("Email candidates"), PATHS("File / registry paths"), COMMANDS("Commands / interpreters"), APIS("System / execution APIs"),
-        SECRETS("Credentials / secret candidates"), CRYPTO("Cryptographic material / algorithms"),
-        PERSISTENCE("Persistence / startup indicators"), EVASION("Anti-analysis / introspection indicators"),
-        VULNERABILITIES("Vulnerability / exploit indicators"), DANGEROUS("Dangerous operation / input indicators"),
-        ENCODINGS("Encoded data candidates"), IDENTIFIERS("Hashes / identifiers");
-        final String label;
-        Group(String label) { this.label = label; }
+        URLS("URLs / URIs", "A URI scheme and address-like syntax can identify a resource or protocol. The matched literal is evidence of text, not of a request or successful access."),
+        ENDPOINTS("Service / API endpoints", "A service path, URI or address can describe where software exchanges data. A path may need a separate host/base URL; no listening or reachable service is established."),
+        DOMAINS("Domain candidates", "DNS-shaped labels can identify hosts, but filenames and package/class names share this syntax. Registration and resolution are not checked."),
+        ADDRESSES("IP address literals", "Locally validated address syntax can name a network destination or interface. It can also be test data, a bind address or an unused constant; no connection is observed."),
+        EMAILS("Email candidates", "Mailbox-shaped text can name a contact or account. Syntax alone does not show that the mailbox exists, belongs to someone or receives mail."),
+        PATHS("File / registry paths", "Path syntax identifies a possible location in a filesystem, registry or provider. Actual access depends on code, permissions and the runtime environment."),
+        COMMANDS("Commands / interpreters", "Interpreter/utility names and arguments can be passed to a command execution API. Here they are text; a caller and its arguments must be traced before claiming execution."),
+        APIS("System / execution APIs", "API names refer to operations a program could request from its runtime or operating system. A name may be documentation or unused data; imports and call sites are separate evidence."),
+        SECRETS("Credentials / secret candidates", "A recognized token shape or credential-related assignment could contain authentication material. Examples, placeholders and inactive/public values can match; validity and privileges are not tested."),
+        CRYPTO("Cryptographic material / algorithms", "Algorithm names or encoded key/certificate markers suggest cryptographic context. Actual purpose, parameters, key contents and secure use need separate inspection."),
+        PERSISTENCE("Persistence / startup indicators", "Boot, startup and scheduling mechanisms can arrange work after launch or reboot. Legitimate installers and administrators use them too; a string does not establish a registration or unwanted persistence."),
+        EVASION("Anti-analysis / introspection indicators", "Debugger, instrumentation or environment checks can reveal analysis conditions; display controls can obscure what an analyst sees. These mechanisms can support evasion, diagnostics or compatibility. This category does not establish an evasion branch or behavior."),
+        VULNERABILITIES("Vulnerability / exploit indicators", "A weakness identifier, review-sensitive API, legacy security primitive or attack-shaped input can point to a security question. A vulnerability needs corroborating affected code/version, unsafe parameters and a reachable input path; none is established by the string alone."),
+        DANGEROUS("Dangerous operation / input indicators", "The matched operation, transport or input can have security impact in some contexts: execution, destructive changes, injection or unencrypted transfer. Arguments, permissions and actual use determine impact; no harmful action is observed."),
+        ENCODINGS("Encoded data candidates", "A recognized encoding or encoded-command shape can wrap other bytes. Encoding is a representation, not proof of encryption or concealment; no decoded command is executed."),
+        IDENTIFIERS("Hashes / identifiers", "A recognized identifier layout or digest-length token can link related records. Its shape does not establish an algorithm, object authenticity or a current database entry.");
+        final String label, rationale;
+        Group(String label, String rationale) { this.label = label; this.rationale = rationale; }
         long bit() { return 1L << ordinal(); }
+        JSONObject json() throws JSONException { return new JSONObject().put("group", name()).put("label", label).put("reason", rationale); }
     }
     interface ByteLocation { long at(int utf16Index) throws Exception; }
     interface Validator { boolean accepts(String matched); }
@@ -37,8 +48,13 @@ final class StringClassifier {
         }
         long mask() { long value = 0; for (Group group : groups) value |= group.bit(); return value; }
         JSONObject json() throws JSONException {
-            JSONArray categories = new JSONArray(); for (Group group : groups) categories.put(group.name());
+            JSONArray categories = new JSONArray(), rationales = new JSONArray();
+            for (Group group : groups) {
+                categories.put(group.name());
+                rationales.put(group.json());
+            }
             return new JSONObject().put("ruleId", id).put("title", title).put("expression", expression).put("groups", categories)
+                .put("categoryRationales", rationales)
                 .put("observation", explanation).put("implicationsAndNextStep", implication).put("matchMethod", "Built-in Java regular expression with optional local syntactic validation")
                 .put("validator", validator == null ? JSONObject.NULL : id).put("source", "DiE Android built-in catalog " + VERSION).put("license", "GPL-3.0-only");
         }
@@ -52,10 +68,22 @@ final class StringClassifier {
         final List<Hit> hits;
         final long groups;
         Result(List<Hit> hits, long groups) { this.hits = Collections.unmodifiableList(hits); this.groups = groups; }
+        String summary(String preferredGroup) {
+            if (hits.isEmpty()) return "No built-in rule matched this candidate; this is not a safety finding.";
+            Hit chosen = hits.get(0);
+            Group preferred = null;
+            try { preferred = Group.valueOf(preferredGroup); } catch (IllegalArgumentException | NullPointerException ignored) { }
+            if (preferred != null) for (Hit hit : hits) if (hit.rule.groups.contains(preferred)) { chosen = hit; break; }
+            return "Why " + (preferred == null ? "classified" : preferred.label) + ": "
+                    + chosen.rule.title + " — " + chosen.rule.explanation;
+        }
         JSONArray json(String text, ByteLocation physical) throws Exception {
             JSONArray values = new JSONArray();
             for (Hit hit : hits) {
-                JSONObject value = hit.rule.json().put("startUtf16", hit.start).put("endUtf16", hit.end)
+                JSONObject value = hit.rule.json();
+                // Group definitions belong once to the row, not once per repeated occurrence.
+                value.remove("categoryRationales");
+                value.put("startUtf16", hit.start).put("endUtf16", hit.end)
                     .put("matchedTextPreview", text.substring(hit.start, Math.min(hit.end, hit.start + 512)))
                     .put("previewComplete", hit.end - hit.start <= 512).put("physicalMatchOffset", physical == null ? JSONObject.NULL : physical.at(hit.start))
                     .put("physicalMatchLengthBytes", physical == null ? JSONObject.NULL : physical.at(hit.end) - physical.at(hit.start));
@@ -64,6 +92,11 @@ final class StringClassifier {
             return values;
         }
         JSONArray groupNames() { JSONArray values = new JSONArray(); for (Group group : Group.values()) if ((groups & group.bit()) != 0) values.put(group.name()); return values; }
+        JSONArray categoryRationales() throws JSONException {
+            JSONArray values = new JSONArray();
+            for (Group group : Group.values()) if ((groups & group.bit()) != 0) values.put(group.json());
+            return values;
+        }
     }
     private static Rule rule(String id, String title, String expression, String observation, String next, Group... groups) {
         return new Rule(id,title,expression,observation,next,null,groups);
@@ -107,13 +140,13 @@ final class StringClassifier {
         rule("cmd.encoded", "Encoded interpreter argument", "(?i)(?<![A-Za-z0-9_])-(?:enc|encodedcommand)\\s+[A-Za-z0-9+/]{8,4096}={0,2}",
             "An option resembles a PowerShell encoded-command argument.", "The classifier does not execute or recursively decode commands. Confirm the interpreter and decode bytes in a separate explicit investigation.", Group.COMMANDS,Group.ENCODINGS,Group.DANGEROUS),
         rule("api.windows-exec", "Windows execution / injection API", "\\b(?:CreateRemoteThread(?:Ex)?|WriteProcessMemory|VirtualAlloc(?:Ex)?|VirtualProtect(?:Ex)?|QueueUserAPC|SetThreadContext|NtCreateThreadEx|ShellExecute(?:Ex)?[AW]?|WinExec|CreateProcess[AW]?|URLDownloadToFile[AW]?)\\b",
-            "An execution, process-memory or download API name appears.", NO_EXECUTION, Group.APIS,Group.DANGEROUS),
+            "Depending on the matched name, these Windows APIs can start processes/threads, change memory protection, access another process's memory or download files. Such operations can support injection or ordinary application/debugger work; only the name was found here.", NO_EXECUTION, Group.APIS,Group.DANGEROUS),
         rule("api.loader", "Dynamic loading / symbol lookup API", "\\b(?:LoadLibrary(?:Ex)?[AW]?|GetProcAddress|dlopen|dlsym|DexClassLoader|InMemoryDexClassLoader|PathClassLoader|loadLibrary)\\b",
             "A dynamic loader or symbol lookup name appears.", "Dynamic loading is common in ordinary applications and plugins. Resolve the referenced library/class and call sites.", Group.APIS),
         rule("api.process", "Process / shell execution API", "\\b(?:execve|execvp|execl|popen|system|ProcessBuilder|Runtime[.;/]exec|Runtime\\.getRuntime|java/lang/Runtime|java/lang/ProcessBuilder)\\b",
             "A process-execution API or class name appears; generic names such as system can be ambiguous.", NO_EXECUTION, Group.APIS,Group.DANGEROUS),
         rule("api.unsafe-c", "C memory / formatting API requiring review", "\\b(?:strcpy|strcat|gets|sprintf|vsprintf|memcpy|scanf|sscanf)\\b",
-            "A C API name has operations whose safety depends on sizes, formats, bounds and inputs.", "No vulnerability is established. Check actual imports/callers, buffer capacities, format strings and attacker-controlled data; memcpy and scanf can be used safely.", Group.APIS,Group.VULNERABILITIES),
+            "This C API name is associated with copying or formatted input/output. Missing or incorrect bounds, input widths or format handling can cause memory errors; memcpy and scanf can also be used safely.", "No vulnerability is established. Check actual imports/callers, buffer capacities, format strings and attacker-controlled data; memcpy and scanf can be used safely.", Group.APIS,Group.VULNERABILITIES),
         rule("api.android-capability", "Android sensitive capability API", "\\b(?:AccessibilityService|DeviceAdminReceiver|PackageInstaller|REQUEST_INSTALL_PACKAGES|BIND_ACCESSIBILITY_SERVICE|MediaProjection|VpnService|TelephonyManager|SmsManager|KeyStore|BiometricPrompt)\\b",
             "An Android capability/API/permission name appears in text.", "A reference is distinct from a manifest declaration, granted permission or observed use. Check the manifest, call sites and platform restrictions.", Group.APIS),
         rule("secret.aws-id", "AWS access key identifier", "\\b(?:AKIA|ASIA)[A-Z0-9]{16}\\b",
@@ -135,21 +168,21 @@ final class StringClassifier {
         rule("crypto.algorithms", "Cryptographic algorithm / construction name", "(?i)\\b(?:AES(?:[-_/](?:GCM|CBC|CTR|ECB|CCM|CFB|OFB))?|3DES|DES|RC4|MD5|SHA[-_ ]?(?:1|224|256|384|512)|HMAC|PBKDF2|Argon2(?:id|i|d)?|scrypt|bcrypt|ChaCha20|Poly1305|Ed25519|Curve25519|RSA|ECDSA)\\b",
             "A recognized cryptographic algorithm/construction name occurs.", "Names do not identify actual algorithms, modes, parameters, keys or secure implementation. Inspect code and configuration.", Group.CRYPTO),
         rule("crypto.legacy", "Legacy primitive / ECB marker", "(?i)\\b(?:RC4|(?:3)?DES|MD5|SHA[-_ ]?1|AES[-_/]ECB)\\b",
-            "A marker names a primitive/mode with known limitations in some security uses.", "This is not a vulnerability verdict. MD5/SHA-1 can identify content, and compatibility/test data can name old algorithms. Determine the security purpose and parameters.", Group.CRYPTO,Group.VULNERABILITIES),
+            "A legacy primitive/mode is named: MD5/SHA-1 collision weaknesses can undermine signatures; DES has a small key space, RC4 has keystream biases, 3DES has legacy block-size limits, and ECB exposes repeated blocks. Relevance depends on which token matched and its security purpose.", "This is not a vulnerability verdict. MD5/SHA-1 can identify content, and compatibility/test data can name old algorithms. Determine the security purpose and parameters.", Group.CRYPTO,Group.VULNERABILITIES),
         rule("persist.windows", "Windows startup / task marker", "(?i)(?:\\\\(?:CurrentVersion\\\\Run(?:Once)?|Start Menu\\\\Programs\\\\Startup)(?=\\\\|$)|\\bschtasks(?:\\.exe)?\\b|\\bRegister-ScheduledTask\\b)",
             "A startup registry/folder or scheduled-task token appears.", "Persistence, installation, administration and cleanup tools share these markers. Identify actual writes/registrations and owners.", Group.PERSISTENCE,Group.PATHS),
         rule("persist.unix", "Unix / Android startup marker", "(?:/etc/(?:cron(?:tab|\\.[a-z]+)?|init\\.d|systemd/system)(?:/|\\b)|\\b(?:BOOT_COMPLETED|LOCKED_BOOT_COMPLETED|RECEIVE_BOOT_COMPLETED)\\b)",
             "A startup/scheduler path or Android boot broadcast name appears.", "A string is distinct from a registration or granted capability. Check manifest receivers, service units and write permissions.", Group.PERSISTENCE),
         rule("evasion.debug", "Debugger / tracing introspection", "\\b(?:IsDebuggerPresent|CheckRemoteDebuggerPresent|NtQueryInformationProcess|ptrace|TracerPid|Debug[.;/]isDebuggerConnected|isDebuggerConnected|PTRACE_TRACEME)\\b",
-            "A debugger/tracing detection or introspection token appears.", "Debugging, crash reporting and anti-tamper code can all use it. Resolve call sites and branch conditions; no evasion behavior is observed.", Group.EVASION,Group.APIS),
+            "The token names debugger/tracing introspection: debugger queries or TracerPid can reveal a debugger, and ptrace can trace a process or expose tracing conflicts. Code could use the result to change behavior during analysis; NtQueryInformationProcess also has unrelated uses, depending on its information class.", "Debugging, crash reporting and anti-tamper code can all use it. Resolve call sites and branch conditions; no evasion behavior is observed.", Group.EVASION,Group.APIS),
         rule("text.direction", "Invisible text direction control", "[\u202a-\u202e\u2066-\u2069]",
             "An invisible Unicode bidirectional control can change display order while leaving stored bytes unchanged.", "The UI shows these controls as escapes; exports retain the original value. Such controls can also occur in ordinary multilingual text.", Group.EVASION),
         rule("evasion.environment", "Virtualization / emulator marker", "(?i)(?:\\b(?:frida|xposed|qemu|vbox|vmware|goldfish|ranchu)\\b|ro\\.kernel\\.qemu|/dev/qemu_pipe)",
-            "A known instrumentation, virtualization or emulator-associated name appears.", "May be support, diagnostics, tests or detection code. The selected file is not thereby shown to run in, or evade, that environment.", Group.EVASION),
+            "The token names instrumentation, virtualization or emulator artifacts. Checking such names, properties or device paths could distinguish an analysis/test environment and alter behavior, but the literal alone does not show that a check or branch exists.", "May be support, diagnostics, tests or detection code. The selected file is not thereby shown to run in, or evade, that environment.", Group.EVASION),
         rule("vuln.cve", "CVE identifier", "(?i)\\bCVE-(?:19|20)[0-9]{2}-[0-9]{4,19}\\b",
-            "A syntactically shaped CVE identifier is present.", "No vulnerability database lookup, affected-version match or exploit verification occurs. It may be documentation, a fix note, test data or an exploit reference.", Group.VULNERABILITIES,Group.IDENTIFIERS),
+            "CVE means Common Vulnerabilities and Exposures: identifiers reference disclosed security issues. This token has that identifier's shape; it does not show that this file contains the issue.", "No vulnerability database lookup, affected-version match or exploit verification occurs. It may be documentation, a fix note, test data or an exploit reference.", Group.VULNERABILITIES,Group.IDENTIFIERS),
         rule("vuln.cwe", "CWE identifier", "(?i)\\bCWE-[1-9][0-9]{0,5}\\b",
-            "A weakness-category identifier appears.", "The classifier does not verify that the file has this weakness or that the identifier exists in a current database.", Group.VULNERABILITIES,Group.IDENTIFIERS),
+            "CWE means Common Weakness Enumeration: identifiers name classes of implementation weaknesses, rather than a specific affected product/version. This is an identifier-shaped literal, not a verified weakness in this file.", "The classifier does not verify that the file has this weakness or that the identifier exists in a current database.", Group.VULNERABILITIES,Group.IDENTIFIERS),
         rule("vuln.terminology", "Exploit / vulnerability terminology", "(?i)\\b(?:buffer overflow|heap overflow|use[- ]after[- ]free|SQL injection|command injection|remote code execution|privilege escalation|shellcode)\\b",
             "The string contains vulnerability/exploitation terminology.", "Documentation, warnings, defensive engines and tests commonly contain these terms. Corroborate against actual code and inputs.", Group.VULNERABILITIES),
         rule("vuln.input-pattern", "Injection / traversal-shaped input", "(?i)(?:\\$\\{jndi:(?:ldap|rmi|dns)://|(?:\\.\\.[/\\\\]){2,}|\\bunion\\s+(?:all\\s+)?select\\b|%n(?=[^A-Za-z]|$))",
@@ -166,7 +199,10 @@ final class StringClassifier {
     private static String identity() {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            for (Rule rule : RULES) digest.update((rule.id + "\n" + rule.title + "\n" + rule.expression + "\n" + rule.groups + "\n" + rule.explanation + "\n" + rule.implication + "\n" + (rule.validator == null ? "none" : rule.id) + "\n").getBytes(StandardCharsets.UTF_8));
+            for (Rule rule : RULES) {
+                digest.update((rule.id + "\n" + rule.title + "\n" + rule.expression + "\n" + rule.groups + "\n" + rule.explanation + "\n" + rule.implication + "\n" + (rule.validator == null ? "none" : rule.id) + "\n").getBytes(StandardCharsets.UTF_8));
+                for (Group group : rule.groups) digest.update(("categoryRationale\n" + group.name() + "\n" + group.label + "\n" + group.rationale + "\n").getBytes(StandardCharsets.UTF_8));
+            }
             return Inspector.toHex(digest.digest());
         } catch (Exception e) { throw new ExceptionInInitializerError(e); }
     }

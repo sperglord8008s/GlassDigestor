@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="workbench_background">#15191E</color>
+    <color name="workbench_text">#E5EAF0</color>
+    <color name="workbench_secondary">#B8C4D0</color>
+    <color name="workbench_accent">#80CBC4</color>
+    <color name="workbench_divider">#3D4B58</color>
+    <color name="workbench_pressed">#2680CBC4</color>
+</resources>

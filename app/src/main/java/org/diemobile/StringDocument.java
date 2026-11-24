@@ -179,19 +179,21 @@ final class StringDocument implements AutoCloseable {
         final int[] indices = Arrays.copyOf(included,count);
         return new EvidenceRows("strings-"+group,"Strings • " + group) {
             int size() { return indices.length; }
-            Row row(int i, BooleanSupplier stop) throws Exception { return StringDocument.this.row(indices[i],stop); }
+            Row row(int i, BooleanSupplier stop) throws Exception { return StringDocument.this.row(indices[i],stop,group); }
             JSONObject metadata() throws Exception { return StringDocument.this.metadata().put("selectedGroup",group).put("selectedGroupRecords",indices.length); }
         };
     }
-    private EvidenceRows.Row row(int index, BooleanSupplier stop) throws Exception {
+    private EvidenceRows.Row row(int index, BooleanSupplier stop, String selectedGroup) throws Exception {
         EvidenceRows.check(stop); if (closed) throw new IOException("String snapshot closed"); Record record = records.get(index);
         spool.seek(record.spool); int length = spool.readInt(); if (length < 0 || length > FRAGMENT_UNITS*4) throw new IOException("Invalid private string snapshot");
         byte[] encoded = new byte[length]; spool.readFully(encoded); String value = new String(encoded,StandardCharsets.UTF_8); StringClassifier.Result classified = StringClassifier.classify(value,stop);
         JSONObject fields = new JSONObject().put("value",value).put("encoding",record.encoding.name()).put("alignment",record.alignment).put("unicodeCodePoints",record.codePoints).put("utf16Units",value.length())
             .put("physicalTextOffset",record.physical).put("textByteLength",record.length).put("runStartPhysicalOffset",record.runStart).put("fragmentIndex",record.fragment).put("runContinues",record.continued)
-            .put("groups",classified.groupNames()).put("classificationMatches",classified.json(value, units -> record.physical + (record.encoding == Encoding.UTF8 ? value.substring(0,units).getBytes(StandardCharsets.UTF_8).length : units*2L)))
+            .put("groups",classified.groupNames()).put("categoryRationales",classified.categoryRationales())
+            .put("classificationMatches",classified.json(value, units -> record.physical + (record.encoding == Encoding.UTF8 ? value.substring(0,units).getBytes(StandardCharsets.UTF_8).length : units*2L)))
             .put("locationMeaning", "Exact bytes encoding this decoded text fragment; excludes a separator/terminator or BOM. Byte order/alignment are decoding candidates, not format validation.");
-        return new EvidenceRows.Row(index,value,record.encoding + " • " + record.codePoints + " code points • " + classified.groupNames(),record.physical,record.length,fields);
+        return new EvidenceRows.Row(index,value,record.encoding + " • " + record.codePoints + " code points • " + classified.groupNames()
+                + "\n" + classified.summary(selectedGroup),record.physical,record.length,fields);
     }
     @Override public void close() throws IOException { if (!closed) { closed = true; try { spool.close(); } finally { spoolFile.delete(); snapshot.close(); } } }
 }

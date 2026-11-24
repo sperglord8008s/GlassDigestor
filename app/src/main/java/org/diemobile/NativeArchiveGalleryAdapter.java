@@ -84,10 +84,7 @@ final class NativeArchiveGalleryAdapter extends BaseAdapter implements AutoClose
     }
 
     private TextView text(String value, int size) {
-        TextView text = new TextView(context);
-        text.setText(value);
-        text.setTextSize(size);
-        return text;
+        return WorkbenchUi.text(context, value, size);
     }
 
     @Override
@@ -97,6 +94,7 @@ final class NativeArchiveGalleryAdapter extends BaseAdapter implements AutoClose
         tile.setOrientation(LinearLayout.VERTICAL);
         tile.setPadding(dp(8), dp(8), dp(8), dp(8));
         TextView title = text(entry.label, 13);
+        title.setTypeface(null, android.graphics.Typeface.BOLD);
         title.setMaxLines(5);
         tile.addView(title);
         if (entry.member == null) {

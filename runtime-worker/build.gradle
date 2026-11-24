@@ -20,8 +20,15 @@ def stageWorkerSources = tasks.register('stageWorkerSources', Sync) {
         include 'org/diemobile/MediaFrame.java', 'org/diemobile/PdfPagePreview.java',
                 'org/diemobile/OwnedContent.java', 'org/diemobile/PreparedExport.java'
         include 'org/diemobile/PackageManifest.java'
+        include 'org/diemobile/TextActions.java', 'org/diemobile/WorkbenchUi.java'
     }
     into layout.buildDirectory.dir('shared-worker-sources')
+}
+def stageTextActionResources = tasks.register('stageTextActionResources', Sync) {
+    from(rootProject.file('app/src/main/res')) {
+        include 'values/colors.xml', 'values/text_action_ids.xml'
+    }
+    into layout.buildDirectory.dir('shared-text-resources')
 }
 def stageWorkerNotices = tasks.register('stageWorkerNotices', Sync) {
     from(rootProject.file('generated-assets')) { include 'notices/**' }
@@ -53,6 +60,7 @@ android {
     externalNativeBuild { cmake { path '../app/src/main/cpp/CMakeLists.txt'; version '3.22.1' } }
     sourceSets.main {
         java.srcDir layout.buildDirectory.dir('shared-worker-sources')
+        res.srcDir layout.buildDirectory.dir('shared-text-resources')
         jniLibs.srcDir '../app/build/generated-archive-jni'
         jniLibs.srcDir '../app/build/generated-photorec-jni'
         assets.srcDir '../app/build/generated-archive-assets'
@@ -92,5 +100,5 @@ def generateRuntimeMediaFixture = tasks.register('generateRuntimeMediaFixture', 
     outputs.dir layout.buildDirectory.dir('generated-runtime-assets/test-fixtures')
 }
 tasks.named('preBuild').configure {
-    dependsOn buildRuntimeArchive, buildRuntimePhotoRec, stageWorkerSources, stageWorkerNotices, generateRuntimeMediaFixture
+    dependsOn buildRuntimeArchive, buildRuntimePhotoRec, stageWorkerSources, stageTextActionResources, stageWorkerNotices, generateRuntimeMediaFixture
 }

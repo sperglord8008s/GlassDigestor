@@ -19,6 +19,7 @@ CHECKS = {
     "exact-recovered-platform-pdf-pages",
     "token-scoped-kill-with-blocked-report-pipe",
     "normal-client-recovers-after-worker-death",
+    "exact-text-actions-platform-clipboard-and-uris",
 }
 
 

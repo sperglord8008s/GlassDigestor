@@ -58,3 +58,67 @@ for invalid in 0 -1 268435457 99999999999999999999 invalid; do
 done
 test "$(wc -l < "$tmp/calls")" -eq 5
 printf '%s\n' 'Verified dependency acquisition: reuse, interrupted/incorrect download cleanup, unchanged edited cache and offline no-network behavior passed.'
+
+# Exercise the public fallback helper with authored bytes and no real network.
+cat > "$tmp/bin/curl" <<'MOCK'
+#!/usr/bin/env bash
+set -eu
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -o) destination="$2"; shift 2 ;;
+    https://*) url="$1"; shift ;;
+    *) shift ;;
+  esac
+done
+case "$url" in
+  https://maven-central.storage-download.googleapis.com/maven2/*) host=mirror ;;
+  https://repo.maven.apache.org/maven2/*) host=central ;;
+  *) echo 'Unexpected dependency origin.' >&2; exit 1 ;;
+esac
+printf '%s\n' "$host" >> "$DEPENDENCY_FETCH_CALLS"
+if [[ "$DEPENDENCY_FETCH_MODE" = both-fail || "$DEPENDENCY_FETCH_MODE" = limited && "$host" = mirror ]]; then
+  printf partial > "$destination"; exit 22
+fi
+if [[ "$DEPENDENCY_FETCH_MODE" = corrupt || "$DEPENDENCY_FETCH_MODE" = mirror-corrupt && "$host" = mirror ]]; then
+  printf 'wrong bytes\n' > "$destination"
+else
+  printf 'known complete bytes\n' > "$destination"
+fi
+MOCK
+chmod +x "$tmp/bin/curl"
+for scenario in valid limited mirror-corrupt; do
+  export DEPENDENCY_FETCH_MODE="$scenario"
+  : > "$DEPENDENCY_FETCH_CALLS"
+  maven_fixture_path="$tmp/maven/$scenario.jar"
+  fetch_verified_maven_dependency "$maven_fixture_path" "$checksum" org/fixture/version/fixture.jar
+  if [[ "$scenario" = valid ]]; then expected=1; else expected=2; fi
+  test "$(wc -l < "$DEPENDENCY_FETCH_CALLS")" -eq "$expected"
+  test "$(head -n 1 "$DEPENDENCY_FETCH_CALLS")" = mirror
+  fetch_verified_maven_dependency "$maven_fixture_path" "$checksum" org/fixture/version/fixture.jar
+  test "$(wc -l < "$DEPENDENCY_FETCH_CALLS")" -eq "$expected"
+done
+for scenario in both-fail corrupt; do
+  export DEPENDENCY_FETCH_MODE="$scenario"
+  : > "$DEPENDENCY_FETCH_CALLS"
+  maven_fixture_path="$tmp/maven/$scenario.jar"
+  if fetch_verified_maven_dependency "$maven_fixture_path" "$checksum" org/fixture/version/fixture.jar; then
+    echo 'Invalid Maven acquisition succeeded.' >&2; exit 1
+  fi
+  test ! -e "$maven_fixture_path"
+  test "$(wc -l < "$DEPENDENCY_FETCH_CALLS")" -eq 2
+done
+: > "$DEPENDENCY_FETCH_CALLS"
+export DIE_OFFLINE=true
+fetch_verified_maven_dependency "$tmp/maven/valid.jar" "$checksum" org/fixture/version/fixture.jar
+if fetch_verified_maven_dependency "$tmp/maven/missing.jar" "$checksum" org/fixture/version/fixture.jar; then
+  echo 'Missing offline Maven input was accepted.' >&2; exit 1
+fi
+unset DIE_OFFLINE
+printf 'edited cache\n' > "$tmp/maven/edited.jar"
+if fetch_verified_maven_dependency "$tmp/maven/edited.jar" "$checksum" org/fixture/version/fixture.jar; then
+  echo 'Edited Maven cache was replaced.' >&2; exit 1
+fi
+test "$(cat "$tmp/maven/edited.jar")" = 'edited cache'
+test ! -s "$DEPENDENCY_FETCH_CALLS"
+test -z "$(find "$tmp/maven" -name '*.download.*' -print)"
+echo 'Maven acquisition: identical pinned mirror/fallback bytes, partial/corrupt cleanup and strict offline/cache refusals passed.'

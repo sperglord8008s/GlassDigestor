@@ -422,7 +422,19 @@ public final class NativeArchiveExplorerActivity extends Activity {
                             member -> select(member, 2));
             gallery.setAdapter(galleryAdapter);
         } else
-            list.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, visible));
+            list.setAdapter(WorkbenchUi.adapter(this, visible, entry -> {
+                if (entry.member == null) return new WorkbenchUi.Lines(this)
+                        .heading(entry.label).muted("Virtual directory · open to browse").build();
+                NativeArchiveStore.Member member = entry.member;
+                return new WorkbenchUi.Lines(this)
+                        .heading("#" + member.index + " " + WorkbenchUi.preview(member.name, 160))
+                        .field("Type", member.directory ? "Directory" : member.linked ? "Link (never materialized)"
+                                : member.regular ? "Regular member" : "Special / unknown", false)
+                        .field("Declared bytes", member.size == null ? "unknown" : member.size.toString(), true)
+                        .muted((member.encrypted ? "Encrypted · " : "")
+                                + (!member.treeName() ? "Name outside virtual tree · " : "")
+                                + "Tap for member actions / complete evidence").build();
+            }));
         previous.setEnabled(!busy && location.page > 0);
         next.setEnabled(!busy && location.page + 1 < pages);
         String retentionWarning = "";

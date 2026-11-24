@@ -35,6 +35,7 @@ public final class StringWorkbenchTest {
         temporary = Files.createTempDirectory("die-string-ui"); ByteArrayOutputStream data = new ByteArrayOutputStream();
         for (int i = 0; i < 71; i++) { data.write(String.format(Locale.ROOT,"https://fixture-%03d.invalid/api/v1",i).getBytes(StandardCharsets.UTF_8)); data.write(0); }
         data.write("é😀 https://unicode.fixture.invalid/\0ptrace CVE-2024-12345 strcpy\0client_secret=EXAMPLE_ONLY_VALUE\0ordinary fixture text\0".getBytes(StandardCharsets.UTF_8));
+        data.write(("many-evasion " + "ptrace ".repeat(20) + "\0").getBytes(StandardCharsets.UTF_8));
         data.write(new byte[4]); data.write(LE.getBytes(StandardCharsets.UTF_16LE)); data.write(new byte[4]); input = temporary.resolve("mixed.bin").toFile(); Files.write(input.toPath(),data.toByteArray());
         Intent intent = new Intent(RuntimeEnvironment.getApplication(),InvestigationActivity.class).putExtra("provider","strings").putExtra("path",input.getAbsolutePath()).putExtra("name","mixed.bin");
         controller = Robolectric.buildActivity(InvestigationActivity.class,intent).setup().visible(); activity = controller.get(); settle();
@@ -104,5 +105,88 @@ public final class StringWorkbenchTest {
         button("reload").performClick(); settle(); assertEquals(50,records().getAdapter().getCount());
         File directory = new File(activity.getCacheDir(),"string-snapshots"); assertEquals(2,Objects.requireNonNull(directory.list()).length);
         controller.pause().stop().destroy(); controller = null; assertTrue(worker.awaitTermination(30,TimeUnit.SECONDS)); assertEquals(0,Objects.requireNonNull(directory.list()).length); assertTrue(input.isFile());
+    }
+
+    @Test public void openedRiskCategoryShowsItsActualReasonBeforeRawJson() throws Exception {
+        root("Vulnerability / exploit");
+        EvidenceRows.Row captured = row(0);
+        String encoded = captured.encoded;
+        TextView displayed = (TextView) records().getAdapter().getView(0, null, records());
+        assertTrue(displayed.getText().toString(), displayed.getText().toString().contains("Common Vulnerabilities and Exposures"));
+        assertTrue(displayed.getText() instanceof android.text.Spanned);
+        records().performItemClick(null, 0, 0);
+        AlertDialog dialog = ShadowAlertDialog.getLatestAlertDialog();
+        JSONObject fields = captured.json();
+        int cve = -1;
+        JSONArray matches = fields.getJSONArray("classificationMatches");
+        for (int i = 0; i < matches.length(); i++) if (matches.getJSONObject(i).getString("ruleId").equals("vuln.cve")) cve = i;
+        assertTrue(cve >= 0);
+        TextView why = dialog.findViewById(android.R.id.content).findViewWithTag("string-why-" + cve);
+        assertNotNull(why);
+        assertEquals(android.view.View.VISIBLE, why.getVisibility());
+        assertTrue(why.getText().toString().contains("does not show that this file contains"));
+        assertFalse(new JSONObject(ReflectionHelpers.<String>getField(activity, "provenance")).getBoolean("vulnerabilityVerified"));
+        assertEquals(encoded, captured.encoded);
+        assertEquals(fields.getJSONArray("groups").length(), fields.getJSONArray("categoryRationales").length());
+        assertFalse(matches.getJSONObject(cve).has("categoryRationales"));
+    }
+
+    @Test public void exactWholeAndMatchedCopyDoNotUseTheEscapedPreviewOrOpenABrowser() throws Exception {
+        root("Vulnerability / exploit");
+        EvidenceRows.Row captured = row(0); String encoded = captured.encoded;
+        records().performItemClick(null, 0, 0);
+        AlertDialog dialog = ShadowAlertDialog.getLatestAlertDialog();
+        android.content.ClipboardManager clipboard = (android.content.ClipboardManager) activity.getSystemService(android.content.Context.CLIPBOARD_SERVICE);
+        ((Button) dialog.findViewById(android.R.id.content).findViewWithTag("string-value-copy")).performClick();
+        assertEquals(captured.json().getString("value"), clipboard.getPrimaryClip().getItemAt(0).getText().toString());
+        JSONArray matches = captured.json().getJSONArray("classificationMatches");
+        int cve = -1;
+        for (int i = 0; i < matches.length(); i++) if (matches.getJSONObject(i).getString("ruleId").equals("vuln.cve")) cve = i;
+        ((Button) dialog.findViewById(android.R.id.content).findViewWithTag("string-match-" + cve + "-copy")).performClick();
+        assertEquals("CVE-2024-12345", clipboard.getPrimaryClip().getItemAt(0).getText().toString());
+        assertNull(Shadows.shadowOf(activity).getNextStartedActivity());
+        assertEquals(encoded, captured.encoded);
+    }
+
+    @Test public void engineChoicesSendOnlyExactTextAndEnglishTargetAfterExplicitSelection() throws Exception {
+        root("URLs / URIs"); filter().setText("utf16.fixture.invalid"); button("search").performClick(); settle();
+        int selected = -1;
+        for (int i = 0; i < records().getAdapter().getCount(); i++) if (row(i).name.equals(LE)) selected = i;
+        assertTrue(selected >= 0);
+        records().performItemClick(null, selected, selected);
+        AlertDialog detail = ShadowAlertDialog.getLatestAlertDialog();
+        ((Button) detail.findViewById(android.R.id.content).findViewWithTag("string-value-search")).performClick();
+        assertNull(Shadows.shadowOf(activity).getNextStartedActivity());
+        choose("Brave Search");
+        Intent chooser = Shadows.shadowOf(activity).getNextStartedActivity();
+        assertEquals(Intent.ACTION_CHOOSER, chooser.getAction());
+        Intent view = chooser.getParcelableExtra(Intent.EXTRA_INTENT);
+        assertEquals(Intent.ACTION_VIEW, view.getAction());
+        assertEquals("search.brave.com", view.getData().getHost());
+        assertEquals(LE, view.getData().getQueryParameter("q"));
+        assertFalse(view.hasExtra("path"));
+        ((Button) detail.findViewById(android.R.id.content).findViewWithTag("string-value-translate")).performClick();
+        assertNull(Shadows.shadowOf(activity).getNextStartedActivity());
+        choose("Bing Translator");
+        view = Shadows.shadowOf(activity).getNextStartedActivity().getParcelableExtra(Intent.EXTRA_INTENT);
+        assertEquals("en", view.getData().getQueryParameter("to"));
+        assertEquals(LE, view.getData().getQueryParameter("text"));
+        assertFalse(view.hasExtra("path"));
+    }
+
+    @Test public void everyCapturedMatchRemainsAvailableThroughBoundedExplanationPages() throws Exception {
+        root("Anti-analysis / introspection"); filter().setText("many-evasion"); button("search").performClick(); settle();
+        EvidenceRows.Row captured = row(0); String encoded = captured.encoded;
+        assertEquals(20, captured.json().getJSONArray("classificationMatches").length());
+        records().performItemClick(null, 0, 0);
+        AlertDialog dialog = ShadowAlertDialog.getLatestAlertDialog();
+        android.view.View body = dialog.findViewById(android.R.id.content);
+        TextView count = body.findViewWithTag("string-match-count");
+        assertTrue(count.getText().toString(), count.getText().toString().contains("1–8 of 20"));
+        Button next = body.findViewWithTag("string-matches-next"); next.performClick(); next.performClick();
+        assertTrue(count.getText().toString(), count.getText().toString().contains("17–20 of 20"));
+        assertFalse(next.isEnabled());
+        assertNotNull(body.findViewWithTag("string-why-19"));
+        assertEquals(encoded, captured.encoded);
     }
 }
