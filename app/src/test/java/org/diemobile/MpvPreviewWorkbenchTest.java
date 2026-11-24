@@ -411,12 +411,13 @@ public final class MpvPreviewWorkbenchTest {
         MediaPlayer player = ReflectionHelpers.getField(activity, "player");
         assertNotNull(player); assertFalse(player.isPlaying());
         assertEquals(0, HostFrame.calls.get());
-        Shadows.shadowOf(player).invokeErrorListener(1, -1004);
+        Shadows.shadowOf(player).invokeErrorListener(MediaPlayer.MEDIA_ERROR_UNKNOWN,
+                MediaPlayer.MEDIA_ERROR_UNSUPPORTED);
         settlePreview();
         green(previewBitmap());
         assertNull(ReflectionHelpers.getField(activity, "player"));
         JSONObject failure = ReflectionHelpers.getField(activity, "platformPreview");
-        assertEquals(-1004, failure.getInt("extra"));
+        assertEquals(MediaPlayer.MEDIA_ERROR_UNSUPPORTED, failure.getInt("extra"));
         HostFrame.captured = new CountDownLatch(1); HostFrame.release = new CountDownLatch(1);
         ReflectionHelpers.callInstanceMethod(activity, "render");
         assertTrue(HostFrame.captured.await(30, TimeUnit.SECONDS));
@@ -426,6 +427,49 @@ public final class MpvPreviewWorkbenchTest {
         settlePreview();
         assertNull(activity.getWindow().getDecorView().findViewWithTag("content-image"));
         assertTrue(ReflectionHelpers.<TextView>getField(activity, "status").getText().toString().startsWith("Hex"));
+    }
+
+    @Test public void ioTimeoutServerAndUnknownMediaErrorsDoNotAdmitStillFallback() throws Exception {
+        ShadowMediaPlayer.setMediaInfoProvider(source -> new ShadowMediaPlayer.MediaInfo(1000, 0));
+        openPreview(video(), "VIDEO");
+        int[][] refused = {
+            {MediaPlayer.MEDIA_ERROR_UNKNOWN, MediaPlayer.MEDIA_ERROR_IO},
+            {MediaPlayer.MEDIA_ERROR_UNKNOWN, MediaPlayer.MEDIA_ERROR_TIMED_OUT},
+            {MediaPlayer.MEDIA_ERROR_SERVER_DIED, 0},
+            {MediaPlayer.MEDIA_ERROR_SERVER_DIED, MediaPlayer.MEDIA_ERROR_UNSUPPORTED},
+            {MediaPlayer.MEDIA_ERROR_UNKNOWN, 0},
+            {MediaPlayer.MEDIA_ERROR_UNKNOWN, -12345},
+            {0, MediaPlayer.MEDIA_ERROR_MALFORMED},
+            {MediaPlayer.MEDIA_ERROR_NOT_VALID_FOR_PROGRESSIVE_PLAYBACK,
+                    MediaPlayer.MEDIA_ERROR_UNSUPPORTED}
+        };
+        for (int[] error : refused) {
+            MediaPlayer player = ReflectionHelpers.getField(activity, "player");
+            assertNotNull(player);
+            Shadows.shadowOf(player).invokeErrorListener(error[0], error[1]);
+            settlePreview();
+            assertNull(ReflectionHelpers.getField(activity, "player"));
+            assertEquals(0, HostFrame.calls.get());
+            assertEquals("Automatic", ReflectionHelpers.getField(activity, "mode"));
+            assertNull(activity.getWindow().getDecorView().findViewWithTag("content-image"));
+            String status = ReflectionHelpers.<TextView>getField(activity, "status")
+                    .getText().toString();
+            assertTrue(status, status.contains("what=" + error[0])
+                    && status.contains("extra=" + error[1]));
+            ReflectionHelpers.callInstanceMethod(activity, "render");
+            settlePreview();
+        }
+        // A later documented malformed-data refusal can still produce a real still from the
+        // unchanged owned bytes; prior IO/service errors do not poison the next request.
+        MediaPlayer player = ReflectionHelpers.getField(activity, "player");
+        Shadows.shadowOf(player).invokeErrorListener(MediaPlayer.MEDIA_ERROR_UNKNOWN,
+                MediaPlayer.MEDIA_ERROR_MALFORMED);
+        settlePreview();
+        green(previewBitmap());
+        assertEquals(1, HostFrame.calls.get());
+        assertEquals(MediaPlayer.MEDIA_ERROR_MALFORMED,
+                ReflectionHelpers.<JSONObject>getField(activity, "platformPreview").getInt("extra"));
+        input.checkIdentity(() -> false);
     }
 
     private interface Refused { void run() throws Exception; }

@@ -1123,7 +1123,12 @@ public final class ContentPreviewActivity extends Activity {
         releasePlayer();
         decoderNotice = "Platform media decoder failed · what=" + what + " extra=" + extra;
         status.setText(decoderNotice);
-        if (!video) return;
+        // OnError's what is the error category; extra supplies the format/codec detail.
+        // IO, timeout, server death and undocumented codes do not establish a decoder refusal.
+        boolean decoderRefusal = what == MediaPlayer.MEDIA_ERROR_UNKNOWN
+                && (extra == MediaPlayer.MEDIA_ERROR_UNSUPPORTED
+                        || extra == MediaPlayer.MEDIA_ERROR_MALFORMED);
+        if (!video || !decoderRefusal) return;
         try {
             mediaFailure = new JSONObject().put("decoder", "Android MediaPlayer")
                     .put("phase", "OnError").put("what", what).put("extra", extra);

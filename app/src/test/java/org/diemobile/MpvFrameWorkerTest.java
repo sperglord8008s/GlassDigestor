@@ -132,9 +132,11 @@ public final class MpvFrameWorkerTest {
 
     private JSONObject send(ServiceController<BinaryWorkerService> controller, Message message)
             throws Exception {
+        WorkerDescriptorFactsFixture.safe(message.getData()).attach(controller.get());
         new Messenger(controller.get().onBind(new Intent())).send(message);
         Shadows.shadowOf(Looper.getMainLooper()).idle();
-        return new JSONObject(new String(Files.readAllBytes(report.toPath()), StandardCharsets.UTF_8));
+        return new JSONObject(
+                new String(Files.readAllBytes(report.toPath()), StandardCharsets.UTF_8));
     }
 
     @Test
@@ -314,6 +316,15 @@ public final class MpvFrameWorkerTest {
                                 facts(11, 0),
                                 OsConstants.O_WRONLY,
                                 envelope));
+        assertThrows(
+                IOException.class,
+                () ->
+                        BinaryWorkerService.validateFrameDescriptorFacts(
+                                source,
+                                OsConstants.O_RDONLY,
+                                pixels,
+                                OsConstants.O_WRONLY,
+                                facts(11, 0)));
         assertThrows(
                 IOException.class,
                 () ->

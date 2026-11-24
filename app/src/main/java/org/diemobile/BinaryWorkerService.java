@@ -22,6 +22,7 @@ public final class BinaryWorkerService extends Service {
     private String activeToken;
     private boolean isolated;
     private Messenger messenger;
+    private DescriptorInspector descriptorInspector = BinaryWorkerService::inspectDescriptor;
 
     @Override
     public void onCreate() {
@@ -33,7 +34,7 @@ public final class BinaryWorkerService extends Service {
                                 Looper.getMainLooper(),
                                 message -> {
                                     Bundle data = message.getData();
-                                    String token = data.getString("token");
+                                    String token = messageString(data, "token", null);
                                     if (message.what == CANCEL) {
                                         if (isolated && token != null && token.equals(activeToken))
                                             android.os.Process.killProcess(
@@ -41,18 +42,43 @@ public final class BinaryWorkerService extends Service {
                                         return true;
                                     }
                                     if (message.what != RUN) return false;
-                                    ParcelFileDescriptor input = data.getParcelable("input"),
-                                            output = data.getParcelable("output"),
-                                            payload = data.getParcelable("payload"),
-                                            raster = data.getParcelable("raster");
-                                    if (input == null || output == null || token == null) {
-                                        close(input);
-                                        close(output);
-                                        close(payload);
-                                        close(raster);
+                                    ParcelFileDescriptor[] descriptors =
+                                            new ParcelFileDescriptor[4];
+                                    String[] keys = {"input", "output", "payload", "raster"};
+                                    boolean malformed = false;
+                                    for (int i = 0; i < keys.length; i++) {
+                                        try {
+                                            Object value = data.get(keys[i]);
+                                            if (value == null
+                                                    || value instanceof ParcelFileDescriptor)
+                                                descriptors[i] = (ParcelFileDescriptor) value;
+                                            else malformed = true;
+                                        } catch (RuntimeException invalidDescriptor) {
+                                            malformed = true;
+                                        }
+                                    }
+                                    ParcelFileDescriptor input = descriptors[0],
+                                            output = descriptors[1],
+                                            payload = descriptors[2],
+                                            raster = descriptors[3];
+                                    if (malformed
+                                            || input == null
+                                            || output == null
+                                            || token == null) {
+                                        closeRequest(input, output, payload, raster);
                                         return true;
                                     }
-                                    String engine = data.getString("engine", "binwalk");
+                                    // Even a rejection is a write. An unsafe reply descriptor must
+                                    // never reach error serialization or change the active token.
+                                    if (!reportChannelSafe(input, output, payload, raster)) {
+                                        closeRequest(input, output, payload, raster);
+                                        return true;
+                                    }
+                                    String engine = messageString(data, "engine", "binwalk");
+                                    if (engine == null) {
+                                        closeRequest(input, output, payload, raster);
+                                        return true;
+                                    }
                                     String rejection =
                                             !isolated
                                                     ? "The binary worker does not have an isolated"
@@ -178,7 +204,8 @@ public final class BinaryWorkerService extends Service {
         try (ParcelFileDescriptor source = input;
                 ParcelFileDescriptor destination = payload;
                 ParcelFileDescriptor pixels = raster;
-                OutputStream target = new ParcelFileDescriptor.AutoCloseOutputStream(output)) {
+                ParcelFileDescriptor envelope = output) {
+            if (!reportChannelSafe(source, envelope, destination, pixels)) return;
             String result;
             try {
                 if (rejection != null) throw new IOException(rejection);
@@ -244,31 +271,36 @@ public final class BinaryWorkerService extends Service {
                                 .put("error", failure.toString())
                                 .toString();
             }
-            target.write(
-                    ("{\"workerUid\":"
-                                    + android.os.Process.myUid()
-                                    + ",\"applicationUid\":"
-                                    + getApplicationInfo().uid
-                                    + ",\"isolatedUid\":"
-                                    + isolated
-                                    + ",\"engine\":"
-                                    + JSONObject.quote(engine)
-                                    + (engine.equals("mpv-frame")
-                                            ? ",\"requestToken\":"
-                                                    + JSONObject.quote(token)
-                                                    + ",\"maximumDimensionPixels\":"
-                                                    + maximumDimensionPixels
-                                            : "")
-                                    + (limits == null
-                                            ? ""
-                                            : ",\"analysisDeadlineMs\":"
-                                                    + limits.analysisDeadlineMs
-                                                    + ",\"requestDeadlineMs\":"
-                                                    + limits.requestDeadlineMs)
-                                    + ",\"report\":")
-                            .getBytes(StandardCharsets.UTF_8));
-            target.write(result.getBytes(StandardCharsets.UTF_8));
-            target.write('}');
+            // This stays outside the parser-error catch: a channel failure cannot itself be
+            // serialized into the descriptor it rejected. Recheck after native work as well.
+            if (!reportChannelSafe(source, envelope, destination, pixels)) return;
+            try (OutputStream target = new ParcelFileDescriptor.AutoCloseOutputStream(envelope)) {
+                target.write(
+                        ("{\"workerUid\":"
+                                        + android.os.Process.myUid()
+                                        + ",\"applicationUid\":"
+                                        + getApplicationInfo().uid
+                                        + ",\"isolatedUid\":"
+                                        + isolated
+                                        + ",\"engine\":"
+                                        + JSONObject.quote(engine)
+                                        + (engine.equals("mpv-frame")
+                                                ? ",\"requestToken\":"
+                                                        + JSONObject.quote(token)
+                                                        + ",\"maximumDimensionPixels\":"
+                                                        + maximumDimensionPixels
+                                                : "")
+                                        + (limits == null
+                                                ? ""
+                                                : ",\"analysisDeadlineMs\":"
+                                                        + limits.analysisDeadlineMs
+                                                        + ",\"requestDeadlineMs\":"
+                                                        + limits.requestDeadlineMs)
+                                        + ",\"report\":")
+                                .getBytes(StandardCharsets.UTF_8));
+                target.write(result.getBytes(StandardCharsets.UTF_8));
+                target.write('}');
+            }
         } catch (Exception ignored) {
             /* Pipe closure/crash is an explicit incomplete-report failure in the caller. */
         } finally {
@@ -286,6 +318,99 @@ public final class BinaryWorkerService extends Service {
                 value.close();
             } catch (IOException ignored) {
             }
+    }
+
+    private static String messageString(Bundle message, String key, String fallback) {
+        try {
+            Object value = message.get(key);
+            return value == null ? fallback : value instanceof String ? (String) value : null;
+        } catch (RuntimeException malformed) {
+            return null;
+        }
+    }
+
+    private static void closeRequest(
+            ParcelFileDescriptor input,
+            ParcelFileDescriptor output,
+            ParcelFileDescriptor payload,
+            ParcelFileDescriptor raster) {
+        close(input);
+        close(output);
+        close(payload);
+        close(raster);
+    }
+
+    static final class DescriptorFacts {
+        final StructStat stat;
+        final int flags;
+
+        DescriptorFacts(StructStat stat, int flags) {
+            this.stat = stat;
+            this.flags = flags;
+        }
+    }
+
+    interface DescriptorInspector {
+        DescriptorFacts inspect(ParcelFileDescriptor descriptor) throws IOException;
+    }
+
+    private static DescriptorFacts inspectDescriptor(ParcelFileDescriptor descriptor)
+            throws IOException {
+        try {
+            return new DescriptorFacts(
+                    Os.fstat(descriptor.getFileDescriptor()),
+                    Os.fcntlInt(descriptor.getFileDescriptor(), OsConstants.F_GETFL, 0));
+        } catch (ErrnoException | IllegalStateException invalid) {
+            throw new IOException("Worker descriptor inspection failed", invalid);
+        }
+    }
+
+    private boolean reportChannelSafe(
+            ParcelFileDescriptor input,
+            ParcelFileDescriptor output,
+            ParcelFileDescriptor payload,
+            ParcelFileDescriptor raster) {
+        try {
+            validateReportDescriptorFacts(
+                    inspected(input),
+                    inspected(output),
+                    payload == null ? null : inspected(payload),
+                    raster == null ? null : inspected(raster));
+            return true;
+        } catch (IOException | RuntimeException | LinkageError unsafe) {
+            return false;
+        }
+    }
+
+    private DescriptorFacts inspected(ParcelFileDescriptor descriptor) throws IOException {
+        DescriptorFacts facts = descriptorInspector.inspect(descriptor);
+        if (facts == null)
+            throw new IOException("Worker descriptor inspection returned no identity");
+        return facts;
+    }
+
+    /**
+     * Kernel object identity applies to independently opened FDs and hard links, not just paths.
+     */
+    static void validateReportDescriptorFacts(
+            DescriptorFacts input,
+            DescriptorFacts output,
+            DescriptorFacts payload,
+            DescriptorFacts raster)
+            throws IOException {
+        if (input == null || input.stat == null || output == null || output.stat == null)
+            throw new IOException("Worker reply descriptor identity is unavailable");
+        int access = output.flags & OsConstants.O_ACCMODE;
+        if (output.flags < 0 || (access != OsConstants.O_WRONLY && access != OsConstants.O_RDWR))
+            throw new IOException("Worker reply descriptor is not writable");
+        for (DescriptorFacts other : new DescriptorFacts[] {input, payload, raster}) {
+            if (other == null) continue;
+            if (other.stat == null
+                    || other.flags < 0
+                    || output.stat.st_dev == other.stat.st_dev
+                            && output.stat.st_ino == other.stat.st_ino)
+                throw new IOException("Worker reply descriptor aliases data or cannot be verified");
+        }
     }
 
     static int frameMaximum(Bundle message) throws IOException {
@@ -330,6 +455,7 @@ public final class BinaryWorkerService extends Service {
                 || (pixelFlags & OsConstants.O_ACCMODE) == OsConstants.O_RDONLY
                 || (pixelFlags & OsConstants.O_APPEND) != 0
                 || source.st_dev == pixels.st_dev && source.st_ino == pixels.st_ino
+                || source.st_dev == envelope.st_dev && source.st_ino == envelope.st_ino
                 || envelope.st_dev == pixels.st_dev && envelope.st_ino == pixels.st_ino)
             throw new IOException(
                     "MPV frame needs read-only bounded input and a fresh separate writable"
