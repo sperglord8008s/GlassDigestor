@@ -17,14 +17,21 @@ identity exactly matches the reported `L0_Video.dd.bz2` screenshot. Complete
 archive decoding has passed through the actual host libarchive JNI and a
 symlinked trusted cache ancestor, producing 62,578,688 bytes with the pinned
 independently calculated SHA-256. Binwalk and PhotoRec also produce real
-discovery reports. Discovery counts are not recovered-file acceptance.
+discovery reports. Discovery counts are separate from recovered-file acceptance. A subsequent host
+replay of those complete native captures through the unchanged production
+evidence/content-map/export models produced an actual ZIP. Independent streaming
+ZIP/CRC/SHA-256 checks confirm **five of six** reference files byte-for-byte,
+including two exact copies of the AVI. MPEG is missing: its first native
+candidate exhausts the current 8 MiB streaming-callback budget. Another 79
+exported entries remain additional, unscored findings; they are not discarded.
+This baseline does not execute Android UI or SAF.
 
 | Gate | L0_Video | Other 29 images |
 | --- | --- | --- |
 | Reference layout recorded | Yes, with one flagged Fill-row inconsistency | Yes, with six flagged inconsistencies |
 | Compressed and decoded identity pinned | Yes | Pending acquisition |
 | Entire archive decoded byte-for-byte | Passed on host JNI | Unverified |
-| Every expected file recovered and exported byte-for-byte | Unverified | Unverified |
+| Every expected file recovered and exported byte-for-byte | **5/6** exact on host; MPEG missing; additional exports unscored | Unverified |
 | Android gallery, preview and real destination export | Unverified for this corpus | Unverified |
 
 For a complete contiguous recovery, compare the **actual exported bytes** with
@@ -39,3 +46,25 @@ Run `python3 tests/test-nist-catalog.py` to check the reference inventory.
 repeats the optional exact public-image archive regression entirely offline.
 The caller acquires the external image separately. Broader carving/export
 evaluation and the remaining 29 image identities are continuation work.
+
+
+## Score actual recovered files
+
+`L0_Video-expected.json` pins all six original file intervals and SHA-256 values.
+Regenerate it from the separately acquired image using Python's independent
+BZip2 decoder; no media files are written:
+
+```sh
+python3 scripts/derive-nist-oracle.py /path/to/L0_Video.dd.bz2 --output /tmp/oracle.json
+cmp tests/fixtures/nist/L0_Video-expected.json /tmp/oracle.json
+python3 scripts/score-nist-recovery.py /path/to/recovered-files.zip --output /tmp/score.json
+```
+
+The score checks source binding, every actual payload's CRC/size/SHA-256,
+reference coordinates and all indexed entries. A missing file returns status
+1; complete reference recovery returns 0. Duplicate exact files and additional
+exports remain visible. Malformed/unindexed/duplicate ZIP entries and false
+manifest digests are refused. Nine small independent negative/positive fixtures
+run without corpus downloads in `scripts/test.sh`. This scoring/oracle code is
+test tooling only; production discovery never receives reference coordinates.
+Fragmented, missing-data and unacquired cases remain unscored.

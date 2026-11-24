@@ -9,3 +9,4 @@ java -cp "$tmp" org.diemobile.ArchiveStoreTest
 bash scripts/test-presentation.sh
 python3 tests/test-build-version.py
 python3 tests/test-nist-catalog.py
+python3 tests/test-nist-recovery-score.py

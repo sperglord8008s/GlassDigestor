@@ -1,0 +1,47 @@
+{
+  "schema": "org.glassdigestor.nist-contiguous-oracle",
+  "schemaVersion": 1,
+  "case": "L0_Video",
+  "layoutSourceSha256": "665fb749210b7f86433ac0680351647ee7a01305cfaa41ecd1fd666127fc60c3",
+  "meaning": "Independent test oracle from full pinned stdlib BZip2 decode and published NIST layout coordinates; never a production recovery algorithm.",
+  "sourceSha256": "20d8a231ded5223bbecab97d4155d028ef9cd0760a5dd3ecef22123c46b48870",
+  "sourceSizeBytes": 62578688,
+  "files": [
+    {
+      "name": "vid1.mp4",
+      "offset": 5120000,
+      "sizeBytes": 1136007,
+      "sha256": "0ee69d3b50e9e0fa83d4d1f022510f99d4d013fd42fa4da5804d5fe0c66ffda4"
+    },
+    {
+      "name": "vid2.avi",
+      "offset": 11376128,
+      "sizeBytes": 1470360,
+      "sha256": "e0063e655acae16079cc8bae5ad1862d52b449f5aad919d311c9222f63f38693"
+    },
+    {
+      "name": "vid3.mov",
+      "offset": 17966592,
+      "sizeBytes": 497414,
+      "sha256": "a080ef2d7afce448e981e9eceaed709beffc073dccdea12f7b6fe08c3c891323"
+    },
+    {
+      "name": "vid4.flv",
+      "offset": 23584256,
+      "sizeBytes": 3713213,
+      "sha256": "e846f9806e5c9f471f4be8c40f435aece8c42d64966db79960d248eed071f198"
+    },
+    {
+      "name": "vid5.mpg",
+      "offset": 32417792,
+      "sizeBytes": 22579200,
+      "sha256": "b5332c2cb5be61711e1f15efd9438e1505b94b75cb0e9980ad0cab12ec884878"
+    },
+    {
+      "name": "vid6.wmv",
+      "offset": 60116992,
+      "sizeBytes": 2461696,
+      "sha256": "a2363a893e588db5d4456e0e8028d39abfdbadc7fe6858ec43d8665f3d29b109"
+    }
+  ]
+}

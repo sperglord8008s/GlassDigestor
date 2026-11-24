@@ -1657,3 +1657,25 @@ builds reuse independently revalidated unchanged CDiE/hash libraries because
 of constrained storage; clean CI rebuilds normally. The frozen local APK is
 52,837,161 bytes, SHA-256
 `dd2491ab14928da8848758e3edea153aa4da98121768e3d01ec03786d39423f4`.
+
+
+## Independent NIST file-export acceptance baseline
+
+A separate local follow-up branch adds the independent ZIP scorer, an offline
+stdlib oracle derivation command and all six contiguous L0_Video file hashes.
+The oracle regenerates byte-identically from the pinned public compressed image;
+nine positive/negative scorer fixtures and generic regressions pass. Source-bound
+manifest claims are checked against every actual payload's CRC/size/SHA-256;
+missing files, unknown additional exports, duplicates and malformed archives do
+not disappear behind a header count. Fragmented/unacquired cases stay unscored.
+
+Replaying the losslessly retained actual native captures through unchanged
+production evidence/content-map/export code at `47bde0b` yields an actual
+85-file ZIP. Independent scoring confirms **5/6** reference files (two exact AVI
+copies), with 79 additional unscored exports. MPEG's first candidate reaches
+the 8 MiB per-candidate streaming callback limit, with no recovered extent.
+[Complete baseline score](verification/nist-L0-video-export-baseline.json).
+This is host model/export verification, separate from Android UI/SAF. The
+follow-up priority is larger bounded streaming checks with explicit handling of
+repeated MPEG pack signatures, preserving every original native row and the
+separate reviewed PDF 8 MiB optional-metadata limit.
