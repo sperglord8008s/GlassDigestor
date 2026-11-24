@@ -157,11 +157,17 @@ public final class NativeArchiveStoreTest {
             File original = temporary.resolve("original.bin").toFile();
             Files.copy(fixtures.resolve("mislabeled.apk"), original.toPath());
             String sourceLabel = "misleading-" + "世界😀".repeat(4000) + ".jpg";
+            // Android may expose private cache through an ancestor alias (/data/user/0).
+            // The alias is trusted Context storage; individual cache leaf links remain invalid.
+            Path physicalCache = Files.createDirectories(temporary.resolve("physical-cache"));
+            Path cacheAlias = temporary.resolve("context-cache-alias");
+            Files.createSymbolicLink(cacheAlias, physicalCache);
+            File aliasedSessions = cacheAlias.resolve("sessions").toFile();
             NativeArchiveSession session =
                     NativeArchiveSession.open(
                             original,
                             sourceLabel,
-                            temporary.resolve("sessions").toFile(),
+                            aliasedSessions,
                             0,
                             original.length(),
                             NATIVE,
@@ -177,6 +183,25 @@ public final class NativeArchiveStoreTest {
                             .equals(sourceLabel),
                     "Full source name missing from export");
             File directory = session.directory;
+            require(
+                    directory.equals(directory.getCanonicalFile()),
+                    "Session retained the Context ancestor alias instead of its anchored root");
+            Path sentinel = temporary.resolve("outside-session-sentinel.json");
+            byte[] sentinelBytes =
+                    "preserve outside bytes".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+            Files.write(sentinel, sentinelBytes);
+            Path linkedCapture = directory.toPath().resolve("archive-capture-link.json");
+            Files.createSymbolicLink(linkedCapture, sentinel);
+            NativeArchiveSession aliasSession = session;
+            refuse(
+                    () ->
+                            aliasSession.changeScope(
+                                    0, aliasSession.current().input.size, () -> false),
+                    "a linked cache leaf under an aliased Context root");
+            require(
+                    Arrays.equals(Files.readAllBytes(sentinel), sentinelBytes),
+                    "Linked-entry refusal modified bytes outside the session");
+            Files.delete(linkedCapture);
             NativeArchiveStore.Inventory inventory = session.current().inventory;
             require(
                     !inventory.members.get(0).treeName(),
@@ -188,9 +213,7 @@ public final class NativeArchiveStoreTest {
             int before = calls;
             String state = session.retentionState();
             session.close(true);
-            session =
-                    NativeArchiveSession.restore(
-                            directory.getParentFile(), state, NATIVE, () -> false);
+            session = NativeArchiveSession.restore(aliasedSessions, state, NATIVE, () -> false);
             require(calls == before, "Restore reran native analysis");
             require(
                     session.current().name.equals(sourceLabel),

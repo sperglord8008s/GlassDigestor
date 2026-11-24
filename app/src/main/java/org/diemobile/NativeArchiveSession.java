@@ -73,6 +73,9 @@ final class NativeArchiveSession implements AutoCloseable {
             ArchiveLaunch launch,
             BooleanSupplier stop)
             throws Exception {
+        // Context cache roots can have Android-managed ancestor aliases. Anchor the
+        // trusted root once; per-entry canonical checks must still reject leaf links.
+        base = base.getCanonicalFile();
         if (!base.isDirectory() && !base.mkdirs())
             throw new IOException("Cannot create archive sessions");
         File directory = File.createTempFile("archive-session-", ".owned", base);
@@ -183,9 +186,9 @@ final class NativeArchiveSession implements AutoCloseable {
 
     private void capture(Location location, long offset, long length, BooleanSupplier stop)
             throws Exception {
+        long[] usage = privateUsage();
         NativeArchiveStore.Inventory result =
                 NativeArchiveStore.inspect(location.input, offset, length, runner, stop);
-        long[] usage = privateUsage();
         long reportBytes = usage[1] + result.raw.getBytes(StandardCharsets.UTF_8).length;
         if (location.acquisition != null && location.acquisitionFile == null)
             reportBytes += location.acquisition.getBytes(StandardCharsets.UTF_8).length;
@@ -351,6 +354,7 @@ final class NativeArchiveSession implements AutoCloseable {
 
     static NativeArchiveSession restore(
             File base, String state, ArchiveRunner runner, BooleanSupplier stop) throws Exception {
+        base = base.getCanonicalFile();
         if (state == null || state.length() > MAX_STATE)
             throw new IOException("Archive state absent or exceeds budget");
         JSONObject value = new JSONObject(state);
@@ -547,7 +551,7 @@ final class NativeArchiveSession implements AutoCloseable {
     }
 
     private static File leaf(File directory, String name) throws IOException {
-        File file = new File(directory, name);
+        File file = new File(directory.getCanonicalFile(), name);
         if (!file.getAbsoluteFile().equals(file.getCanonicalFile())
                 || !file.getParentFile().getCanonicalFile().equals(directory.getCanonicalFile())
                 || !file.getName().equals(name))

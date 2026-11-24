@@ -206,3 +206,17 @@ identities and page pixels/geometry are independently verified;
 [evidence](verification/android-worker-runtime-04e93c0.json). Production ARM64,
 SAF and full gallery UI acceptance remain separate. See
 [PDF preview contracts](pdf-page-previews.md).
+
+
+## Compressed files and the NIST recovery target
+
+The current archive iteration fixes trusted Android cache-path aliases without
+accepting generated leaf symlinks. Captured archive/compression identification
+now leads directly to browsing/decompression. A single decoded file can be
+opened or saved without traversing evidence metadata, and its preview can stage
+an independent Gallerize discovery input. The exact public NIST L0_Video BZip2
+sample passes complete host-native decoding. The test-only
+[30-image corpus matrix](../tests/fixtures/nist/README.md) distinguishes this
+from complete media carving/export, Android UI and fragmented recovery.
+Source CI and the new eleventh actual Android contract are pending; earlier
+published verification remains as recorded above.

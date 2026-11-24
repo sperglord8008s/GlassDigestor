@@ -75,6 +75,7 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
             record("isolated-native-hash-vectors", small);
             largeHash();
             archive();
+            archiveSession();
             compiledManifest();
             photoRecPdf();
             pdfPages();
@@ -130,6 +131,174 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
         }
     }
 
+    private void archiveSession() throws Exception {
+        File compressed = new File(directory, "archive-session-misleading.jpeg");
+        try (InputStream asset = target.getAssets().open("test-fixtures/archive-session-20m.bz2");
+                OutputStream output = new FileOutputStream(compressed)) {
+            byte[] buffer = new byte[65536];
+            long copied = 0;
+            for (int count; (count = asset.read(buffer)) != -1; ) {
+                copied += count;
+                require(copied < 22L * 1024 * 1024, "Archive fixture exceeds its bounded size");
+                output.write(buffer, 0, count);
+            }
+        }
+        require(
+                compressed.length() > 19L * 1024 * 1024,
+                "Archive fixture is not a large full input");
+        long compressedSize = compressed.length();
+        String compressedSha = reportDigest(compressed);
+        File physical = File.createTempFile("archive-session-physical-", ".owned", directory);
+        require(physical.delete() && physical.mkdir(), "Cannot create physical cache fixture");
+        File alias = new File(directory, physical.getName() + ".alias");
+        Os.symlink(physical.getAbsolutePath(), alias.getAbsolutePath());
+        File base = new File(alias, "sessions");
+        File sentinel = new File(directory, "archive-session-outside-sentinel.json");
+        byte[] originalSentinel = "preserve outside bytes".getBytes(StandardCharsets.UTF_8);
+        write(sentinel, originalSentinel);
+        File linked = null;
+        NativeArchiveSession session = null;
+        BinaryWorkerClient actual = new BinaryWorkerClient(target, "archive");
+        int[] requests = {0};
+        ArchiveRunner counted =
+                new ArchiveRunner() {
+                    @Override
+                    public String inspect(
+                            File input,
+                            long offset,
+                            long length,
+                            java.util.function.BooleanSupplier stop)
+                            throws Exception {
+                        requests[0]++;
+                        return actual.inspect(input, offset, length, stop);
+                    }
+
+                    @Override
+                    public String extract(
+                            File input,
+                            File output,
+                            long offset,
+                            long length,
+                            int member,
+                            java.util.function.BooleanSupplier stop)
+                            throws Exception {
+                        requests[0]++;
+                        return actual.extract(input, output, offset, length, member, stop);
+                    }
+                };
+        try {
+            session =
+                    NativeArchiveSession.open(
+                            compressed,
+                            "misleading.jpeg",
+                            base,
+                            0,
+                            compressed.length(),
+                            counted,
+                            ArchiveLaunch.forInput(
+                                    compressedSha, compressed.length(), 0, compressed.length()),
+                            () -> false);
+            require(
+                    session.directory.equals(session.directory.getCanonicalFile()),
+                    "Session failed to anchor the Context cache alias");
+            require(
+                    session.current().inventory.complete
+                            && session.current().inventory.members.size() == 1,
+                    "BZip2 stream did not produce one complete returned member");
+            JSONObject inspection = session.current().inventory.json();
+            int inspectedRequests = requests[0];
+            linked = new File(session.directory, "archive-capture-linked.json");
+            Os.symlink(sentinel.getAbsolutePath(), linked.getAbsolutePath());
+            boolean refused = false;
+            try {
+                session.changeScope(0, session.current().input.size, () -> false);
+            } catch (IOException expected) {
+                refused = true;
+            }
+            require(
+                    refused && requests[0] == inspectedRequests,
+                    "Linked cache leaf was not refused before native work");
+            require(
+                    Arrays.equals(originalSentinel, read(sentinel)),
+                    "Cache refusal changed bytes outside the session");
+            java.nio.file.Files.deleteIfExists(linked.toPath());
+            linked = null;
+            String state = session.retentionState();
+            session.close(true);
+            session = null;
+            require(compressed.delete(), "Cannot expire original compressed fixture");
+            session = NativeArchiveSession.restore(base, state, counted, () -> false);
+            require(requests[0] == inspectedRequests, "Alias restoration repeated native analysis");
+            final NativeArchiveSession captured = session;
+            NativeArchiveStore.Member member = session.current().inventory.members.get(0);
+            try (NativeArchiveStore.Acquired acquired =
+                    session.acquire(
+                            member, new File(directory, "archive-session-members"), () -> false)) {
+                String expectedSha =
+                        "73aea6dfaf4ef1966595e77bfa2c69597b0830f7f6c82f9ca6490260ae16ccf3";
+                require(
+                        acquired.input.size == 20L * 1024 * 1024
+                                && acquired.input.sha256.equals(expectedSha)
+                                && reportDigest(acquired.input.file).equals(expectedSha),
+                        "Complete native BZip2 payload differs from its independent oracle");
+                File origins = new File(alias, "origins");
+                try (ContentOrigin origin =
+                                ContentOrigin.create(
+                                        origins,
+                                        acquired.input,
+                                        ContentOrigin.member(session.current().input, member.index),
+                                        records ->
+                                                records.json(
+                                                        "archiveTrail",
+                                                        out ->
+                                                                captured.writeCapturedEvidence(
+                                                                        out, () -> false)),
+                                        () -> false);
+                        ContentOrigin restored =
+                                ContentOrigin.restore(
+                                        origins,
+                                        origin.descriptor(),
+                                        acquired.input.sha256,
+                                        acquired.input.size,
+                                        () -> false)) {
+                    require(
+                            origin.size == restored.size && origin.size > 0,
+                            "Archive origin handoff failed through the Context alias");
+                }
+                record(
+                        "aliased-cache-bzip2-session-and-exact-large-file",
+                        new JSONObject()
+                                .put("compressedSizeBytes", compressedSize)
+                                .put("compressedSha256", compressedSha)
+                                .put("decodedSizeBytes", acquired.input.size)
+                                .put("decodedSha256", acquired.input.sha256)
+                                .put("contextAncestorAliasAccepted", true)
+                                .put("sessionRootCanonical", true)
+                                .put("linkedCacheLeafRefusedBeforeNativeWork", true)
+                                .put("outsideSentinelUnchanged", true)
+                                .put("restoreFromAliasWithoutNativeReanalysis", true)
+                                .put("originalSourceExpiredBeforeAcquisition", true)
+                                .put("originRestoredThroughAlias", true)
+                                .put("sourceExtensionIgnored", true)
+                                .put("fullArchiveUiExecuted", false)
+                                .put("inspection", inspection)
+                                .put("acquisition", new JSONObject(acquired.extractionReport)));
+            }
+        } finally {
+            if (linked != null)
+                try {
+                    java.nio.file.Files.deleteIfExists(linked.toPath());
+                } catch (Exception ignored) {
+                }
+            if (session != null) session.close();
+            actual.close();
+            try {
+                java.nio.file.Files.deleteIfExists(alias.toPath());
+            } catch (Exception ignored) {
+            }
+        }
+    }
+
     private void textActions() throws Exception {
         TextActionRuntimeActivity activity =
                 (TextActionRuntimeActivity)
@@ -140,7 +309,9 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
         AtomicReference<Boolean> sensitive = new AtomicReference<>(false);
         String raw = "研究 😀 &?#/\n" + (char) 0 + (char) 0x202e + (char) 0xd800;
         try {
-            require(activity.awaitFocus(), "Clipboard fixture never obtained window focus");
+            require(
+                    activity.awaitFocus(),
+                    "Clipboard fixture never obtained window focus: " + activity.focusState());
             waitForIdleSync();
             runOnMainSync(
                     () -> {

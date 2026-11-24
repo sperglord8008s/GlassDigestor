@@ -74,6 +74,76 @@ public final class PrimaryScanTargetTest {
             }
     }
 
+    private void scanCompressedFixture() throws Exception {
+        File compressed = temporary.resolve("L0_Video.dd.bz2").toFile();
+        Files.copy(
+                Path.of(System.getProperty("die.archive.fixture.dir"), "raw.bz2"),
+                compressed.toPath());
+        ReflectionHelpers.callInstanceMethod(
+                activity,
+                "scan",
+                ReflectionHelpers.ClassParameter.from(Uri.class, Uri.fromFile(compressed)));
+        settle();
+        assertTrue(
+                ReflectionHelpers.<String>getField(activity, "error"),
+                ReflectionHelpers.<String>getField(activity, "error").isEmpty());
+    }
+
+    @Test
+    public void bzipHeaderShowsImmediateSourceBoundBrowseDecompressAction() throws Exception {
+        scanCompressedFixture();
+        Inspector.Result captured = ReflectionHelpers.getField(activity, "result");
+        assertEquals("bzip2 compressed stream", captured.type);
+        Button contents =
+                activity.getWindow().getDecorView().findViewWithTag("main-open-archive-contents");
+        assertNotNull("Archive discovery was buried behind generic Binary facts", contents);
+        contents.performClick();
+        Intent request = Shadows.shadowOf(activity).getNextStartedActivity();
+        assertNotNull(request);
+        assertEquals(
+                NativeArchiveExplorerActivity.class.getName(),
+                request.getComponent().getClassName());
+        assertEquals(captured.sha256, request.getStringExtra("sha256"));
+        assertEquals(captured.size, request.getLongExtra("sourceSize", -1));
+        assertEquals(
+                ReflectionHelpers.<File>getField(activity, "retainedFile").getAbsolutePath(),
+                request.getStringExtra("path"));
+    }
+
+    @Test
+    public void actualBzipDetectionDialogOpensItsCapturedSourceDespiteLaterUiChanges()
+            throws Exception {
+        scanCompressedFixture();
+        ScanEvidence evidence = ReflectionHelpers.getField(activity, "evidence");
+        ScanEvidence.Row archive =
+                evidence.rows.stream()
+                        .filter(row -> "Archive".equalsIgnoreCase(row.category))
+                        .findFirst()
+                        .orElseThrow();
+        Button record =
+                activity.getWindow()
+                        .getDecorView()
+                        .findViewWithTag("detection-evidence-" + archive.index);
+        assertNotNull(record);
+        record.performClick();
+        AlertDialog dialog = ShadowAlertDialog.getLatestAlertDialog();
+        Button browse = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+        assertNotNull("Archive detection offered no next action", browse);
+        assertEquals("Browse / extract", browse.getText().toString());
+        File captured = ReflectionHelpers.getField(activity, "retainedFile");
+        ReflectionHelpers.setField(
+                activity, "retainedFile", new File(temporary.toFile(), "other-input.bin"));
+        try {
+            browse.performClick();
+            Shadows.shadowOf(Looper.getMainLooper()).idle();
+            Intent request = Shadows.shadowOf(activity).getNextStartedActivity();
+            assertNotNull(request);
+            assertEquals(captured.getAbsolutePath(), request.getStringExtra("path"));
+        } finally {
+            ReflectionHelpers.setField(activity, "retainedFile", captured);
+        }
+    }
+
     private void settle() throws Exception {
         for (int i = 0; i < 8; i++) {
             ReflectionHelpers.<ExecutorService>getField(activity, "worker")

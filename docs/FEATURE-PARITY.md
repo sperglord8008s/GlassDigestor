@@ -395,3 +395,31 @@ The public six-file checkpoint inventory and all corresponding public asset
 digests match, and exact-source APK static verification passes. This verifies
 the shared PDF helper on those Android fixtures; production ARM64/SAF/full
 gallery UI, arbitrary documents and full desktop parity remain separate.
+
+
+## Archive cache aliases and actionable compressed files (pre-alpha.18 work)
+
+Implemented: canonical trusted roots for archive sessions/origins/staged ranges,
+strict generated-leaf refusal retained, a prominent source-bound archive action
+before generic desktop parser facts, direct decoded-file Open/Save, and an
+independent preview → Gallerize handoff. Four new actual-JNI host/widget cases
+cover captured BZip2 actions and decoded file ownership. Gallery mode retains
+its existing direct card actions and usable viewport.
+
+The exact public NIST L0_Video input from the reported screenshot passes complete
+host-JNI BZip2 acquisition: 19,741,341 compressed bytes → 62,578,688 decoded
+bytes, independently pinned SHA-256. Actual Binwalk/PhotoRec discovery runs also
+complete; full recovered/exported-file scoring remains **unverified**. All
+30 related CFReDS carving images have a test-only reference catalog, with raw
+layout cells and seven disclosed inconsistencies. Only L0_Video is acquired
+and hash-pinned. [Acceptance criteria and current matrix](../tests/fixtures/nist/README.md).
+The optional offline exact-image regression is reproducible from an externally
+supplied corpus file. No expected layouts or third-party media enter the app.
+
+An eleventh actual Android lab contract covers >20 MiB compressed input,
+20 MiB exact decoding, trusted ancestor aliases, leaf refusal before native
+work, restoration and origin ownership. All **213 host Android cases**, generic/native regressions and the optional
+exact-image decoding test pass locally. [Full host receipt](verification/nist-L0-video-archive-host.json).
+The eleventh lab case compiles locally; source CI and actual API 26/35
+execution remain pending. Full gallery/SAF/production ARM64
+acceptance and arbitrary fragmentation/deobfuscation remain unverified.

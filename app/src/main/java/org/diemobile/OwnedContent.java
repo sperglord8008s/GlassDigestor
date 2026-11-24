@@ -15,6 +15,7 @@ final class OwnedContent {
             throws Exception {
         requireSource(source, range);
         source.checkIdentity(stop);
+        directory = directory.getCanonicalFile();
         InputSnapshot staged = null;
         try {
             try (RandomAccessFile file = new RandomAccessFile(source.file, "r")) {

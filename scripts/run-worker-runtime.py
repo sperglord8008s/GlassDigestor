@@ -20,6 +20,7 @@ CHECKS = {
     "token-scoped-kill-with-blocked-report-pipe",
     "normal-client-recovers-after-worker-death",
     "exact-text-actions-platform-clipboard-and-uris",
+    "aliased-cache-bzip2-session-and-exact-large-file",
 }
 
 
