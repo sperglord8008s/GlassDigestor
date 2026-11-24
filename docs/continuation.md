@@ -37,31 +37,49 @@ production discovery. Continue the remaining corpus after media stability.
 
 ## Active MPV still-image pass
 
-The next pass is isolated in `/workspace/mpv-work`, commit `b839189`, version
-**pre-alpha.21 / code 27**. It restores the archived frame foundation with
-SAR-aware bounds before screenshot allocation, strict node/raster/event guards,
-a separate raster-descriptor worker protocol and owned helper. Platform-first
-image/video/archive previews expose separate MPV still observations; explicit
-mode is a still image, not playback. [Contract](media-still-previews.md).
+The next pass is isolated in `/workspace/mpv-work`, branch
+`codex/mpv-image-fallback`, PR #25, **pre-alpha.21 / code 27**. It restores the
+archived frame foundation with SAR-aware allocation bounds, strict
+node/raster/event guards and a separate raster-descriptor worker protocol.
+Platform-first image/video/archive previews and explicit MPV stills retain
+separate observations. [Contract](media-still-previews.md).
 
-Actual host FFV1/Matroska/TIFF/PPM/SAR/pixel tests and 61 model checks pass;
-ARM64 JNI compiles, complete corresponding-source bundle verifies, and all 24
-new host Android cases pass. The full 265-case host suite passes at `b839189`;
-review corrections still require regression verification.
-Review identified two corrections before acceptance: MediaPlayer IO/timeout/
-server errors must not admit decoder-only fallback; source/report descriptor
-aliases must be rejected before any envelope write, including error replies.
-Neither issue affects the normal released20 client pipe path. Actual ARM64 MPV,
-isolated native execution, full UI/SAF/playback remain unverified. The x86 lab
-has no MPV runtime; do not imply its13 contracts verify this path.
+All 274 host Android cases pass at `3976f94`; real host MPV/native-core tests,
+61 independent model checks, ARM64 JNI and complete source-bundle verification
+pass. Review fixes for error eligibility and report aliases are committed.
+The fortified-compiler rollback correction at `c692a49` passes real C/JNI/pixel
+and both fortification-level object checks. `512f032` orders accepted slot
+release before report EOF while retaining blocked-write cancellation; all 31
+focused host cases pass, including two deterministic ordering regressions.
+Fresh complete source/PR/API 26/35 gates remain required before publication.
 
-Merge the latest main into the next working pass before final build/CI. Retain
-root's test fixes splitting API26 into a fresh JNI fork, delegating framework
-drawables to the stock bitmap shadow and using readAllBytes for Android API
-compatibility. New worker OS-fact tests explicitly substitute Robolectric's
-placeholder fstat/fcntl; they are not actual OS validation. Serialize source
-edits/compilation and never overwrite a library while a JVM has it loaded.
-The original experiment stays at `savepoint/mpv-frame-foundation-0ef94d3`.
+PR runtime run 45492217492 passes all 14 on API 26/35 at `cb434d6`, whose full Git
+tree equals head `3976f94`; downloaded sources/APKs/libraries/reports/transfer
+and alias-byte/offset facts were independently audited. Push run 45492123756
+API26 fails the immediate same-connection hash assertion; its rejected response
+was not retained by the old harness, so the exact failure cause is unknown.
+The independently identified EOF-before-queued-release gap is corrected without
+retries. Main docs-only run 45490329463 API 35 fails before clipboard access:
+current window focus was absent; Launcher ANR and boot pressure are observed,
+while an interfering overlay remains unproven. Keep both failed captures.
+The new harness preserves bounded replies before assertions and samples current
+resumed/attached/shown/focus state plus bounded failure-only window diagnostics.
+It retains the focus requirement and performs each clipboard/hash operation once.
+
+Root's local logs/receipts and original ZIPs are under
+`/workspace/work/runtime-evidence/{2209322,3976f94}` and `/workspace/attachments`.
+The clean native core is unchanged; local ARM64 Binwalk/archive/PhotoRec/MPV
+rebuilds also pass. Large regenerable CMake/IDE plans and Rust targets were
+reclaimed after preserving generated JNI/source identities and logs; clean CI
+must perform full assembly. The earlier working pre-alpha.20 APK remains loose.
+
+Retain test fixes splitting API26 into a fresh JNI fork, delegating framework
+drawables to the stock bitmap shadow and using readAllBytes for Android APIs.
+OS-fact tests substitute Robolectric's placeholder fstat/fcntl explicitly;
+they do not establish real kernel behavior. Actual Android MPV/isolated decoder,
+ARM64 handset/full UI/SAF/playback remain unverified. The x86 lab has no MPV
+runtime. Serialize edits/builds and never overwrite loaded JNI. The original
+experiment remains at `savepoint/mpv-frame-foundation-0ef94d3`.
 
 ## Reproduce clean builds
 
@@ -79,7 +97,7 @@ python3 scripts/verify-worker-runtime.py
 ```
 
 The laboratory owns its generated JNI/archive-assets outputs independently of
-the app. Actual execution uses disposable x86 API26/35 emulators in the separate
+the app. Actual execution uses disposable x86 API 26/35 emulators in the separate
 [runtime laboratory](../runtime-worker/README.md). Its report runner verifies
 unique completion length/SHA before parsing, retries only immutable reads and
 preserves failed-check reports or last partials. Publication consumes an exact
