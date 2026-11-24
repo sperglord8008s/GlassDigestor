@@ -1,0 +1,99 @@
+{
+  "canonicalMain": "c2ecc2f6a3007774d2a1d74de6df575c8fe8f387",
+  "activeBranch": "codex/workbench-improvements",
+  "mergedRemoteBranchesToRemove": [
+    {
+      "branch": "codex/android-worker-runtime",
+      "sha": "02e8b8fe262e48924cb8e75587c6ae2e777da7ea"
+    },
+    {
+      "branch": "codex/apk-community-context",
+      "sha": "85f28c5b90458510f56687a0de2abeb75e79da6d"
+    },
+    {
+      "branch": "codex/archive-cache-and-detection-handoff",
+      "sha": "47bde0bbada819a7f7b58d1dfd0dfa720b013729"
+    },
+    {
+      "branch": "codex/archive-file-gallery",
+      "sha": "2dcfce358c6d82a0a76116a5c3142f3ebb3b7227"
+    },
+    {
+      "branch": "codex/content-origin-evidence",
+      "sha": "ae4f87b655b15a9d4b42bc1ca037e6e7ad5ddc54"
+    },
+    {
+      "branch": "codex/embedded-archive-links",
+      "sha": "53935a2f3850247d89ce8dae0d31721052ba8c69"
+    },
+    {
+      "branch": "codex/explain-strings-explore-style",
+      "sha": "7c803225ff7048f917a84a3b7ee98a04ba72beb8"
+    },
+    {
+      "branch": "codex/gallery-inspection-ranges",
+      "sha": "eda3b09c30a00b20d8ead4e964f1db3e0983cd1e"
+    },
+    {
+      "branch": "codex/gallery-media-frames",
+      "sha": "8f2ab38af319a02c85618a0f398d654c1b48c15a"
+    },
+    {
+      "branch": "codex/offline-host-test-sdks",
+      "sha": "95e46b3011a59b2c79059b0dda01922c443849ab"
+    },
+    {
+      "branch": "codex/package-knowledge-cards",
+      "sha": "facd03afe76e7b9cb813f71d970440c3c4349551"
+    },
+    {
+      "branch": "codex/pdf-file-recovery",
+      "sha": "431f98d2ef996e99ab7c0a0938a9604c5979d171"
+    },
+    {
+      "branch": "codex/pdf-footer-budgets",
+      "sha": "8adac7bd2a8ed81caabf7d919b751859dc804590"
+    },
+    {
+      "branch": "codex/pdf-page-previews",
+      "sha": "04e93c0225211740a39458eabc4833d575659434"
+    },
+    {
+      "branch": "codex/recovered-file-gallery",
+      "sha": "123193dca35b37d0ebf1b6c25eff7f90ce6b7280"
+    },
+    {
+      "branch": "codex/release15-verification",
+      "sha": "f3ff5ed9430d6204efa41afca7f78e566e1ac819"
+    },
+    {
+      "branch": "codex/text-evidence-paging",
+      "sha": "df082d961a06a705e68dd268ccaabf7c74b32c50"
+    },
+    {
+      "branch": "codex/verified-prerelease-publication",
+      "sha": "ec2c9b7d4b7340d4ecf3f677b1ed166a0cda56c7"
+    },
+    {
+      "branch": "codex/workbench-parity",
+      "sha": "021622632859c743264ab653234dea53ec5a994c"
+    }
+  ],
+  "unmergedLocalBranchesToPreserve": [
+    {
+      "branch": "codex/mpv-decoded-frame-previews",
+      "sha": "0ef94d3683816304cf458236d4b178e1c1f9bc1e"
+    }
+  ],
+  "date": "2026-11-25",
+  "rule": "Remove only branches whose exact tip is an ancestor of canonical main, with atomic expected-tip leases. Preserve unfinished work by named immutable savepoint tags.",
+  "removedMergedLocalBranchCount": 20,
+  "archivedDrafts": [
+    {
+      "tag": "savepoint/mpv-frame-foundation-0ef94d3",
+      "commit": "0ef94d3683816304cf458236d4b178e1c1f9bc1e",
+      "scope": "Host-tested native decoded-frame foundation; Android/worker/UI integration pending."
+    }
+  ],
+  "result": "Canonical main plus one active workbench branch. All removed remote heads are ancestors of main; unfinished native work remains in an immutable remote savepoint tag. Clean support worktrees detached at their original commits."
+}
