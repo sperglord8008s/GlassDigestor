@@ -54,8 +54,9 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
                             "Actual x86_64 Android production worker, hash/archive/PhotoRec JNI,"
                                 + " Binder, descriptors, PDF file recovery, compiled manifest"
                                 + " declarations, token cancellation and the production platform"
-                                + " media/PDF preview and text clipboard/URI helpers. This does not"
-                                + " verify ARM64, full UI, MPV playback or 16 KiB-page runtime.");
+                                + " media/PDF preview, text clipboard/URI helpers, captured"
+                                + " analysis limits and private diagnostics. This does not verify"
+                                + " ARM64, full UI, MPV playback or 16 KiB-page runtime.");
             require(
                     android.os.Process.myUid() == target.getApplicationInfo().uid,
                     "Instrumentation must run as the normal target app UID");
@@ -83,6 +84,7 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
             cancelBlockedReporter(abc);
             record("normal-client-recovers-after-worker-death", hash(abc));
             textActions();
+            capturedLimitsAndDiagnostics();
             success = true;
         } catch (Throwable failure) {
             try {
@@ -129,6 +131,417 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
                     success ? android.app.Activity.RESULT_OK : android.app.Activity.RESULT_CANCELED,
                     result);
         }
+    }
+
+    private void capturedLimitsAndDiagnostics() throws Exception {
+        long began = SystemClock.elapsedRealtime();
+        JSONObject limits = capturedLimits();
+        JSONObject diagnostics = privateDiagnostics();
+        record(
+                "captured-analysis-limits-and-private-diagnostics",
+                new JSONObject()
+                        .put("limits", limits)
+                        .put("diagnostics", diagnostics)
+                        .put("elapsedMs", SystemClock.elapsedRealtime() - began)
+                        .put("binwalkNativeExecuted", false)
+                        .put("workerDeadlineWaitExecuted", false)
+                        .put("fullUiExecuted", false)
+                        .put("safExecuted", false));
+    }
+
+    private JSONObject capturedLimits() throws Exception {
+        SharedPreferences preferences =
+                target.getSharedPreferences(
+                        "runtime-analysis-limits-fixture", Context.MODE_PRIVATE);
+        require(preferences.edit().clear().commit(), "Cannot reset private limit fixture settings");
+        Context fixture =
+                new ContextWrapper(target) {
+                    @Override
+                    public SharedPreferences getSharedPreferences(String name, int mode) {
+                        return AnalysisTimeLimits.PREFERENCES.equals(name)
+                                ? preferences
+                                : super.getSharedPreferences(name, mode);
+                    }
+                };
+        try {
+            AnalysisTimeLimits.Request defaults = AnalysisTimeLimits.capture(fixture, "binwalk");
+            require(
+                    defaults.analysisDeadlineMs == 120000 && defaults.requestDeadlineMs == 150000,
+                    "Actual Android default limit capture differs from 120/150 seconds");
+            Bundle defaultMessage = new Bundle();
+            defaults.writeTo(defaultMessage);
+            int[] defaultParcelBytes = {0};
+            AnalysisTimeLimits.Request defaultTransported =
+                    AnalysisTimeLimits.fromMessage(
+                            limitParcelRoundTrip(defaultMessage, defaultParcelBytes), "binwalk");
+            require(
+                    defaultTransported.analysisDeadlineMs == 120000
+                            && defaultTransported.requestDeadlineMs == 150000,
+                    "Actual Android Parcel changed the default limit capture");
+            AnalysisTimeLimits.save(fixture, "binwalk", 240);
+            AnalysisTimeLimits.Request custom = AnalysisTimeLimits.capture(fixture, "binwalk");
+            require(
+                    custom.analysisDeadlineMs == 240000 && custom.requestDeadlineMs == 270000,
+                    "Actual Android custom limit capture differs from 240/270 seconds");
+            require(
+                    custom.requestDeadlineMs - custom.analysisDeadlineMs == 30000,
+                    "Captured worker margin differs from 30 seconds");
+            Bundle captured = new Bundle();
+            custom.writeTo(captured);
+            int[] parcelBytes = {0};
+            Bundle roundTripped = limitParcelRoundTrip(captured, parcelBytes);
+            AnalysisTimeLimits.save(fixture, "binwalk", 30);
+            AnalysisTimeLimits.Request changed = AnalysisTimeLimits.capture(fixture, "binwalk");
+            AnalysisTimeLimits.Request transported =
+                    AnalysisTimeLimits.fromMessage(roundTripped, "binwalk");
+            require(
+                    changed.analysisDeadlineMs == 30000 && changed.requestDeadlineMs == 60000,
+                    "Mutated Android preference was not read by a new capture");
+            require(
+                    transported.analysisDeadlineMs == 240000
+                            && transported.requestDeadlineMs == 270000
+                            && custom.analysisDeadlineMs == 240000
+                            && defaults.analysisDeadlineMs == 120000,
+                    "Preference mutation changed an already captured/parcelled limit");
+
+            int saveRefusals = 0;
+            for (int invalid : new int[] {0, AnalysisTimeLimits.MAX_SECONDS + 1}) {
+                try {
+                    AnalysisTimeLimits.save(fixture, "binwalk", invalid);
+                    throw new AssertionError("Unsupported saved seconds were accepted");
+                } catch (IllegalArgumentException expected) {
+                    saveRefusals++;
+                }
+            }
+            try {
+                AnalysisTimeLimits.save(fixture, "hashes", 240);
+                throw new AssertionError("A non-configurable engine accepted saved seconds");
+            } catch (IllegalArgumentException expected) {
+                saveRefusals++;
+            }
+            require(
+                    AnalysisTimeLimits.seconds(fixture, "binwalk") == 30,
+                    "A refused setting changed the previous preference");
+
+            Bundle partial = new Bundle(captured);
+            partial.remove("requestDeadlineMs");
+            requireLimitMessageRefusal(partial, "binwalk");
+            Bundle wrongType = new Bundle(captured);
+            wrongType.putInt("analysisDeadlineMs", 240000);
+            requireLimitMessageRefusal(wrongType, "binwalk");
+            Bundle mismatched = new Bundle(captured);
+            mismatched.putLong("requestDeadlineMs", 270001);
+            requireLimitMessageRefusal(mismatched, "binwalk");
+            Bundle fractionalSecond = new Bundle(captured);
+            fractionalSecond.putLong("analysisDeadlineMs", 240001);
+            fractionalSecond.putLong("requestDeadlineMs", 270001);
+            requireLimitMessageRefusal(fractionalSecond, "binwalk");
+            Bundle oversized = new Bundle(captured);
+            long excessive = 1000L * (AnalysisTimeLimits.MAX_SECONDS + 1);
+            oversized.putLong("analysisDeadlineMs", excessive);
+            oversized.putLong("requestDeadlineMs", excessive + 30000);
+            requireLimitMessageRefusal(oversized, "binwalk");
+            requireLimitMessageRefusal(captured, "hashes");
+            AnalysisTimeLimits.Request legacy =
+                    AnalysisTimeLimits.fromMessage(
+                            limitParcelRoundTrip(new Bundle(), null), "binwalk");
+            require(
+                    legacy.analysisDeadlineMs == 120000 && legacy.requestDeadlineMs == 150000,
+                    "Legacy empty Bundle defaults differ");
+            require(
+                    custom.termination(269999, false, false) == null
+                            && custom.termination(270000, false, false) != null
+                            && custom.termination(0, true, false) instanceof InterruptedIOException
+                            && custom.termination(0, false, true) instanceof InterruptedIOException,
+                    "Captured deadline/cancellation boundaries differ");
+
+            require(
+                    preferences
+                            .edit()
+                            .putString("binwalk_seconds", "invalid-fixture-type")
+                            .commit(),
+                    "Cannot write the corrupt-type preference fixture");
+            require(
+                    AnalysisTimeLimits.seconds(fixture, "binwalk") == 120,
+                    "Corrupt preference type did not fall back to default");
+            require(
+                    preferences
+                            .edit()
+                            .putInt("binwalk_seconds", AnalysisTimeLimits.MAX_SECONDS + 1)
+                            .commit(),
+                    "Cannot write the out-of-range preference fixture");
+            require(
+                    AnalysisTimeLimits.seconds(fixture, "binwalk") == 120,
+                    "Out-of-range preference did not fall back to default");
+            return new JSONObject()
+                    .put("defaultAnalysisMs", defaults.analysisDeadlineMs)
+                    .put("defaultWorkerMs", defaults.requestDeadlineMs)
+                    .put("customAnalysisMs", custom.analysisDeadlineMs)
+                    .put("customWorkerMs", custom.requestDeadlineMs)
+                    .put("workerMarginMs", custom.requestDeadlineMs - custom.analysisDeadlineMs)
+                    .put("defaultParcelBytes", defaultParcelBytes[0])
+                    .put("customParcelBytes", parcelBytes[0])
+                    .put("bundleLongTypesRetained", true)
+                    .put(
+                            "capturedAfterPreferenceMutationAnalysisMs",
+                            transported.analysisDeadlineMs)
+                    .put("mutatedPreferenceAnalysisMs", changed.analysisDeadlineMs)
+                    .put("invalidSaveRefusals", saveRefusals)
+                    .put("invalidParcelledMessageRefusals", 6)
+                    .put("corruptPreferenceDefaulted", true)
+                    .put("legacyEmptyBundleDefaulted", true)
+                    .put("deadlineAndCancellationBoundariesChecked", true);
+        } finally {
+            require(
+                    preferences.edit().clear().commit(),
+                    "Cannot clear private limit fixture settings");
+        }
+    }
+
+    private static Bundle limitParcelRoundTrip(Bundle original, int[] encodedBytes) {
+        Parcel writer = Parcel.obtain();
+        Parcel reader = Parcel.obtain();
+        try {
+            writer.writeBundle(original);
+            byte[] bytes = writer.marshall();
+            if (encodedBytes != null) encodedBytes[0] = bytes.length;
+            reader.unmarshall(bytes, 0, bytes.length);
+            reader.setDataPosition(0);
+            Bundle restored = reader.readBundle(AnalysisTimeLimits.class.getClassLoader());
+            require(restored != null, "Actual Android Parcel lost the Bundle");
+            return restored;
+        } finally {
+            writer.recycle();
+            reader.recycle();
+        }
+    }
+
+    private static void requireLimitMessageRefusal(Bundle message, String engine) throws Exception {
+        try {
+            AnalysisTimeLimits.fromMessage(limitParcelRoundTrip(message, null), engine);
+            throw new AssertionError("Unsupported parcelled limit message was accepted");
+        } catch (IOException expected) {
+            // Complete typed messages are required after actual platform Parcel decoding.
+        }
+    }
+
+    private JSONObject privateDiagnostics() throws Exception {
+        File root = target.getNoBackupFilesDir().getCanonicalFile();
+        require(
+                root.isDirectory()
+                        && root.getParentFile()
+                                .equals(
+                                        new File(target.getApplicationInfo().dataDir)
+                                                .getCanonicalFile()),
+                "Diagnostics fixture is not inside the actual application no-backup root");
+        File journal = new File(root, "program-debug/events.log");
+        File alias = File.createTempFile("runtime-debug-context-", ".alias", root);
+        File sentinel = File.createTempFile("runtime-debug-outside-", ".sentinel", directory);
+        byte[] sentinelBytes =
+                "outside fixture bytes must remain unchanged".getBytes(StandardCharsets.UTF_8);
+        boolean linkedLeaf = false;
+        try {
+            require(alias.delete(), "Cannot prepare the trusted diagnostics ancestor alias");
+            Os.symlink(root.getAbsolutePath(), alias.getAbsolutePath());
+            Context aliased =
+                    new ContextWrapper(target) {
+                        @Override
+                        public File getNoBackupFilesDir() {
+                            return alias;
+                        }
+                    };
+            require(DebugJournal.clear(target), "Cannot clear the target's private diagnostics");
+            DebugJournal.record(
+                    target,
+                    "runtime_diagnostic",
+                    "engine=binwalk status=complete requestMs=270000"
+                        + " path=/runtime/private-selected.bin"
+                        + " filename=runtime_private_filename.bin query=runtime_query_needle"
+                        + " runtime_raw_text");
+            IOException failure = new IOException("runtime_exception_private_message");
+            failure.setStackTrace(
+                    new StackTraceElement[] {
+                        new StackTraceElement(
+                                "thirdparty.Parser", "read", "runtime_private_parser.bin", 11),
+                        new StackTraceElement(
+                                "org.diemobile.WorkerRuntimeInstrumentation",
+                                "capturedLimitsAndDiagnostics",
+                                "runtime_private_source.bin",
+                                731)
+                    });
+            DebugJournal.recordFailure(target, "runtime_failure", "engine=binwalk", failure);
+            DebugJournal.Snapshot privacy = DebugJournal.read(target);
+            require(
+                    privacy.available && privacy.entries.size() == 2,
+                    "Actual Android private diagnostics did not retain the expected entries");
+            String text = privacy.text();
+            for (String secret :
+                    new String[] {
+                        "private-selected.bin",
+                        "runtime_private_filename.bin",
+                        "runtime_query_needle",
+                        "runtime_raw_text",
+                        "runtime_exception_private_message",
+                        "runtime_private_parser.bin",
+                        "runtime_private_source.bin"
+                    })
+                require(
+                        !text.contains(secret),
+                        "Private source text entered the diagnostics fixture");
+            require(
+                    text.contains("exception=IOException")
+                            && text.contains("class=org.diemobile.WorkerRuntimeInstrumentation")
+                            && text.contains("method=capturedLimitsAndDiagnostics")
+                            && text.contains("line=731"),
+                    "Safe exception class/method/line metadata was lost");
+            require(
+                    journal.isFile() && journal.equals(journal.getCanonicalFile()),
+                    "Actual no-backup journal leaf is unavailable or noncanonical");
+            long privacyBytes = journal.length();
+            DebugJournal.record(aliased, "runtime_alias_event", "engine=binwalk status=complete");
+            DebugJournal.Snapshot aliasRead = DebugJournal.read(target);
+            require(
+                    aliasRead.available
+                            && aliasRead.entries.size() == 3
+                            && aliasRead.entries.get(0).event.equals("runtime_alias_event"),
+                    "Trusted diagnostics ancestor alias did not share the actual journal");
+            require(
+                    DebugJournal.clear(aliased)
+                            && !journal.exists()
+                            && DebugJournal.read(target).entries.isEmpty(),
+                    "Clearing through the trusted alias did not clear the physical journal");
+
+            write(sentinel, sentinelBytes);
+            Os.symlink(sentinel.getCanonicalPath(), journal.getAbsolutePath());
+            linkedLeaf = true;
+            DebugJournal.record(aliased, "runtime_refused_link", "engine=binwalk");
+            require(
+                    !DebugJournal.read(aliased).available && !DebugJournal.clear(aliased),
+                    "Generated diagnostics leaf link was accepted");
+            require(
+                    Arrays.equals(sentinelBytes, read(sentinel)),
+                    "Diagnostics linked-leaf refusal changed the outside sentinel");
+            java.nio.file.Files.delete(journal.toPath());
+            linkedLeaf = false;
+
+            JSONObject retention = diagnosticsRetention(target, journal);
+            require(DebugJournal.clear(target), "Cannot clear retained diagnostics fixture");
+            DebugJournal.Snapshot empty = DebugJournal.read(target);
+            require(
+                    empty.available && empty.entries.isEmpty() && !journal.exists(),
+                    "Cleared diagnostics were not readable and empty");
+            return new JSONObject()
+                    .put("actualNoBackupRootUsed", true)
+                    .put("journalLeafCanonical", true)
+                    .put("contextAncestorAliasAccepted", true)
+                    .put("privatePathsContentsAndQueriesOmitted", true)
+                    .put("exceptionMessagesAndSourceFilenamesOmitted", true)
+                    .put("appClassMethodLineRetained", true)
+                    .put("privacyProbeEntries", privacy.entries.size())
+                    .put("privacyProbeStoredBytes", privacyBytes)
+                    .put("linkedJournalLeafRefused", true)
+                    .put("outsideSentinelUnchanged", true)
+                    .put("clearLeavesReadableEmptyJournal", true)
+                    .put("retention", retention);
+        } finally {
+            if (linkedLeaf) java.nio.file.Files.deleteIfExists(journal.toPath());
+            DebugJournal.clear(target);
+            java.nio.file.Files.deleteIfExists(alias.toPath());
+            sentinel.delete();
+        }
+    }
+
+    private static JSONObject diagnosticsRetention(Context context, File journal) throws Exception {
+        require(DebugJournal.clear(context), "Cannot reset row retention fixture");
+        DebugJournal.record(context, "runtime_retention_oldest", "engine=hashes count=0");
+        byte[] oldest = read(journal);
+        DebugJournal.record(context, "runtime_retention_seed", "engine=hashes count=1");
+        String[] lines = new String(read(journal), StandardCharsets.UTF_8).split("\n", -1);
+        require(lines.length == 3, "Cannot acquire actual journal line fixtures");
+        byte[] seed = (lines[1] + "\n").getBytes(StandardCharsets.UTF_8);
+        prefillDiagnostics(journal, oldest, seed, DebugJournal.MAX_ENTRIES);
+        require(
+                DebugJournal.read(context).entries.size() == DebugJournal.MAX_ENTRIES,
+                "Owned row retention prefill was not accepted");
+        DebugJournal.record(context, "runtime_retention_latest", "engine=hashes count=256");
+        DebugJournal.Snapshot rowBounded = DebugJournal.read(context);
+        require(
+                rowBounded.available
+                        && rowBounded.entries.size() == DebugJournal.MAX_ENTRIES
+                        && rowBounded.entries.get(0).event.equals("runtime_retention_latest"),
+                "Actual Android journal row retention bound failed");
+        for (DebugJournal.Entry entry : rowBounded.entries)
+            require(!entry.event.equals("runtime_retention_oldest"), "Oldest row was not removed");
+
+        require(DebugJournal.clear(context), "Cannot reset byte retention fixture");
+        char[] code96 = new char[96], code64 = new char[64];
+        Arrays.fill(code96, 'x');
+        Arrays.fill(code64, 'x');
+        String detail =
+                "token="
+                        + new String(code96)
+                        + " request="
+                        + new String(code96)
+                        + " status="
+                        + new String(code64)
+                        + " count=1234567890123456";
+        String oldestEvent = diagnosticsEvent("runtime_byte_oldest");
+        DebugJournal.record(context, oldestEvent, detail);
+        oldest = read(journal);
+        DebugJournal.record(context, diagnosticsEvent("runtime_byte_seed"), detail);
+        lines = new String(read(journal), StandardCharsets.UTF_8).split("\n", -1);
+        require(lines.length == 3, "Cannot acquire actual bounded long-line fixtures");
+        seed = (lines[1] + "\n").getBytes(StandardCharsets.UTF_8);
+        require(seed.length == oldest.length, "Long-line fixture sizes differ");
+        int byteEntries = DebugJournal.MAX_BYTES / seed.length;
+        require(
+                byteEntries > 1 && byteEntries < DebugJournal.MAX_ENTRIES,
+                "Byte retention fixture does not isolate the byte bound");
+        prefillDiagnostics(journal, oldest, seed, byteEntries);
+        require(
+                DebugJournal.read(context).entries.size() == byteEntries
+                        && journal.length() > DebugJournal.MAX_BYTES - seed.length,
+                "Owned byte retention prefill was not accepted near the bound");
+        String latestEvent = diagnosticsEvent("runtime_byte_latest");
+        DebugJournal.record(context, latestEvent, detail);
+        DebugJournal.Snapshot byteBounded = DebugJournal.read(context);
+        require(
+                byteBounded.available
+                        && byteBounded.entries.size() == byteEntries
+                        && byteBounded.entries.get(0).event.equals(latestEvent)
+                        && journal.length() <= DebugJournal.MAX_BYTES,
+                "Actual Android journal byte retention bound failed");
+        for (DebugJournal.Entry entry : byteBounded.entries)
+            require(
+                    !entry.event.equals(oldestEvent)
+                            && entry.detail.length() <= DebugJournal.MAX_DETAIL_UNITS,
+                    "Byte retention preserved the oldest row or an over-budget detail");
+        return new JSONObject()
+                .put("maxEntries", DebugJournal.MAX_ENTRIES)
+                .put("maxStoredBytes", DebugJournal.MAX_BYTES)
+                .put("rowBoundRetainedEntries", rowBounded.entries.size())
+                .put("byteBoundPrefilledEntries", byteEntries)
+                .put("byteBoundRetainedEntries", byteBounded.entries.size())
+                .put("byteBoundStoredBytes", journal.length())
+                .put("validOwnedLinePrefillUsed", true)
+                .put("oldestRowsRemoved", true)
+                .put("newestEventsRetained", true);
+    }
+
+    private static void prefillDiagnostics(File file, byte[] oldest, byte[] seed, int entries)
+            throws IOException {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        bytes.write(oldest);
+        for (int index = 1; index < entries; index++) bytes.write(seed);
+        require(bytes.size() <= DebugJournal.MAX_BYTES, "Owned journal prefill exceeds its bound");
+        write(file, bytes.toByteArray());
+    }
+
+    private static String diagnosticsEvent(String prefix) {
+        char[] value = new char[64];
+        Arrays.fill(value, 'x');
+        prefix.getChars(0, prefix.length(), value, 0);
+        return new String(value);
     }
 
     private void archiveSession() throws Exception {

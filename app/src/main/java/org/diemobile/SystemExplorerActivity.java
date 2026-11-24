@@ -299,7 +299,7 @@ public final class SystemExplorerActivity extends Activity {
         if (!entry.description.isEmpty()) body.addView(WorkbenchUi.prose(this, entry.description));
         for (Fact fact : entry.facts)
             body.addView(WorkbenchUi.fact(this, fact.key, fact.value, fact.code));
-        android.widget.ScrollView scroll = new android.widget.ScrollView(this);
+        android.widget.ScrollView scroll = WorkbenchUi.scroll(this);
         scroll.addView(body);
         AlertDialog.Builder dialog =
                 new AlertDialog.Builder(this)
@@ -318,7 +318,7 @@ public final class SystemExplorerActivity extends Activity {
     }
 
     private void message(String title, String value) {
-        android.widget.ScrollView scroll = new android.widget.ScrollView(this);
+        android.widget.ScrollView scroll = WorkbenchUi.scroll(this);
         TextView body = WorkbenchUi.prose(this, value);
         int pad = WorkbenchUi.dp(this, 12);
         body.setPadding(pad, pad, pad, pad);

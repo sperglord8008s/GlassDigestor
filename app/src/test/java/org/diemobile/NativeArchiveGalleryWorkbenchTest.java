@@ -353,7 +353,7 @@ public final class NativeArchiveGalleryWorkbenchTest {
         View tools = ShadowAlertDialog.getLatestAlertDialog().getWindow().getDecorView();
         for (String label :
                 new String[] {
-                    "Evidence",
+                    "Information",
                     "Export report",
                     "Parsing interval",
                     "Reload",
