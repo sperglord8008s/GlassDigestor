@@ -18,7 +18,7 @@
 </p>
 
 GlassDigestor investigates files, embedded media, archives, executables and
-Android packages on your device. Technical facts, original evidence and
+Android packages on your device. Technical facts, original records and
 expandable explanations are available together. Dense views, search, paging
 and complete exports support investigations beyond the first screen of results.
 
@@ -36,7 +36,7 @@ action. Android's normal permissions determine accessible files and system data.
 2. **Tap a file to preview it.** Use **Save file** for an individual payload,
    or **Export files (ZIP)** for actual files across every page in the selected
    group. Extensions, MIME types, source coordinates and original findings are
-   retained. Hold a card for evidence and expert actions.
+   retained. Hold a card for details and expert actions.
 3. **Open an archive to explore its contents.** The native browser identifies
    supported archives from bytes, offers virtual folders and nested Back, and
    acquires members by exact index. Use **Gallery** for
@@ -56,12 +56,17 @@ Recognition alone does not establish a complete file boundary or full validity.
 
 ## Follow interesting strings
 
-Open **Strings → Grouped string classifier** or a DEX string group. Each match
+Open **Strings → Browse all strings / categories** or a DEX string group. Each match
 explains **why** it belongs to the selected category, highlights the exact token,
-and preserves its rule, source spans and original evidence. **Copy**, **Search…**
+and preserves its rule, source spans and original text. **Copy**, **Search…**
 and **Translate…** work on whole strings or exact matches. Choose a search or
 English-translation engine before the external browser receives any text.
 No query history or background submission is added.
+
+Minimum length and live filtering are beside Strings; Categories explains the
+grouped results. Binwalk has a visible 1–1800-second time limit, and Options
+provides About and a private debug log. Grids support zoom, pan and contiguous
+range selection. [Workbench controls](docs/workbench-usability.md).
 
 [Text actions, privacy and verification scope](docs/text-investigation-ui.md)
 
@@ -73,7 +78,7 @@ No query history or background submission is added.
 | **Media & metadata** | Bounded in-app previews; EXIF/XMP/raw metadata; MPV/FFmpeg codec, container, track and property inspection; exact payload and report exports. |
 | **PE, ELF & Mach-O** | Typed structures, maps, imports, exports, symbols, resources and disassembly, with supported links back to original bytes. |
 | **Android packages** | DEX/smali; compiled manifests/resources; APK signatures/certificates; captured base/split relationships; sourced SDK/tracker matching and practical package knowledge. |
-| **System & repeatable analysis** | Visible package/file/service inventory; captured normal-UID Binder evidence; scan profiles, document batches, byte/tree comparisons and complete scoped reports. |
+| **System & repeatable analysis** | Visible package/file/service inventory; captured normal-UID Binder records; scan profiles, document batches, byte/tree comparisons and complete scoped reports. |
 
 [Engine credits and detailed tools](docs/workbench-features.md) ·
 [Feature parity and remaining work](docs/FEATURE-PARITY.md)
@@ -83,7 +88,7 @@ No query history or background submission is added.
 Get an **ARM64 APK** from [GitHub Releases](https://github.com/sperglord8008s/GlassDigestor/releases),
 alongside its SHA-256, build manifest and corresponding-source bundles. Requires
 **Android 8.0 / API 26 or later**. Every checkpoint has a numbered version and
-source revision; tap the app title or **Options → Build details** to inspect it.
+source revision; tap the app title or **Options → About** to inspect it.
 
 Current releases are debug testing builds. Check signer digests before updating:
 keys from separate CI runners can differ. Preserve your existing installation
@@ -94,12 +99,12 @@ the MPV source-build, dependency, release and signing work needed for submission
 
 ## Verification
 
-The published [pre-alpha.18 checkpoint](https://github.com/sperglord8008s/GlassDigestor/releases/tag/v0.6.0-pre-alpha.18)
-passed all five source CI jobs and **213 Android host tests**, using real native
+The published [pre-alpha.19 checkpoint](https://github.com/sperglord8008s/GlassDigestor/releases/tag/v0.6.0-pre-alpha.19)
+passed all five source CI jobs and **241 Android host tests**, using real native
 engines/parsers where documented. ARM64 compilation, lint, APK signatures,
 offline assets and static 16 KiB alignment are checked.
 
-**Eleven actual Android contracts** passed on x86 API 26 and 35. Downloaded
+**Twelve actual Android contracts** passed on x86 API 26 and 35. Downloaded
 reports were independently checked against source, APK/library and report
 hashes. They include isolated worker transport/cancellation, archive extraction,
 bounded media observations, compiled declarations and exact recovery of a
@@ -108,9 +113,12 @@ known colors and geometry. A focused normal-UID window also checks exact raw
 UTF-16 copying, sensitive clipboard flags and seven engine URI encodings,
 without contacting an external service. The new large-archive contract checks
 20 MiB of exact decoded bytes through trusted cache aliases, retained origins
-and the actual isolated worker. [Download-verified runtime checks](docs/verification/android-worker-runtime-47bde0b.json).
+and the actual isolated worker. A new normal-UID contract checks captured
+Binwalk settings, real Bundle/Parcel values and private diagnostic log privacy,
+links and retention. It does not run Binwalk JNI or the full interface.
+[Download-verified runtime checks](docs/verification/android-worker-runtime-d91e39f.json).
 All 14 public release assets and the original CI files were independently audited;
-[release receipt](docs/verification/pre-alpha18-release.json).
+[release receipt](docs/verification/pre-alpha19-release.json).
 
 **Pre-alpha scope:** production ARM64 handset/SAF/UI acceptance, every media
 codec, arbitrary PDF/document support, fragmented recovery and full desktop Detect It Easy
@@ -128,7 +136,7 @@ offline application use.
 Start with [AGENTS.md](AGENTS.md), [design goals](docs/DESIGN-GOALS.md) and the
 [complete build/check/continuation guide](docs/continuation.md). Contributions
 are welcome: reproducible recovery fixtures, handset test reports, accessibility,
-source-audited engines, documentation and evidence-backed package knowledge.
+source-audited engines, documentation and source-backed package knowledge.
 For bugs, include the build identifier, Android version, tool and observed error.
 Share sample bytes only when you have permission.
 

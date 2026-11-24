@@ -29,12 +29,24 @@ watchdog can still terminate the isolated worker with its request token.
 
 ## Verification
 
-Current local checks: **62 focused host Android cases pass**, including actual
-scroll gestures, complete strings navigation, exact selected-tail export across
-source expiry/recreation, safe log copy/export/alias handling, source identity,
-compact definitions and deadline publication races. Eight Rust checks and all
-Binwalk JNI ownership/64 MiB/configured-limit fixtures pass; the ARM64 bridge
-compiles. Independent grid tests cover 81 coordinate/range/maximum-layout cases.
-Full host/native/release and actual Android regression gates are pending for
-this pass. These checks do not establish production ARM64 handset, real SAF,
-external browser/provider, font-scale or screen-reader acceptance.
+All **241 host Android cases** pass with zero failures/errors/skips, including
+real scroll gestures, complete strings navigation, selected-tail export through
+source expiry/recreation, safe log copy/export/aliases, compact definitions and
+deadline publication races. Required generic/native regressions, eight Rust
+cases, Binwalk JNI ownership/64 MiB/configured limits, ARM64 assembly/lint and
+signature/offline/identity/static alignment pass. Independent grid tests cover
+81 coordinate/range/maximum-layout cases. Clean source and PR CI are green at
+exact published source `d91e39f`.
+
+All **12 actual x86 API 26/35 contracts** pass; complete downloaded reports,
+source/APK/library identities and bounded completions were independently checked.
+The new contract verifies real preferences/Bundle/Parcel capture and private
+no-backup journal alias/refusal/privacy/retention behavior. It explicitly does
+not execute Binwalk JNI, full UI, a watchdog deadline wait or SAF. Earlier native
+worker/media/PDF/clipboard/archive contracts remain verified on their fixtures.
+[Runtime receipt](verification/android-worker-runtime-d91e39f.json).
+
+Pre-alpha.19 is published; all 14 public assets and six original CI files passed
+independent download/hash/source audits. [Release receipt](verification/pre-alpha19-release.json).
+These checks do not establish production ARM64 handset, real SAF, external
+browser/provider, font-scale or screen-reader acceptance.
