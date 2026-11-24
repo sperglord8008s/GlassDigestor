@@ -74,6 +74,7 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
                     digests(small).get("CRC32").equals("352441c2"),
                     "Actual Android native CRC32 abc vector differs");
             record("isolated-native-hash-vectors", small);
+            reportSourceAliasRefusal();
             largeHash();
             archive();
             archiveSession();
@@ -900,6 +901,254 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
         }
         require(values.size() == 8, "Incomplete native digest set");
         return values;
+    }
+
+    private void reportSourceAliasRefusal() throws Exception {
+        AtomicReference<Messenger> remote = new AtomicReference<>();
+        CountDownLatch connected = new CountDownLatch(1);
+        ServiceConnection connection =
+                new ServiceConnection() {
+                    @Override
+                    public void onServiceConnected(ComponentName name, IBinder binder) {
+                        remote.set(new Messenger(binder));
+                        connected.countDown();
+                    }
+
+                    @Override
+                    public void onServiceDisconnected(ComponentName name) {
+                        remote.set(null);
+                        connected.countDown();
+                    }
+                };
+        boolean bound =
+                target.bindService(
+                        new Intent(target, BinaryWorkerService.class),
+                        connection,
+                        Context.BIND_AUTO_CREATE);
+        require(bound, "Cannot bind the actual report-alias refusal worker");
+        File source = new File(directory, "report-alias-owned-source.bin");
+        try {
+            require(
+                    connected.await(15, TimeUnit.SECONDS) && remote.get() != null,
+                    "Actual report-alias refusal worker did not connect");
+            Messenger service = remote.get();
+            IBinder binder = service.getBinder();
+            int binderIdentity = System.identityHashCode(binder), workerUid = -1;
+            String[] labels = {"supported-hashes", "unsupported-engine", "empty-hashes"};
+            String[] engines = {"hashes", "runtime-unsupported", "hashes"};
+            JSONArray cases = new JSONArray();
+            for (int index = 0; index < labels.length; index++) {
+                byte[] expected =
+                        index == 2 ? new byte[0] : "abc".getBytes(StandardCharsets.US_ASCII);
+                write(source, expected);
+                String expectedSha =
+                        Inspector.toHex(MessageDigest.getInstance("SHA-256").digest(expected));
+                try (ParcelFileDescriptor input =
+                                ParcelFileDescriptor.open(
+                                        source, ParcelFileDescriptor.MODE_READ_ONLY);
+                        ParcelFileDescriptor report =
+                                ParcelFileDescriptor.open(
+                                        source, ParcelFileDescriptor.MODE_WRITE_ONLY)) {
+                    StructStat before = Os.fstat(input.getFileDescriptor());
+                    StructStat reportIdentity = Os.fstat(report.getFileDescriptor());
+                    require(
+                            input.getFd() != report.getFd()
+                                    && before.st_dev == reportIdentity.st_dev
+                                    && before.st_ino == reportIdentity.st_ino
+                                    && before.st_size == expected.length
+                                    && (Os.fcntlInt(
+                                                            input.getFileDescriptor(),
+                                                            OsConstants.F_GETFL,
+                                                            0)
+                                                    & OsConstants.O_ACCMODE)
+                                            == OsConstants.O_RDONLY
+                                    && (Os.fcntlInt(
+                                                            report.getFileDescriptor(),
+                                                            OsConstants.F_GETFL,
+                                                            0)
+                                                    & OsConstants.O_ACCMODE)
+                                            == OsConstants.O_WRONLY,
+                            "Alias fixture did not open independent RO/WO descriptors of one"
+                                    + " source");
+                    require(
+                            Os.lseek(input.getFileDescriptor(), 1, OsConstants.SEEK_SET) == 1
+                                    && Os.lseek(report.getFileDescriptor(), 0, OsConstants.SEEK_CUR)
+                                            == 0,
+                            "Independent alias fixture descriptions unexpectedly share an offset");
+                    Message alias = Message.obtain(null, BinaryWorkerService.RUN);
+                    Bundle arguments = alias.getData();
+                    arguments.putString("engine", engines[index]);
+                    arguments.putString("token", UUID.randomUUID().toString());
+                    AnalysisTimeLimits.capture(target, engines[index]).writeTo(arguments);
+                    arguments.putParcelable("input", input);
+                    arguments.putParcelable("output", report);
+                    service.send(alias);
+
+                    // Same-Messenger ordering makes the valid reply a processing barrier for
+                    // the preceding alias. No sleep or reply on the unsafe descriptor is used.
+                    JSONObject recovered = hashOnConnection(service, source);
+                    JSONObject worker = recovered.getJSONObject("worker");
+                    int currentUid = worker.getInt("workerUid");
+                    if (workerUid == -1) workerUid = currentUid;
+                    require(
+                            currentUid == workerUid
+                                    && binder.isBinderAlive()
+                                    && remote.get() != null
+                                    && remote.get().getBinder() == binder,
+                            "Report-alias refusal killed or replaced the connected worker");
+                    require(
+                            digests(recovered).get("SHA256").equals(expectedSha),
+                            "Same-connection native recovery hash differs from the original"
+                                    + " source");
+                    StructStat after = Os.fstat(input.getFileDescriptor());
+                    byte[] actual = new byte[expected.length];
+                    if (actual.length != 0)
+                        require(
+                                Os.pread(input.getFileDescriptor(), actual, 0, actual.length, 0)
+                                        == actual.length,
+                                "Cannot independently read the complete alias fixture source");
+                    long inputPosition =
+                            Os.lseek(input.getFileDescriptor(), 0, OsConstants.SEEK_CUR);
+                    long reportPosition =
+                            Os.lseek(report.getFileDescriptor(), 0, OsConstants.SEEK_CUR);
+                    require(
+                            Arrays.equals(expected, actual)
+                                    && after.st_dev == before.st_dev
+                                    && after.st_ino == before.st_ino
+                                    && after.st_size == expected.length
+                                    && input.getFileDescriptor().valid()
+                                    && report.getFileDescriptor().valid()
+                                    && inputPosition == 1
+                                    && reportPosition == 0,
+                            "Refused report alias changed source bytes, size or descriptor"
+                                    + " positions");
+                    cases.put(
+                            new JSONObject()
+                                    .put("case", labels[index])
+                                    .put("probeEngine", engines[index])
+                                    .put("sourceSizeBytes", expected.length)
+                                    .put("sourceSha256", expectedSha)
+                                    .put("sameDeviceInode", true)
+                                    .put("independentReadWriteOpenDescriptions", true)
+                                    .put("inputOffsetBefore", 1)
+                                    .put("inputOffsetAfter", inputPosition)
+                                    .put("reportOffsetBefore", 0)
+                                    .put("reportOffsetAfter", reportPosition)
+                                    .put("sourceBytesAndIdentityUnchanged", true)
+                                    .put("parentDescriptorsRemainValid", true)
+                                    .put("serializedEnvelopeObserved", false)
+                                    .put("sameConnectionHashSucceeded", true)
+                                    .put("recoverySha256", digests(recovered).get("SHA256"))
+                                    .put("workerUid", currentUid)
+                                    .put("workerBinderIdentityHash", binderIdentity)
+                                    .put("recoveryWorker", worker));
+                }
+            }
+            record(
+                    "isolated-report-source-alias-refusal-and-recovery",
+                    new JSONObject()
+                            .put("cases", cases)
+                            .put("sameConnectionAcrossAllCases", true)
+                            .put("recoveryReportReadDeadlineMs", 30000)
+                            .put("maximumRecoveryReportBytes", 1024 * 1024)
+                            .put("workerUid", workerUid)
+                            .put("workerBinderIdentityHash", binderIdentity)
+                            .put("ordinaryUidRejectionPathExercised", false)
+                            .put("mpvNativeExecuted", false)
+                            .put("uiExecuted", false)
+                            .put("safExecuted", false)
+                            .put("arm64Executed", false));
+        } finally {
+            source.delete();
+            try {
+                target.unbindService(connection);
+            } catch (IllegalArgumentException ignored) {
+                // Cleanup must not replace an alias/refusal/transport failure.
+            }
+        }
+    }
+
+    private JSONObject hashOnConnection(Messenger service, File source) throws Exception {
+        ParcelFileDescriptor[] pipe = ParcelFileDescriptor.createPipe();
+        String token = UUID.randomUUID().toString();
+        boolean complete = false;
+        try {
+            AnalysisTimeLimits.Request limits = AnalysisTimeLimits.capture(target, "hashes");
+            try (ParcelFileDescriptor input =
+                    ParcelFileDescriptor.open(source, ParcelFileDescriptor.MODE_READ_ONLY)) {
+                Message request = Message.obtain(null, BinaryWorkerService.RUN);
+                Bundle arguments = request.getData();
+                arguments.putString("engine", "hashes");
+                arguments.putString("token", token);
+                limits.writeTo(arguments);
+                arguments.putParcelable("input", input);
+                arguments.putParcelable("output", pipe[1]);
+                service.send(request);
+            }
+            pipe[1].close();
+            pipe[1] = null;
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            FileDescriptor reader = pipe[0].getFileDescriptor();
+            int flags = Os.fcntlInt(reader, OsConstants.F_GETFL, 0);
+            Os.fcntlInt(reader, OsConstants.F_SETFL, flags | OsConstants.O_NONBLOCK);
+            StructPollfd poll = new StructPollfd();
+            poll.fd = reader;
+            poll.events = (short) OsConstants.POLLIN;
+            StructPollfd[] descriptors = {poll};
+            byte[] block = new byte[4096];
+            long deadline = SystemClock.elapsedRealtime() + 30000;
+            while (true) {
+                long remaining = deadline - SystemClock.elapsedRealtime();
+                if (remaining <= 0)
+                    throw new IOException(
+                            "Hash recovery report exceeded its 30-second read deadline");
+                try {
+                    if (Os.poll(descriptors, (int) remaining) == 0) continue;
+                    if ((poll.revents & (OsConstants.POLLERR | OsConstants.POLLNVAL)) != 0)
+                        throw new IOException("Hash recovery report pipe is unavailable");
+                    int count = Os.read(reader, block, 0, block.length);
+                    if (count == 0) break;
+                    require(
+                            count <= 1024 * 1024 - bytes.size(),
+                            "Hash recovery report exceeds 1 MiB");
+                    bytes.write(block, 0, count);
+                } catch (ErrnoException failure) {
+                    if (failure.errno != OsConstants.EINTR && failure.errno != OsConstants.EAGAIN)
+                        throw new IOException("Hash recovery report read failed", failure);
+                }
+            }
+            JSONObject envelope = new JSONObject(bytes.toString(StandardCharsets.UTF_8.name()));
+            JSONObject report = envelope.getJSONObject("report");
+            limits.validateEnvelope(envelope, report);
+            envelope.remove("report");
+            report.put("worker", envelope);
+            worker(report, "hashes");
+            require(
+                    report.getBoolean("ok")
+                            && report.getBoolean("wholeInputComplete")
+                            && report.getLong("bytesRead") == source.length()
+                            && report.getLong("fileSizeBytes") == source.length(),
+                    "Same-connection hash request did not recover after the refused alias");
+            complete = true;
+            return report;
+        } finally {
+            if (!complete) {
+                try {
+                    Message cancel = Message.obtain(null, BinaryWorkerService.CANCEL);
+                    cancel.getData().putString("token", token);
+                    service.send(cancel);
+                } catch (Exception ignored) {
+                    // Preserve the principal timeout/transport/refusal failure.
+                }
+            }
+            for (ParcelFileDescriptor fd : pipe)
+                if (fd != null)
+                    try {
+                        fd.close();
+                    } catch (IOException ignored) {
+                        // Closing a failed channel must not replace its original failure.
+                    }
+        }
     }
 
     private void largeHash() throws Exception {
