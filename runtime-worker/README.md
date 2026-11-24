@@ -154,6 +154,16 @@ hashes. PhotoRec notices are included. Runtime-only C/C++ Debug flags use `-g0`
 to avoid large unused DWARF intermediates; production native build flags are
 unchanged. Assertions and optimization defaults otherwise retain Debug behavior.
 
+Packaged archive/PhotoRec libraries and generated archive notices belong to
+this module's `build/generated-archive-jni`, `build/generated-photorec-jni` and
+`build/generated-archive-assets` directories. The production app owns its
+separate generated outputs. The shared Android wrappers accept optional
+`DIE_ARCHIVE_JNI_ROOT`, `DIE_PHOTOREC_JNI_ROOT` and `DIE_ARCHIVE_ASSETS_DIR`
+destinations; JNI roots receive an ABI child, and archive assets receive a
+`notices` child. Unset destinations keep the existing `app/build` defaults;
+host output paths and ABI-specific CMake caches are unchanged. This keeps
+combined app/laboratory builds independent of the ARM64 producer task.
+
 
 The full evidence report stays in the target's private file and is captured by
 `run-as`. Instrumentation's Binder result returns only a small status, count,

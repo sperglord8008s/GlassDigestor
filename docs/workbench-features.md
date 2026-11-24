@@ -1,3 +1,6 @@
+Current verification is recorded in [STATUS](STATUS.md) and the [current parity checklist](FEATURE-PARITY.md).
+Selected actual x86 Android contracts are verified; historical unverified statements below do not establish or revoke other scopes.
+
 # GlassDigestor — detailed workbench capabilities
 
 Offline native Android frontend for the open-source Detect It Easy ecosystem. Independent project, not an official Horsicq application.

@@ -17,7 +17,7 @@ if [[ "$mode" = android ]]; then
   ndk="${ANDROID_NDK_HOME:-${ANDROID_HOME:?Set ANDROID_HOME}/ndk/28.2.13676358}"
   flags+=(-DCMAKE_TOOLCHAIN_FILE="$ndk/build/cmake/android.toolchain.cmake"
     -DANDROID_ABI="$abi" -DANDROID_PLATFORM=android-26 -DANDROID_STL=c++_static)
-  output="app/build/generated-archive-jni/$abi"
+  output="${DIE_ARCHIVE_JNI_ROOT:-app/build/generated-archive-jni}/$abi"
 else
   output=app/build/host-archive
 fi
@@ -29,7 +29,7 @@ cp "$build/libdiearchive.so" "$output/"
 cp archive-engine/{NOTICE.txt,source-headers.txt} "$output/"
 
 if [[ "$mode" = android ]]; then
-  assets=app/build/generated-archive-assets/notices
+  assets="${DIE_ARCHIVE_ASSETS_DIR:-app/build/generated-archive-assets}/notices"
   mkdir -p "$assets"
   cp archive-engine/NOTICE.txt "$assets/archive-codecs.txt"
   cp archive-engine/source-headers.txt "$assets/archive-source-headers.txt"

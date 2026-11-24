@@ -4,6 +4,10 @@ def identity = new groovy.json.JsonSlurper().parseText(providers.exec {
     workingDir rootProject.projectDir
     commandLine 'python3', rootProject.file('scripts/build-version.py').absolutePath
 }.standardOutput.asText.get())
+// Each module owns its packaged outputs, including archive notices consumed as assets.
+def runtimeArchiveJni = layout.buildDirectory.dir('generated-archive-jni')
+def runtimeArchiveAssets = layout.buildDirectory.dir('generated-archive-assets')
+def runtimePhotoRecJni = layout.buildDirectory.dir('generated-photorec-jni')
 // Copy exact production files into an isolated source root; javac must not implicitly
 // discover unrelated UI/parser classes through the application's complete source path.
 def stageWorkerSources = tasks.register('stageWorkerSources', Sync) {
@@ -65,9 +69,9 @@ android {
     sourceSets.main {
         java.srcDir layout.buildDirectory.dir('shared-worker-sources')
         res.srcDir layout.buildDirectory.dir('shared-text-resources')
-        jniLibs.srcDir '../app/build/generated-archive-jni'
-        jniLibs.srcDir '../app/build/generated-photorec-jni'
-        assets.srcDir '../app/build/generated-archive-assets'
+        jniLibs.srcDir runtimeArchiveJni
+        jniLibs.srcDir runtimePhotoRecJni
+        assets.srcDir runtimeArchiveAssets
         assets.srcDir layout.buildDirectory.dir('runtime-notices')
         assets.srcDir layout.buildDirectory.dir('generated-runtime-assets')
     }
@@ -83,18 +87,22 @@ def buildRuntimeArchive = tasks.register('buildRuntimeArchive', Exec) {
     workingDir rootProject.projectDir
     commandLine 'bash', rootProject.file('scripts/build-archive.sh').absolutePath, 'android'
     environment 'DIE_ANDROID_ABI', 'x86_64'
+    environment 'DIE_ARCHIVE_JNI_ROOT', runtimeArchiveJni.get().asFile.absolutePath
+    environment 'DIE_ARCHIVE_ASSETS_DIR', runtimeArchiveAssets.get().asFile.absolutePath
     if (gradle.startParameter.offline) environment 'DIE_OFFLINE', 'true'
     inputs.files(rootProject.fileTree('archive-engine'), rootProject.files('scripts/build-archive.sh', 'scripts/build-archive-libraries.sh'))
-    outputs.file(rootProject.file('app/build/generated-archive-jni/x86_64/libdiearchive.so'))
+    outputs.dir(runtimeArchiveJni.map { it.dir('x86_64') })
+    outputs.dir(runtimeArchiveAssets)
 }
 def buildRuntimePhotoRec = tasks.register('buildRuntimePhotoRec', Exec) {
     workingDir rootProject.projectDir
     commandLine 'bash', rootProject.file('scripts/build-photorec.sh').absolutePath, 'android'
     environment 'DIE_ANDROID_ABI', 'x86_64'
+    environment 'DIE_PHOTOREC_JNI_ROOT', runtimePhotoRecJni.get().asFile.absolutePath
     if (gradle.startParameter.offline) environment 'DIE_OFFLINE', 'true'
     inputs.files(rootProject.fileTree('carving-engine'), rootProject.files('scripts/build-photorec.sh',
             'scripts/fetch-photorec.sh', 'scripts/prepare-photorec.py', 'scripts/photorec-notices.py'))
-    outputs.file rootProject.file('app/build/generated-photorec-jni/x86_64/libdiephotorec.so')
+    outputs.file(runtimePhotoRecJni.map { it.file('x86_64/libdiephotorec.so') })
 }
 def generateRuntimeMediaFixture = tasks.register('generateRuntimeMediaFixture', Exec) {
     workingDir rootProject.projectDir

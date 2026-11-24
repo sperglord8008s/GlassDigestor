@@ -101,7 +101,7 @@ def verify(sdk):
         for name in native:
             data = archive.read(name)
             if name.endswith("libdiephotorec.so"):
-                built = ROOT / "app/build/generated-photorec-jni/x86_64/libdiephotorec.so"
+                built = ROOT / "runtime-worker/build/generated-photorec-jni/x86_64/libdiephotorec.so"
                 strip = sdk / "ndk/28.2.13676358/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip"
                 with tempfile.TemporaryDirectory(prefix="photorec-packaging-") as temporary:
                     stripped = Path(temporary) / "libdiephotorec.so"
@@ -148,7 +148,7 @@ def verify(sdk):
             ROOT / "runtime-worker/src/main/java/org/diemobile/TextActionRuntimeActivity.java"
         ),
         "nativePhotoRecSources": {name: sha256(ROOT / name) for name in native_pdf_inputs},
-        "nativePhotoRecX86Sha256": sha256(ROOT / "app/build/generated-photorec-jni/x86_64/libdiephotorec.so"),
+        "nativePhotoRecX86Sha256": sha256(ROOT / "runtime-worker/build/generated-photorec-jni/x86_64/libdiephotorec.so"),
         "nativePhotoRecPackagedSha256": packaged_pdf_sha256,
         "nativePhotoRecPackaging": "NDK 28.2.13676358 llvm-strip --strip-unneeded",
         "instrumentationSourceSha256": sha256(

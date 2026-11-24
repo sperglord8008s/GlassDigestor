@@ -34,7 +34,8 @@ forced platform refusals, selected-range ownership, archive acquisition,
 API 26 metadata-only video, policy/cancellation/stale-generation refusals and
 manual-mode recreation. Worker protocol tests use platform substitutes where
 Robolectric lacks real fstat/fcntl; they do not establish Android OS/UID checks.
-Full host suite, source bundles, ARM64 assembly/static/CI, actual isolated MPV,
+The complete 265-case host suite passes at `b839189`; source bundles and ARM64
+JNI compilation also pass. Review corrections, final assembly/static/CI, actual isolated MPV,
 handset/full UI/SAF/playback and arbitrary codecs remain separate gates. The
 x86 runtime laboratory has no MPV runtime; its existing contracts do not
 verify this path.

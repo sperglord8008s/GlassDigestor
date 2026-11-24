@@ -1,0 +1,235 @@
+{
+  "sourceRevision": "691a4b1e24c6e2196973c0dd8c80f67fa8a8096d",
+  "tag": "v0.6.0-pre-alpha.20",
+  "sourceRun": 45484857179,
+  "runtimeRun": 45484857222,
+  "publisherRun": 45488450806,
+  "allPublicAssetsIndependentlyDownloadedAndHashed": true,
+  "publicAssetCount": 14,
+  "allOriginalCiCheckpointFilesUnchanged": true,
+  "apkSha256": "0b4de106d2594368c078b6777595f1fe60c2c112ea48ad8b88c44cdf88110fda",
+  "apkSizeBytes": 52902749,
+  "publicAssets": [
+    {
+      "name": "CHECKPOINT.md",
+      "sizeBytes": 1005,
+      "sha256": "0a06468b24f88faa10b4f4eaad471e168585c5a18edcdc2a65d108ed2a7db63c"
+    },
+    {
+      "name": "GlassDigestor-0.6.0-pre-alpha.20-dev.g691a4b1e24c6-arm64-v8a-debug.apk",
+      "sizeBytes": 52902749,
+      "sha256": "0b4de106d2594368c078b6777595f1fe60c2c112ea48ad8b88c44cdf88110fda"
+    },
+    {
+      "name": "GlassDigestor-0.6.0-pre-alpha.20-dev.g691a4b1e24c6-arm64-v8a-debug.apk.sha256",
+      "sizeBytes": 137,
+      "sha256": "35034fb510da379e03a04705500b9b9fbbaf38c6e55e2fb41401b23168896d3e"
+    },
+    {
+      "name": "RELEASE-SHA256SUMS",
+      "sizeBytes": 1329,
+      "sha256": "cd1221b2d3d5bf2696154a3263e14d02a73d1e38cf33efde89cd4ab5d7f2de73"
+    },
+    {
+      "name": "SHA256SUMS",
+      "sizeBytes": 528,
+      "sha256": "cbcee1ede9dde1f42422f161f6ff326efd3a6301d8da301d3cc129f55cef36cc"
+    },
+    {
+      "name": "SOURCE-AND-CHECKS.md",
+      "sizeBytes": 869,
+      "sha256": "5bf74358549994b0dee7f68c62287c16012345e0f017bdb97ae751be1ca10bd6"
+    },
+    {
+      "name": "archive-component-sources.zip",
+      "sizeBytes": 12232131,
+      "sha256": "b7ac1924d816db98258b933f1f3a86771357ddc208f31e5094910bba0c6e2e0c"
+    },
+    {
+      "name": "archive-component-sources.zip.sha256",
+      "sizeBytes": 96,
+      "sha256": "2b6a85423e1ac3afaeedeccb779b6230855f129ab47e459b3e292ec348c652e0"
+    },
+    {
+      "name": "build-manifest.txt",
+      "sizeBytes": 6847,
+      "sha256": "85cf47e8608b539b0db36db9f54ca807f608b6c2f42ed43a38ebd2cdf21c6766"
+    },
+    {
+      "name": "checkpoint.json",
+      "sizeBytes": 590,
+      "sha256": "7e2f22a675b5d1234c43adf6f0c43176e28b888404a815bfd0f0a0c0501936cc"
+    },
+    {
+      "name": "mpv-android-2026-09-17-component-sources.zip",
+      "sizeBytes": 76934468,
+      "sha256": "7d0cf131035ffad6e29074978707280bb1736adf01f1eda81ad66dc93b105a5f"
+    },
+    {
+      "name": "mpv-android-2026-09-17-component-sources.zip.sha256",
+      "sizeBytes": 111,
+      "sha256": "1d56846804c644b6c4d911534fcbe33b8b0ffc01b1bbf7abf042f97495ee020f"
+    },
+    {
+      "name": "photorec-7.2-diemobile-sources.zip",
+      "sizeBytes": 870048,
+      "sha256": "78c978d77ad1f60949c996224eb4d003367d6d8bc84c1aed8de1a5062ea09956"
+    },
+    {
+      "name": "photorec-7.2-diemobile-sources.zip.sha256",
+      "sizeBytes": 101,
+      "sha256": "72f17867518d1d4b5d4d7da3725b16aae969939cca9c37fa0307e238ce431433"
+    }
+  ],
+  "componentSources": [
+    {
+      "name": "archive-component-sources.zip",
+      "sha256": "b7ac1924d816db98258b933f1f3a86771357ddc208f31e5094910bba0c6e2e0c",
+      "entries": {
+        "LICENSE": "fb981668c18a279e285fc4d83fba1e836cc84dd4daa73c9697d3cfd2d8aca6e0",
+        "app/src/main/java/org/diemobile/ArchiveEngine.java": "5a408b3997e29a5851d0f660d7433e8d96919e4f76fcca21565b0d41c9bf470b",
+        "archive-engine/CMakeLists.txt": "1a57d9d89e797deab29d442486d09a58f34820c442d3f3f953cfd42b9905179b",
+        "archive-engine/NOTICE.txt": "ad06b02f93b79c4d51336d222d04d76d794df5748dd114ce06c48e4e4a635386",
+        "archive-engine/README.md": "f3ae098a227ea83c7d1077084308f10866e78deea11947e542098ca759a8aa8f",
+        "archive-engine/archive_reader.cpp": "f8c10a6057ddb27b97f067f446f2c689ee7050c3120f184f9b1be2fc034c7cb7",
+        "archive-engine/archive_reader.h": "e66b0b7a716f311a88746786a2297836fa06e7234b80862ee999cda76f25de3f",
+        "archive-engine/bzip2/CMakeLists.txt": "bee3dd1191a2e9d7cdc19f76c0f08106e4cd3eaf716b20e686c4f4df0fef41bf",
+        "archive-engine/decoder_limits.c": "50195cd79928eaa22768cc98796b8c33c33ccf2603189de2e3b5e7238e94143c",
+        "archive-engine/exports.map": "974fe197ea88e205a38fc337b3dd683f3c4c87017f8e9577b91429355f7cf35b",
+        "archive-engine/input.h": "72e3bcb359b597ddb5faf401cc0ff3d1c9795411b5084872eac8be4bc2cd656a",
+        "archive-engine/json.h": "05a648de895fc9aa0b799c40ca67beed8d2d58e40f61f3e744cb41aab1151138",
+        "archive-engine/probe.cpp": "4c4d43b4faae7fa4a436f22b6c6abcd2b429a4b7958083cd9cf270e81c556d34",
+        "archive-engine/source-headers.txt": "7c7b46222dbbbc6915958729563b0a0b8b51bbdb873b9da3d0e264ab308505fd",
+        "archive-engine/source-lock.json": "619903e7f3c4fcf263336171ccf83d54bfdf69f86059355e89203fb39c632d65",
+        "scripts/archive-notices.py": "8e37a20ca4d2604b475d9b87348007598421ef5b0540d3c5624e75cd6d9d8672",
+        "scripts/build-archive-libraries.sh": "cefa1f1344d30a2793a93ee04feb25ad835982c91d606e867301b21e06f6b527",
+        "scripts/build-archive.sh": "4e01ce9b82969dde5fbaa34a4abbbcb386c56838d2bbb0b84758339257f19c8a",
+        "scripts/fetch-archive.sh": "a8944758c074b938010b1d5ed8aa1543ddbf211583015b59d97e6feb01eee69e",
+        "scripts/fetch-verified.sh": "2cae5190a587a9a98e94a394b4c66f757d75fbbac6fdc42875de055405600c1a",
+        "scripts/package-archive-sources.py": "c76a52f4b6ccae825264c1f84402870bd4f9922b67d8d041c2d08294a362eb41",
+        "scripts/prepare-archive.py": "e39b41672216cc837ea961b7fe93d77112de40db29e38a9e1e187b7f0bd7992d",
+        "scripts/test-archive-engine.sh": "1fad2975469832e89350300878237d8944a1e0e4463cf6bb7c98c70654fdbd1e",
+        "scripts/test-dependencies.sh": "2b590e07752a7f00f7b0b9b248f38d47eb57c2f713c3e1dda973f4056cca9ea2",
+        "tests/ArchiveEngineTest.java": "813506c2d4fae98779e40b232826d996bde58a2d17ba65fc052b86380bbe8a15",
+        "tests/archive_header_position_oracle.c": "04a32ac7fd5102886a2441ebeb997002700bcf5ec0ea44c2f43e887ac3baf9dd",
+        "tests/generate-archive-fixtures.py": "79ec7eaaced011ead8f883ab877876a2279b63d6f26cf1cff693cb5968fa5043",
+        "upstream/bzip2-1.0.8.tar.gz": "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269",
+        "upstream/libarchive-3.8.11.tar.gz": "87d05df74305b7f16b784852e49f434e09ce2b3bb29423461f717fc988742a78",
+        "upstream/lz4-1.10.0.tar.gz": "eb1a93e934d4fd29df6e2061ba0bf447568561764d758f4a5662c0e29370ffa9",
+        "upstream/xz-5.8.4.tar.gz": "b5aad5c776b324a39a46bbd588d4b5c001266b87ed3887aea1dc2854702d041c",
+        "upstream/zstd-1.5.7.tar.gz": "4b0bd1f0cfb25e61b9103c35f27395530ff5b4c0d2513a00fd745849e85ea52c"
+      },
+      "exactRepositoryFiles": 27,
+      "pinnedUpstreamArchives": 5,
+      "otherFiles": [],
+      "allZipEntriesCrcChecked": true
+    },
+    {
+      "name": "mpv-android-2026-09-17-component-sources.zip",
+      "sha256": "7d0cf131035ffad6e29074978707280bb1736adf01f1eda81ad66dc93b105a5f",
+      "entries": {
+        "sources/mpv-android.tar": "5ca9265c8824d9afbd5d9c276db950a3b986d1b61972a95657f0d3dd72eddd89",
+        "sources/mpv.tar": "d84b3c706592558bfba8e6305d00f86406c647c3b8b317236433e25caf4d9d91",
+        "sources/ffmpeg.tar": "3633c09eb65cba9864fe4ca1eff75ca1423174869e423e5fe9d8fce028fcf66a",
+        "sources/dav1d.tar": "0ac7c8f7a5cd1d5dbcb24ebaf8f204a44686a80f837c5dfaa5a9775d1841ed8b",
+        "sources/libass.tar": "1f8d0547aa6a40895baee0338adaaae7d8e94406f971a4602957cdbbe6f7d495",
+        "sources/libplacebo.tar": "57b8b2beaba218523cef9839af12c9d44785b6cf8e5f79ca3aa55367d7420c80",
+        "sources/mbedtls.tar": "a7e8bcbec0e6f761b4af24f25677626b35f762f68eef79c08677a363212d11f6",
+        "sources/libxml2.tar": "a569ee9c59eabb197a0d5047046d757ee14c86fb2d4a734555b633cb5584ad25",
+        "sources/fontconfig.tar": "9ae01e1d53acdef56010c5451cd34aa41d325b2faccd8606448d8fa01b2496b3",
+        "sources/freetype2.tar": "dc49de6b01a266eef4876a4dd34d9842c475d3e28ff2eff63bd2fb760ab56261",
+        "sources/fribidi.tar": "1b1cde5b235d40479e91be2f0e88a309e3214c8ab470ec8a2744d82a5a9ea05c",
+        "sources/harfbuzz.tar": "2357ed966c6ced7bfa720b0640c0231065af01158fbea215093ffa15aed44371",
+        "sources/unibreak.tar": "9c4fad6e517338a098373acc9f35579ae2c325e6446666fb9ac2666ba15ceba4",
+        "sources/lua.tar": "b9e2e4aad6789b3b63a056d442f7b39f0ecfca3ae0f1fc0ae4e9614401b69f4b",
+        "sources/curl.tar": "d9b327997999045a24cda50f3983e69e51c516bd8be6ef9842fc7f99135e33bb",
+        "sources/placebo-vulkan-headers.tar": "75967a8288ff16044a86d1af462b96d2e75c435937efb75f2bb4102ab0382f29",
+        "sources/placebo-fast-float.tar": "2b132274539286e41f37857cac22aa8441d21bd86d55de825a3342b149f66801",
+        "sources/placebo-glad.tar": "33dbeae44d8315ece57e14eba4b1b4a02ac5406d1c4f49cd20048c91522a6b9a",
+        "sources/placebo-jinja.tar": "b88a20dcc2e34072fcf4159325bc6c34cd4b29a81a8b83d15d2f28ba561da296",
+        "sources/placebo-markupsafe.tar": "da7c010c9c81a66ac73036558c1fcb6212b50482f43211cd1254035b94f82414",
+        "sources/placebo-nuklear.tar": "ac567995f917c10a722409e0141d226e737d06488b0a31166f6e4925da8e58f0",
+        "sources/freetype-dlg.tar": "263a4a3777d9839e34cd41db988310659e0c00eab37beb7aedd30511a460133b",
+        "sources/mbedtls-framework.tar": "3b0d4864fa877dc9165b90ff3d5b68505c6176c0b22d317d99fe8c89a993e9fd",
+        "integration/source-lock.json": "ad25ea0175c4d2ab1b83fe274119510110db97e70f6cd16693a309d447ae2f07",
+        "integration/runtime-lock.json": "edcd89d979e6d6c2c5b93f95c385ff961ec2796c8bdd15818a5efca10fc91b74",
+        "integration/README.md": "c68f5f16bb6c44cb7431e45bc6c1de1bddf5ee77694c60983756a57cc5a184b1",
+        "integration/probe.c": "0970681a9e19edaab77bd2e77a939cb6a440d615f0b2fcc8254959ed4de099e2",
+        "integration/include/mpv/client.h": "1acf99ee77c8c2a6f1d1993bd81bbc8a91d27fb5924e80171670e6139a4bd353",
+        "integration/include/mpv/stream_cb.h": "188e58b6d14383e15a5dffdc4ecebbdfbf2e412b9c099ff21b571f747a8ce32d",
+        "integration/licenses/compiler-rt-LICENSE.TXT": "1a8f1058753f1ba890de984e48f0242a3a5c29a6a8f2ed9fd813f36985387e8d",
+        "integration/licenses/libcxx-LICENSE.TXT": "539dd7aed86e8a4f12cbdd0e6c50c189c7d74847e4fecc64ce2c6ee3a01da38b",
+        "integration/licenses/libcxxabi-LICENSE.TXT": "e2b35be49f7284a45b7baca8fc7b3ab7440e7902392b2528a457816b5bb2a15c",
+        "integration/licenses/libunwind-LICENSE.TXT": "b5efebcaca80879234098e52d1725e6d9eb8fb96a19fce625d39184b705f7b6d",
+        "integration/licenses/llvm-LICENSE.TXT": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee",
+        "integration/licenses/llvm-license-lock.json": "eade338c73b719058d4dd0902c01cc0475f65f4c500937adbbec776af1da7a58",
+        "integration/DiE-Android-LICENSE.txt": "fb981668c18a279e285fc4d83fba1e836cc84dd4daa73c9697d3cfd2d8aca6e0",
+        "scripts/prepare-mpv-source-build.py": "599fb272b404cafe150ac7f2cd2aa2e57298025f4db2625390a1bd0e9b0cd428",
+        "scripts/fetch-mpv-sources.py": "441169ed3a001c9920aa4b94e7d39cee5ba4adcbb487f81a92f1cc0bb768e00d",
+        "scripts/fetch-mpv.py": "296952f7ad22b98e1c9cb51915861dfd5b1b9e86a9aa82a00ab8a4cc64edbad1",
+        "scripts/build-mpv.sh": "05c28fb2940cc575cd52792cd8883f89939914281aca34bc57a0898e0a11c8b9",
+        "scripts/host-mpv.sh": "ee2e8ac835d2739b20069cac9996e6e75e5e76e48279772fa94029bbd28f8bfa",
+        "scripts/mpv-notices.py": "6b6ee63854c5179f7b414888adb748088fcfe7efd06eb66b32bf6787a12677a0",
+        "scripts/mpv-references.py": "07f50121a7665a99e52eb2e9c62c36b275c90f844aa5e46257b02f32a1dc8a47"
+      },
+      "exactRepositoryFiles": 20,
+      "pinnedUpstreamArchives": 23,
+      "otherFiles": [],
+      "allZipEntriesCrcChecked": true
+    },
+    {
+      "name": "photorec-7.2-diemobile-sources.zip",
+      "sha256": "78c978d77ad1f60949c996224eb4d003367d6d8bc84c1aed8de1a5062ea09956",
+      "entries": {
+        ".ci-cache/photorec/testdisk-7.2.tar.gz": "0cfd82ca6890188a3a4fe01c9b970f654eb3af396580f408ed024789e2873616",
+        "LICENSE": "fb981668c18a279e285fc4d83fba1e836cc84dd4daa73c9697d3cfd2d8aca6e0",
+        "app/src/main/assets/notices/photorec-7.2.txt": "3ed222f7d534fb524e1bfd302adf8bd24a7d2b0dcb887939a7f926b4fa2b4a71",
+        "app/src/main/assets/notices/photorec-source-headers.txt": "e7903ccfbbf7a8302732aebafab367f7f5f7208761921ceec05a37b5f52c070d",
+        "app/src/main/java/org/diemobile/BinaryRunner.java": "6135ce290c8b711a938f899ff436d4bb1584517c2c8b1f7ddc3a6aba75e3b7f7",
+        "app/src/main/java/org/diemobile/CarvingBackend.java": "09a146a105494a182ce2ceaa4a32a068605a3caacbe360201acd26c5dfa4f821",
+        "app/src/main/java/org/diemobile/EvidenceJson.java": "9a234a2715117c8870090fc05e9061024149bf19ef7058529f3ed1fdb0370d19",
+        "app/src/main/java/org/diemobile/EvidenceRows.java": "e4383aeac0a3540c25999b5d9634c7f85c3d75c8611f64b0c4197973dd54f42d",
+        "app/src/main/java/org/diemobile/FileRange.java": "683dcdf2699e101b5bab42b1b9171c22c42b26ebf191b35ad2e5320fca0d2068",
+        "app/src/main/java/org/diemobile/InputSnapshot.java": "7247df3c7718f0871bb1912cb195fdc7b9484de768fd960b2fc567502bf9b912",
+        "app/src/main/java/org/diemobile/Inspector.java": "fee9bdc76821c025a954748eb63ad3f3504c3a2dab95bf8e2ca298495beffb54",
+        "app/src/main/java/org/diemobile/InvestigationBackend.java": "8f9fb8d48fbe65de6654fa36d290b1d55955a27ac8b30996175f1c980baadbaf",
+        "app/src/main/java/org/diemobile/PhotoRecBackend.java": "0a9a4f0152d4b32a98419bb22eb0dc9205d79d8fbecb629aa6450c5372deb9b1",
+        "app/src/main/java/org/diemobile/PhotoRecEngine.java": "70b81043534043b9ddd5fd0686056f5d08700cbc00af329e9582c2b8bbae7a24",
+        "app/src/main/java/org/diemobile/PhotoRecFileChecks.java": "ba7b5b56dea96eeaa5d41015123abe3cb9ec213fd37f07f345e44bcb71123a6a",
+        "app/src/main/java/org/diemobile/PhotoRecReport.java": "40e0b51f860bd04cc7a53d01c8fa9b1d909c49e5c41bd405aeefdb7650d71aec",
+        "app/src/main/java/org/diemobile/PreparedExport.java": "e35926b30f9e3fda983ae8e19a3d2b959b54599cc46ae4e5fe0915991cfbdff2",
+        "app/src/main/java/org/diemobile/RangeAnalysis.java": "9ff06f281d698c49173bf202c78cd540411f93588d14f61b5e0ad338662cf6f6",
+        "carving-engine/CMakeLists.txt": "c2962b00ead0a3dee9ef636fe7c0ca1ed0a376802f1046c3e8c85982cb07b898",
+        "carving-engine/README.md": "382eac3870fd5d4e6b6ddaeead5b338d8cc2a70712dbecd6290864cd7b2b3efd",
+        "carving-engine/blob_input.h": "61089dc4c6c6186e47fc204c81d8a8642d9877f59a0950f9a54ec8e2994cda17",
+        "carving-engine/config.h": "bf97c82ea63de0f767c4ac569dfe5bc12a8edf66fe148ee341c8b5c07209c2ba",
+        "carving-engine/deny-files.c": "bc7a78ecc0228be4275e81cb6615b63fe7da0a87a8f6d6f58f193380b6fa87fb",
+        "carving-engine/exports.map": "988850a27f68f75a9838b2535d70c2b458506c819f46d1851307d1f7ceede962",
+        "carving-engine/probe.cpp": "bf778a1d636eac6e663463422f9468225309742589052032f5e681bce5cb989d",
+        "carving-engine/read_only_file.h": "f2d5491cbe02e8fa2bcf557e58056fb1a1fd2167101dc0999f53b04f3a283849",
+        "carving-engine/source-lock.json": "32e1389f5ecb2289e108d79718fb309dfe56a3aaa8cf06ccbe9735a88fdbfd06",
+        "scripts/build-photorec.sh": "f0c2489e9ff3ea187978b4917bb6179ba1c1be6303ed3b919389a867e1189268",
+        "scripts/fetch-photorec.sh": "9ec7d158e933ccb5af45eb58152214e42a5782edb022c9295d3b22b7e62d17ef",
+        "scripts/fetch-verified.sh": "2cae5190a587a9a98e94a394b4c66f757d75fbbac6fdc42875de055405600c1a",
+        "scripts/package-photorec-sources.py": "8152e80d088deb3c28afc6856c944a08fd2c0dea322af520ba9a552d0eb2d546",
+        "scripts/photorec-notices.py": "c3c62b8f3d429278de7e6693b14ee079e6c2c22a0fa528eec21c244f661d1f3a",
+        "scripts/prepare-photorec.py": "ff94dd864bd7562538e1b44261a101f8862f1e4852635c0259fc2826f4f27955",
+        "scripts/test-dependencies.sh": "2b590e07752a7f00f7b0b9b248f38d47eb57c2f713c3e1dda973f4056cca9ea2",
+        "scripts/test-photorec-mpeg.sh": "4cb5e30d051aac6e70ce0fa2a81bf61c83dbba9816b902e5cd466928264000e3",
+        "scripts/test-photorec.sh": "50068b08c2ea3d26136cdc852a043cc0c6c1f8886c51de1f516dd303215ec6ac",
+        "tests/PhotoRecInvestigationTest.java": "b828a2d52ccb074ceaa608db1f4e5e57c227f2c9f3eae04f37cb607b19b92a93",
+        "tests/PhotoRecMpegTest.java": "1d498e02078c2c822920702491078cf04784556f8cbab1e7b52544faf6ed8a60",
+        "tests/PhotoRecStreamingTest.java": "594c8afc12d9aa439eeddc8159729f10f4f27673cf99c94011af106e21fac0fa",
+        "tests/blob_input_test.cpp": "dba635bb103cbfa9fe1509e45dcdb5530a272a6e1170f533fcb5f1bc9c45b219",
+        "tests/fixtures/carving/CarvingFixture.java": "f83abef8c48e2c8ba25591fac84f0ad8be5b2002663446a41392a20665550295",
+        "tests/fixtures/metadata/MetadataFixtureFactory.java": "2cbd7f5758eb5a57ae12ff5e4544a69620346ef76fd2ebda7527faaf211ae337",
+        "tests/read_only_file_test.cpp": "ee5a5994390febbd20663b515ac558d155c96c758b949e53ed2b58b9fa2211e4"
+      },
+      "exactRepositoryFiles": 42,
+      "pinnedUpstreamArchives": 1,
+      "otherFiles": [],
+      "allZipEntriesCrcChecked": true
+    }
+  ],
+  "productionArm64RuntimeVerified": false
+}

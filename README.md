@@ -99,12 +99,12 @@ the MPV source-build, dependency, release and signing work needed for submission
 
 ## Verification
 
-The published [pre-alpha.19 checkpoint](https://github.com/sperglord8008s/GlassDigestor/releases/tag/v0.6.0-pre-alpha.19)
+The published [pre-alpha.20 checkpoint](https://github.com/sperglord8008s/GlassDigestor/releases/tag/v0.6.0-pre-alpha.20)
 passed all five source CI jobs and **241 Android host tests**, using real native
 engines/parsers where documented. ARM64 compilation, lint, APK signatures,
 offline assets and static 16 KiB alignment are checked.
 
-**Twelve actual Android contracts** passed on x86 API 26 and 35. Downloaded
+**Thirteen actual Android contracts** passed on x86 API 26 and 35. Downloaded
 reports were independently checked against source, APK/library and report
 hashes. They include isolated worker transport/cancellation, archive extraction,
 bounded media observations, compiled declarations and exact recovery of a
@@ -116,9 +116,12 @@ without contacting an external service. The new large-archive contract checks
 and the actual isolated worker. A new normal-UID contract checks captured
 Binwalk settings, real Bundle/Parcel values and private diagnostic log privacy,
 links and retention. It does not run Binwalk JNI or the full interface.
-[Download-verified runtime checks](docs/verification/android-worker-runtime-d91e39f.json).
+[Download-verified runtime checks](docs/verification/android-worker-runtime-691a4b1.json).
+A new isolated MPEG contract checks exact 9 MiB recovery, every pack row and
+source/descriptor ownership. The real NIST L0_Video host pipeline also exports
+6/6 reference files exactly; other corpus images remain unverified.
 All 14 public release assets and the original CI files were independently audited;
-[release receipt](docs/verification/pre-alpha19-release.json).
+[release receipt](docs/verification/pre-alpha20-release.json).
 
 **Pre-alpha scope:** production ARM64 handset/SAF/UI acceptance, every media
 codec, arbitrary PDF/document support, fragmented recovery and full desktop Detect It Easy
