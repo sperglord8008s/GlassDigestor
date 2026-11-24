@@ -65,6 +65,11 @@ def verify(sdk):
     for key in ["exported", "isolatedProcess", "process", "stopWithTask"]:
         assert service.get(ANDROID + key) == production_service.get(ANDROID + key)
     assert service.get(ANDROID + "name") == "org.diemobile.BinaryWorkerService"
+    activity = application.find("activity")
+    assert activity.get(ANDROID + "name") == "org.diemobile.TextActionRuntimeActivity"
+    assert activity.get(ANDROID + "exported") == "false"
+    assert not activity.findall("intent-filter")
+    assert "launchable-activity:" not in badging
     compiled_manifest = subprocess.check_output([
         str(tools / "aapt2"), "dump", "xmltree", str(target),
         "--file", "AndroidManifest.xml"
@@ -82,8 +87,14 @@ def verify(sdk):
         original = ROOT / "app/src/main/java" / relative
         assert original.read_bytes() == file.read_bytes(), f"Shared production source changed: {relative}"
         sources[str(relative)] = sha256(file)
-    for name in ["BinaryWorkerClient", "BinaryWorkerService", "ArchiveEngine", "HashEngine", "AndroidResourceProbe", "PackageManifest", "PdfPagePreview", "OwnedContent", "PreparedExport"]:
+    for name in ["BinaryWorkerClient", "BinaryWorkerService", "ArchiveEngine", "HashEngine", "AndroidResourceProbe", "PackageManifest", "PdfPagePreview", "OwnedContent", "PreparedExport", "TextActions", "WorkbenchUi"]:
         assert "org/diemobile/" + name + ".java" in sources
+    text_resources = {}
+    for name in ["values/colors.xml", "values/text_action_ids.xml"]:
+        original = ROOT / "app/src/main/res" / name
+        staged = ROOT / "runtime-worker/build/shared-text-resources" / name
+        assert original.read_bytes() == staged.read_bytes(), f"Shared resource changed: {name}"
+        text_resources[name] = sha256(staged)
     with zipfile.ZipFile(target) as archive:
         native = [name for name in archive.namelist() if name.endswith(".so")]
         assert set(native) == {"lib/x86_64/libdiearchive.so", "lib/x86_64/libdiehash.so", "lib/x86_64/libdiephotorec.so"}, native
@@ -126,6 +137,10 @@ def verify(sdk):
         "sourceRevision": identity["sourceRevision"], "sourceDirty": identity["sourceDirty"],
         "versionName": identity["versionName"], "versionCode": identity["versionCode"],
         "sharedProductionSources": sources,
+        "sharedTextActionResources": text_resources,
+        "textActionTestActivitySha256": sha256(
+            ROOT / "runtime-worker/src/main/java/org/diemobile/TextActionRuntimeActivity.java"
+        ),
         "nativePhotoRecSources": {name: sha256(ROOT / name) for name in native_pdf_inputs},
         "nativePhotoRecX86Sha256": sha256(ROOT / "app/build/generated-photorec-jni/x86_64/libdiephotorec.so"),
         "nativePhotoRecPackagedSha256": packaged_pdf_sha256,

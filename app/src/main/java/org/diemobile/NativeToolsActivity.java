@@ -47,7 +47,7 @@ public final class NativeToolsActivity extends Activity {
         LinearLayout view = new LinearLayout(this); view.setOrientation(LinearLayout.VERTICAL); return view;
     }
     private TextView text(String value, int size) {
-        TextView view = new TextView(this); view.setText(value); view.setTextSize(size); view.setTextColor(0xffe5eaf0); return view;
+        return WorkbenchUi.text(this, value, size);
     }
     private Button button(String label, Runnable action) {
         Button view = new Button(this); view.setText(label); view.setTextSize(12); view.setAllCaps(false);
@@ -308,8 +308,6 @@ public final class NativeToolsActivity extends Activity {
         public Object getItem(int position) { return rows.get(position); }
         public long getItemId(int position) { return rows.get(position).index; }
         public View getView(int position, View recycled, android.view.ViewGroup parent) {
-            TextView view = recycled instanceof TextView ? (TextView)recycled : text("", 12);
-            view.setTypeface(Typeface.MONOSPACE); view.setPadding(dp(6), dp(8), dp(6), dp(8));
             NativeTable.Row row = rows.get(position);
             String name = row.name.isEmpty() ? "(unnamed)" : row.name;
             if (name.length() > 160) name = name.substring(0, 160) + "… [tap for full name]";
@@ -323,7 +321,9 @@ public final class NativeToolsActivity extends Activity {
                 : table.kind.equals("resources") ? "type=" + row.text("typeId") + " name=" + row.text("nameId") + " lang=" + row.text("languageId") + " cp=" + row.text("codePage")
                 : table.kind.equals("disassembly") ? row.text("bytes") + " | " + row.text("addressDomain") + "\n" + row.text("comment")
                 : "ordinal=" + row.text("ordinal") + (row.flag("isDelay") ? " delay-load" : "") + (row.text("forwarder").isEmpty() ? "" : " forwarder=" + row.text("forwarder"));
-            view.setText(heading + "\n" + numbers + "\n" + extra); return view;
+            WorkbenchUi.Lines display = new WorkbenchUi.Lines(NativeToolsActivity.this).heading(heading).code(numbers);
+            if (table.kind.equals("disassembly")) display.code(extra); else display.line(extra);
+            return WorkbenchUi.row(NativeToolsActivity.this, recycled, display.build());
         }
     }
 
@@ -366,8 +366,8 @@ public final class NativeToolsActivity extends Activity {
             JSONObject fields = row.toJson(); Iterator<String> keys = fields.keys();
             while (keys.hasNext()) {
                 String key = keys.next(); Object value = fields.get(key);
-                TextView rawField = text(key + " = " + (value == JSONObject.NULL ? "null (unavailable)" : value), 13);
-                rawField.setTypeface(Typeface.MONOSPACE); rawField.setTextIsSelectable(true); body.addView(rawField);
+                TextView rawField = WorkbenchUi.fact(this, key, value == JSONObject.NULL ? "null (unavailable)" : value.toString(), true);
+                body.addView(rawField);
                 explanations.paragraph(this,body,"native.field."+source.kind+"."+key,"Explain "+key,ToolReference.field(key),true,false);
             }
             if (!row.hasFileByte(source.fileSize)) body.addView(text("This record has no validated physical target byte. Source-table records and virtual-address mapping may still provide useful evidence.", 13));

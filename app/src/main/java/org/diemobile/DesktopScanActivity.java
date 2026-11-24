@@ -48,7 +48,7 @@ public final class DesktopScanActivity extends Activity {
         b.setOnClickListener(v->action.run());return b;
     }
     private TextView text(String s,int size){
-        TextView t=new TextView(this);t.setText(s);t.setTextSize(size);return t;
+        return WorkbenchUi.text(this,s,size);
     }
 
     @Override public void onCreate(Bundle state) {

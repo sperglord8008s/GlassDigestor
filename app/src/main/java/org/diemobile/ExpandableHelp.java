@@ -129,11 +129,7 @@ final class ExpandableHelp {
             boolean initial) {
         Button toggle = new Button(context);
         toggle.setTextSize(12);
-        TextView body = new TextView(context);
-        body.setText(text);
-        body.setTextSize(13);
-        body.setTextColor(0xffe5eaf0);
-        body.setTextIsSelectable(true);
+        TextView body = WorkbenchUi.prose(context, text);
         int pad = Math.round(8 * context.getResources().getDisplayMetrics().density);
         body.setPadding(pad, pad, pad, pad);
         body.setTag("explanation:" + key);

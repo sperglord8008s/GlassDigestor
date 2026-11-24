@@ -1469,3 +1469,41 @@ cleanup shortcuts into the app. Original native findings and actual file exports
 must remain independent of transient rendered pixels. This is a concrete next
 route to viewing more recovered media; MPV playback and F-Droid source-building
 remain separate work.
+
+
+## Pre-alpha.17: explain strings, text actions and shared readable evidence
+
+Branch `codex/explain-strings-explore-style` targets `0.6.0-pre-alpha.17`, code 23.
+Captured classifier 1.1.0 mechanisms, group-specific Why summaries, structured
+matched text and eight-occurrence pages retain all original occurrences/spans.
+Exact local Copy, explicit four-engine search/three-provider English translation
+and selection actions retain no query history or INTERNET permission. Explore
+and core lists/viewers use the shared labelled hierarchy without losing existing
+acquisition, preview or export routes. Contracts: [text investigation UI](text-investigation-ui.md).
+
+All **209 host Android tests**, standalone strings/DEX, generic and native suites
+pass. Native-graphics compact captures are host images, not handset evidence.
+The new tenth actual Android contract compiles/static-verifies unchanged
+production TextActions/WorkbenchUi/resources, focused exact/sensitive clipboard
+and URI round trips. Actual API 26/35 execution and final source CI are pending.
+
+Local logs are `/workspace/work/string-explanations-{full-ui,generic,native,host,dex-final}.log`;
+runtime build/static logs use `string-explanations-runtime-*`. The full UI suite
+uses retained host JNI and `DIE_OFFLINE=true ./gradlew --offline --no-daemon
+:app:testDebugUnitTest`; do not rebuild Rust caches casually on the small disk.
+The runtime local build excluded unchanged native tasks after verifying all 20
+native source hashes and the previous packaged hash library, recorded in
+`/workspace/work/string-explanations-runtime-native-reuse.json`. Failed
+regenerable CMake metadata and redundant packaging copies were reclaimed; all
+frozen APKs and pinned source/dependency inputs remain intact. Clean CI must
+rebuild natives normally. For ARM64 local assembly recheck every source/library
+hash in `/workspace/work/pdf-unchanged-native-reuse.json`, then exclude only
+`:app:buildCMakeDebug[arm64-v8a][diehash,diemobile]`. Never alter source during a
+build or replace a loaded JNI library.
+
+Next: assemble/lint/static-check the clean commit, run both five-job source and
+ten-contract Android API 26/35 workflows, inspect failures, merge only working
+changes, and publish the exact successful source run as pre-alpha.17. Preserve
+pre-alpha.16 and all older immutable fallbacks. Download/audit new runtime and
+release identities before recording verified claims. Actual ARM64 UI/SAF,
+font-scale/screen-reader and external browser/provider acceptance remain pending.

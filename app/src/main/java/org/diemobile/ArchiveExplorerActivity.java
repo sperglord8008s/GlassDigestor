@@ -171,7 +171,14 @@ public final class ArchiveExplorerActivity extends Activity {
         files.sort(Comparator.comparing(row -> row.path)); ArrayList<Row> rows = new ArrayList<>(directories.values()); rows.addAll(files);
         int pages = Math.max(1, (rows.size() + 49) / 50); current().page = Math.max(0, Math.min(current().page, pages - 1));
         int from = current().page * 50; visible = new ArrayList<>(rows.subList(from, Math.min(rows.size(), from + 50)));
-        list.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, visible)); list.setSelection(0);
+        list.setAdapter(WorkbenchUi.adapter(this, visible, row -> {
+            if (row.member == null) return new WorkbenchUi.Lines(this).heading(row.label).muted("Virtual directory · open to browse").build();
+            ArchiveStore.Member member = row.member;
+            return new WorkbenchUi.Lines(this).heading("#" + member.index + " " + WorkbenchUi.preview(member.name, 160))
+                    .field("Decoded / compressed bytes", member.size + " / " + member.compressedSize, true)
+                    .field("ZIP method / CRC32", member.method + " / " + String.format(Locale.ROOT, "%08X", member.crc32), true)
+                    .muted(member.occurrences > 1 ? "Duplicate name · " + member.occurrences + " occurrences" : "Tap for complete member evidence").build();
+        })); list.setSelection(0);
         previous.setEnabled(!busy && current().page > 0); next.setEnabled(!busy && current().page + 1 < pages);
         if (!busy) status.setText(rows.size() + " folder matches • page " + (current().page + 1) + "/" + pages + " • " + inventory.members.size()
             + " archive entries • level " + trail.size() + "/" + MAX_LEVELS + " • " + retainedBytes() + " retained nested bytes");

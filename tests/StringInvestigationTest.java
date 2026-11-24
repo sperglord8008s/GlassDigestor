@@ -36,7 +36,21 @@ public final class StringInvestigationTest {
         positives.put("id.hex-digest","abcdef0123456789".repeat(4)); positives.put("id.uuid","12345678-1234-5678-abcd-123456789abc");
         require(positives.size() == StringClassifier.RULES.size(),"Every built-in rule needs a semantic positive fixture");
         for (var positive : positives.entrySet()) require(matches(positive.getValue(),positive.getKey()),"Rule failed: " + positive);
-        Set<String> ids = new HashSet<>(); for (var rule : StringClassifier.RULES) require(ids.add(rule.id),"Duplicate rule identifier");
+        Set<String> ids = new HashSet<>();
+        for (var rule : StringClassifier.RULES) {
+            require(ids.add(rule.id),"Duplicate rule identifier");
+            JSONObject captured = rule.json();
+            JSONArray rationales = captured.getJSONArray("categoryRationales");
+            require(rationales.length() == rule.groups.size(), "A category lost its captured rationale");
+            for (int i = 0; i < rationales.length(); i++) {
+                JSONObject reason = rationales.getJSONObject(i);
+                require(reason.getString("group").equals(rule.groups.get(i).name()), "Category rationale refers to another group");
+                require(!reason.getString("label").isEmpty() && !reason.getString("reason").isEmpty(), "Category explanation is blank");
+            }
+        }
+        StringClassifier.Result mixed = StringClassifier.classify("ptrace CVE-2024-12345 strcpy", () -> false);
+        require(mixed.summary("EVASION").contains("tracing") && !mixed.summary("EVASION").contains("CVE identifier"), "An evasion group shows an unrelated first reason");
+        require(mixed.summary("VULNERABILITIES").contains("Common Vulnerabilities and Exposures"), "Vulnerability grouping does not explain its actual CVE witness");
         require(StringClassifier.RULES_SHA256.matches("[a-f0-9]{64}"),"Missing rule identity");
         for (String bad : Arrays.asList("999.0.0.1","192.0.2.1:99999","1.2.3.456","v192.0.2.1")) require(!matches(bad,"net.ipv4"),"Invalid IPv4 accepted: " + bad);
         for (String good : Arrays.asList("::1","2001:db8:0:0:0:0:0:1","::ffff:192.0.2.1","[fe80::1%wlan0]:80")) require(matches(good,"net.ipv6"),"Valid IPv6 absent: " + good);

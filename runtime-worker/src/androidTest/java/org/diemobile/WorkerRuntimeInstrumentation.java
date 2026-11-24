@@ -54,8 +54,8 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
                             "Actual x86_64 Android production worker, hash/archive/PhotoRec JNI,"
                                 + " Binder, descriptors, PDF file recovery, compiled manifest"
                                 + " declarations, token cancellation and the production platform"
-                                + " media/PDF preview helpers. This does not verify ARM64, full UI,"
-                                + " MPV playback or 16 KiB-page runtime.");
+                                + " media/PDF preview and text clipboard/URI helpers. This does not"
+                                + " verify ARM64, full UI, MPV playback or 16 KiB-page runtime.");
             require(
                     android.os.Process.myUid() == target.getApplicationInfo().uid,
                     "Instrumentation must run as the normal target app UID");
@@ -81,6 +81,7 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
             mediaPreview();
             cancelBlockedReporter(abc);
             record("normal-client-recovers-after-worker-death", hash(abc));
+            textActions();
             success = true;
         } catch (Throwable failure) {
             try {
@@ -126,6 +127,118 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
             finish(
                     success ? android.app.Activity.RESULT_OK : android.app.Activity.RESULT_CANCELED,
                     result);
+        }
+    }
+
+    private void textActions() throws Exception {
+        TextActionRuntimeActivity activity =
+                (TextActionRuntimeActivity)
+                        startActivitySync(
+                                new Intent(target, TextActionRuntimeActivity.class)
+                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        AtomicReference<Boolean> sensitive = new AtomicReference<>(false);
+        String raw = "研究 😀 &?#/\n" + (char) 0 + (char) 0x202e + (char) 0xd800;
+        try {
+            require(activity.awaitFocus(), "Clipboard fixture never obtained window focus");
+            waitForIdleSync();
+            runOnMainSync(
+                    () -> {
+                        ClipboardManager clipboard =
+                                (ClipboardManager)
+                                        activity.getSystemService(Context.CLIPBOARD_SERVICE);
+                        try {
+                            require(activity.hasWindowFocus(), "Clipboard window lost focus");
+                            TextActions actions = new TextActions(activity);
+                            actions.copy(raw);
+                            ClipData copied = clipboard.getPrimaryClip();
+                            require(copied != null, "Platform clipboard did not return the clip");
+                            require(
+                                    raw.equals(copied.getItemAt(0).getText().toString()),
+                                    "Clipboard changed raw UTF-16, NUL or isolated surrogate");
+                            if (Build.VERSION.SDK_INT >= 33) {
+                                sensitive.set(
+                                        copied.getDescription()
+                                                .getExtras()
+                                                .getBoolean(ClipDescription.EXTRA_IS_SENSITIVE));
+                                require(sensitive.get(), "Sensitive clipboard flag was lost");
+                            }
+                            char[] oversized = new char[TextActions.MAX_CLIPBOARD_UNITS + 1];
+                            Arrays.fill(oversized, 'x');
+                            actions.copy(new String(oversized));
+                            require(
+                                    raw.equals(
+                                            clipboard
+                                                    .getPrimaryClip()
+                                                    .getItemAt(0)
+                                                    .getText()
+                                                    .toString()),
+                                    "Oversized refusal replaced the previous clip");
+                        } catch (Throwable error) {
+                            failure.set(error);
+                        } finally {
+                            if (clipboard != null)
+                                clipboard.setPrimaryClip(
+                                        ClipData.newPlainText("Fixture cleanup", ""));
+                        }
+                    });
+            require(failure.get() == null, "Platform copy failed: " + failure.get());
+            String query = raw.substring(0, raw.length() - 1);
+            JSONArray engines = new JSONArray();
+            for (TextActions.Engine engine : TextActions.Engine.values()) {
+                android.net.Uri uri = engine.uri(query);
+                require("https".equals(uri.getScheme()), "Text action URI is not HTTPS");
+                String decoded;
+                if (engine == TextActions.Engine.DEEPL) {
+                    require("www.deepl.com".equals(uri.getHost()), "Unexpected DeepL host");
+                    decoded = uri.getFragment().substring("auto/en/".length());
+                    require(uri.getFragment().startsWith("auto/en/"), "DeepL target differs");
+                } else {
+                    decoded = uri.getQueryParameter(engine.translation ? "text" : "q");
+                    if (engine.translation)
+                        require(
+                                "en"
+                                        .equals(
+                                                uri.getQueryParameter(
+                                                        engine
+                                                                        == TextActions.Engine
+                                                                                .GOOGLE_TRANSLATE
+                                                                ? "tl"
+                                                                : "to")),
+                                "Translation target is not English");
+                }
+                require(query.equals(decoded), "URI query changed the exact selected text");
+                try {
+                    engine.uri(raw);
+                    throw new AssertionError("Unpaired surrogate accepted for browser handoff");
+                } catch (IllegalArgumentException expected) {
+                    // Exact copy is allowed; lossy query encoding is not.
+                }
+                engines.put(
+                        new JSONObject()
+                                .put("engine", engine.name())
+                                .put("host", uri.getHost())
+                                .put("translation", engine.translation)
+                                .put("queryRoundTrip", true)
+                                .put("isolatedSurrogateRefused", true));
+            }
+            record(
+                    "exact-text-actions-platform-clipboard-and-uris",
+                    new JSONObject()
+                            .put("applicationUid", android.os.Process.myUid())
+                            .put("focusedNormalUidWindow", true)
+                            .put("exactUtf16Clipboard", true)
+                            .put("clipboardUtf16Units", raw.length())
+                            .put("nulBidiSupplementaryAndIsolatedSurrogate", true)
+                            .put("oversizedClipboardPreservedPrevious", true)
+                            .put("sensitiveClipFlagApplicable", Build.VERSION.SDK_INT >= 33)
+                            .put("sensitiveClipFlag", sensitive.get())
+                            .put("engines", engines)
+                            .put("externalBrowserLaunched", false)
+                            .put("externalServiceContacted", false));
+        } finally {
+            runOnMainSync(activity::finish);
+            waitForIdleSync();
         }
     }
 
@@ -568,7 +681,7 @@ public final class WorkerRuntimeInstrumentation extends Instrumentation {
                                     && full.bitmap.getHeight() == 1024
                                     && full.bitmap.getPixel(768, 512) == Color.RED,
                             "Actual full viewer helper did not rasterize logical points to bounded"
-                                + " useful pixels");
+                                    + " useful pixels");
                     fullReport.put(
                             "centerPixelArgb", Integer.toHexString(full.bitmap.getPixel(768, 512)));
                 } finally {

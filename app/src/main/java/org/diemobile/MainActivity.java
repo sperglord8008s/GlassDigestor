@@ -51,7 +51,7 @@ public class MainActivity extends Activity {
  private int page;
  private int dp(float n){return (int)(n*getResources().getDisplayMetrics().density+.5f);}
  private LinearLayout vertical(){LinearLayout l=new LinearLayout(this);l.setOrientation(LinearLayout.VERTICAL);return l;}
- private TextView txt(String s,int size){TextView t=new TextView(this);t.setText(s);t.setTextSize(size);t.setTextColor(0xffe5eaf0);return t;}
+ private TextView txt(String s,int size){return WorkbenchUi.text(this,s,size);}
  private TextView mono(String s){TextView t=txt(s,12);t.setTypeface(Typeface.MONOSPACE);t.setTextIsSelectable(true);return t;}
  private Button btn(String s,Runnable r){Button b=new Button(this);b.setText(s);b.setTextSize(12);b.setMinHeight(dp(38));b.setMinimumHeight(dp(38));b.setMinWidth(dp(48));b.setMinimumWidth(dp(48));b.setPadding(dp(8),0,dp(8),0);b.setAllCaps(false);b.setOnClickListener(v->r.run());return b;}
  private CheckBox opt(LinearLayout l,String s,boolean b){CheckBox c=new CheckBox(this);c.setText(s);c.setTextSize(12);c.setChecked(b);l.addView(c,new LinearLayout.LayoutParams(0,dp(42),1));return c;}
@@ -261,12 +261,12 @@ public class MainActivity extends Activity {
    case 7:heading("Captured report exports / engine log");addReportFormat("Export complete XML report",ScanReportFormats.Format.XML);addReportFormat("Export complete CSV report",ScanReportFormats.Format.CSV);addReportFormat("Export complete TSV report",ScanReportFormats.Format.TSV);pane.addView(txt("Complete captures, independent of page/filter. XML and tabular string values use explicit JSON encoding to preserve every UTF-16 unit; tabular metadata retains diagnostics and unknown fields.",13));pane.addView(mono(error.isEmpty()?pretty(report):error+"\n"+pretty(report)));break;
   }
  }
- private void heading(String title){TextView h=txt(title,14);h.setTypeface(null,Typeface.BOLD);h.setTextColor(0xff80cbc4);h.setBackgroundColor(0xff26323a);h.setPadding(dp(8),dp(6),dp(8),dp(6));pane.addView(h,new LinearLayout.LayoutParams(-1,-2));}
+ private void heading(String title){pane.addView(WorkbenchUi.section(this,title),new LinearLayout.LayoutParams(-1,-2));}
  private void field(String key,String value){field(key,value,null);}
  private void field(String key,String value,String explanation){
   LinearLayout row=new LinearLayout(this);row.setGravity(Gravity.TOP);row.setPadding(dp(6),dp(5),dp(6),dp(5));
-  TextView k=txt(key,13);k.setTextColor(0xffaab8c4);row.addView(k,new LinearLayout.LayoutParams(dp(78),-2));
-  TextView v=txt(value,13);v.setTextIsSelectable(true);row.addView(v,new LinearLayout.LayoutParams(0,-2,1));
+  LinearLayout facts=vertical();TextView k=txt(key,12);k.setTypeface(null,Typeface.BOLD);k.setTextColor(getColor(R.color.workbench_secondary));facts.addView(k);
+  TextView v=txt(WorkbenchUi.visible(value),14);v.setTextIsSelectable(true);if(key.matches("(?i).*(?:sha|md5|crc|offset|path|identity).*"))v.setTypeface(Typeface.MONOSPACE);facts.addView(v);row.addView(facts,new LinearLayout.LayoutParams(0,-2,1));
   TextView why=null;Button toggle=null;
   if(explanation!=null){toggle=btn("Explain",()->{});row.addView(toggle,new LinearLayout.LayoutParams(dp(78),-2));why=txt(explanation,13);why.setTextIsSelectable(true);why.setPadding(dp(8),dp(4),dp(8),dp(8));why.setTag("explanation:main."+page+"."+key);}
   pane.addView(row);if(why!=null){pane.addView(why);explanations.bind("main."+page+"."+key,"Explain "+key,toggle,why,true,false);}rule(pane);

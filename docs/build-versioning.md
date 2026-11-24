@@ -1,7 +1,7 @@
 # Build and checkpoint versions
 
 `version.properties` is the reviewed version source. Published checkpoints use
-`major.minor.patch-pre-alpha.sequence` (the published checkpoint is `0.6.0-pre-alpha.7`; current development is `0.6.0-pre-alpha.8`). Increase
+`major.minor.patch-pre-alpha.sequence` (the published checkpoint is `0.6.0-pre-alpha.16`; current development is `0.6.0-pre-alpha.17`). Increase
 the sequence and Android `version.code` for each newly published checkpoint.
 The numeric code must always exceed the previous published code; the version
 name itself does not determine Android update ordering.

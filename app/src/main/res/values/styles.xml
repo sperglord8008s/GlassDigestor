@@ -1,1 +1,16 @@
-<resources><style name="AppTheme" parent="android:style/Theme.Material.NoActionBar"><item name="android:fontFamily">sans</item><item name="android:colorAccent">#80CBC4</item><item name="android:windowBackground">#15191E</item><item name="android:statusBarColor">#15191E</item><item name="android:navigationBarColor">#15191E</item><item name="android:windowLightStatusBar">false</item></style></resources>
+<resources>
+    <style name="AppTheme" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">@color/workbench_accent</item>
+        <item name="android:textColorPrimary">@color/workbench_text</item>
+        <item name="android:textColorSecondary">@color/workbench_secondary</item>
+        <item name="android:textColorHint">@color/workbench_secondary</item>
+        <item name="android:textColorLink">@color/workbench_accent</item>
+        <item name="android:colorControlHighlight">@color/workbench_pressed</item>
+        <item name="android:listDivider">@drawable/workbench_divider</item>
+        <item name="android:windowBackground">@color/workbench_background</item>
+        <item name="android:statusBarColor">@color/workbench_background</item>
+        <item name="android:navigationBarColor">@color/workbench_background</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

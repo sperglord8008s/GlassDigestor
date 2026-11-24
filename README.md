@@ -50,6 +50,17 @@ Recognition alone does not establish a complete file boundary or full validity.
 [PDF page previews](docs/pdf-page-previews.md) ·
 [Input limits and large-file checks](docs/input-budgets.md)
 
+## Follow interesting strings
+
+Open **Strings → Grouped string classifier** or a DEX string group. Each match
+explains **why** it belongs to the selected category, highlights the exact token,
+and preserves its rule, source spans and original evidence. **Copy**, **Search…**
+and **Translate…** work on whole strings or exact matches. Choose a search or
+English-translation engine before the external browser receives any text.
+No query history or background submission is added.
+
+[Text actions, privacy and verification scope](docs/text-investigation-ui.md)
+
 ## Explore deeper
 
 | Workbench | Tools |

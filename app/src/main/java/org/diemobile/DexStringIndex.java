@@ -35,9 +35,11 @@ final class DexStringIndex {
             Row row(int i, BooleanSupplier cancelled) throws Exception {
                 Row original = source.row(included[i],cancelled); JSONObject fields = original.json(); String value = fields.getString("value");
                 StringClassifier.Result result = StringClassifier.classify(value,cancelled); long start = fields.getLong("physicalTextOffset");
-                fields.put("groups",result.groupNames()).put("classificationMatches",result.json(value, units -> start + mutf8Bytes(value,units)))
+                fields.put("groups",result.groupNames()).put("categoryRationales",result.categoryRationales())
+                    .put("classificationMatches",result.json(value, units -> start + mutf8Bytes(value,units)))
                     .put("classificationMeaning","Matches on exact decoded DEX string values. A pool value does not prove use; explicit encoded uses are a separate bounded scan.");
-                return new Row(original.index,original.name,"MUTF-8 • " + result.groupNames(),original.physicalOffset,original.sizeBytes,fields);
+                return new Row(original.index,original.name,"MUTF-8 • " + result.groupNames()
+                        + "\n" + result.summary(groupIndex < 0 ? "interesting" : StringClassifier.Group.values()[groupIndex].name()),original.physicalOffset,original.sizeBytes,fields);
             }
             JSONObject metadata() throws Exception {
                 JSONObject groupCounts = new JSONObject(); for (StringClassifier.Group group : StringClassifier.Group.values()) groupCounts.put(group.name(),counts[group.ordinal()]);
