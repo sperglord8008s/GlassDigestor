@@ -103,7 +103,7 @@ public final class NativeToolsActivity extends Activity {
         title.setEllipsize(TextUtils.TruncateAt.END); root.addView(title);
         // Bound configuration space by weight so small windows retain usable
         // results. Analyze/cancel/paging and search stay outside this scroll area.
-        ScrollView parameters = new ScrollView(this); parameters.setScrollbarFadingEnabled(false);
+        ScrollView parameters = WorkbenchUi.scroll(this); parameters.setScrollbarFadingEnabled(false);
         parameters.setContentDescription("Tool parameters and actions; scroll for more");
         LinearLayout controls = vertical(); parameters.addView(controls);
         root.addView(parameters, new LinearLayout.LayoutParams(-1, 0, 1));
@@ -139,8 +139,8 @@ public final class NativeToolsActivity extends Activity {
         metadata = text("", 12); metadata.setTextIsSelectable(true); metadata.setOnClickListener(v -> showMetadata()); root.addView(metadata);
         status = text("Ready", 12); status.setId(R.id.native_status); root.addView(status);
         FrameLayout results = new FrameLayout(this);
-        records = new ListView(this); records.setId(R.id.native_records); results.addView(records, new FrameLayout.LayoutParams(-1, -1));
-        textScroll = new ScrollView(this); HorizontalScrollView horizontal = new HorizontalScrollView(this);
+        records = WorkbenchUi.scrolling(new ListView(this)); records.setId(R.id.native_records); results.addView(records, new FrameLayout.LayoutParams(-1, -1));
+        textScroll = WorkbenchUi.scroll(this); HorizontalScrollView horizontal = new HorizontalScrollView(this);
         output = text("", 12); output.setId(R.id.native_output); output.setTypeface(Typeface.MONOSPACE); output.setTextIsSelectable(true);
         horizontal.addView(output); textScroll.addView(horizontal); results.addView(textScroll, new FrameLayout.LayoutParams(-1, -1));
         root.addView(results, new LinearLayout.LayoutParams(-1, 0, 2)); setContentView(root);
@@ -355,7 +355,7 @@ public final class NativeToolsActivity extends Activity {
         catch (JSONException e) { status.setText(e.toString()); }
     }
     private void showText(String title, String value) {
-        ScrollView scroll = new ScrollView(this); TextView view = text(value, 13); view.setTextIsSelectable(true);
+        ScrollView scroll = WorkbenchUi.scroll(this); TextView view = text(value, 13); view.setTextIsSelectable(true);
         view.setPadding(dp(12), dp(8), dp(12), dp(8)); scroll.addView(view);
         new AlertDialog.Builder(this).setTitle(title).setView(scroll).setPositiveButton("Close", null).show();
     }
@@ -370,8 +370,8 @@ public final class NativeToolsActivity extends Activity {
                 body.addView(rawField);
                 explanations.paragraph(this,body,"native.field."+source.kind+"."+key,"Explain "+key,ToolReference.field(key),true,false);
             }
-            if (!row.hasFileByte(source.fileSize)) body.addView(text("This record has no validated physical target byte. Source-table records and virtual-address mapping may still provide useful evidence.", 13));
-            ScrollView scroll = new ScrollView(this); scroll.addView(body);
+            if (!row.hasFileByte(source.fileSize)) body.addView(text("This record has no validated physical target byte. Source-table records and virtual-address mapping may still provide useful information.", 13));
+            ScrollView scroll = WorkbenchUi.scroll(this); scroll.addView(body);
             new AlertDialog.Builder(this).setTitle(source.kind + " • row " + row.index).setView(scroll)
                 .setNegativeButton("Close", null).setPositiveButton("Actions", (dialog, which) -> rowActions(source, row)).show();
         } catch (JSONException e) { status.setText("Record unavailable: " + e.getMessage()); }
@@ -421,7 +421,7 @@ public final class NativeToolsActivity extends Activity {
         LinearLayout body = vertical(); Spinner domain = new Spinner(this);
         domain.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, new String[]{"Physical file offset", "Preferred virtual address (0x…)"})); body.addView(domain);
         EditText value = new EditText(this); value.setSingleLine(); value.setText("0x" + Long.toHexString(lastOffset)); body.addView(value);
-        new AlertDialog.Builder(this).setTitle("Navigate address").setMessage("Physical offsets locate this file. Preferred VAs require a native map; runtime ASLR addresses need separate load evidence. Overlaps remain explicit.")
+        new AlertDialog.Builder(this).setTitle("Navigate address").setMessage("Physical offsets locate this file. Preferred VAs require a native map; runtime ASLR addresses need separate load information. Overlaps remain explicit.")
             .setView(body).setNegativeButton("Cancel", null).setPositiveButton("Open hex", (dialog, which) -> {
                 if (domain.getSelectedItemPosition() == 1) { mapAddress(value.getText().toString().trim()); return; }
                 try { long at = parseOffset(value.getText().toString(), false); if (at >= file.length()) throw new IOException("Offset has no byte in this input"); navigate(new ToolRequest(9, 0, at, 4, "", false, false)); }
@@ -484,8 +484,8 @@ public final class NativeToolsActivity extends Activity {
                     + String.format(Locale.ROOT, "Shannon entropy: %.6f bits/byte\n", analysis.entropy)
                     + "Range SHA-256: " + analysis.sha256 + "\nRange CRC32: " + analysis.crc32
                     + "\n\nThese digests identify only this physical range. Compression, encryption and ordinary media can all have high entropy; no behavior or safety verdict follows.";
-                TextView body = text(details, 13); body.setTextIsSelectable(true); ScrollView scroll = new ScrollView(this); scroll.addView(body);
-                new AlertDialog.Builder(this).setTitle("Physical range evidence").setView(scroll).setNegativeButton("Close", null)
+                TextView body = text(details, 13); body.setTextIsSelectable(true); ScrollView scroll = WorkbenchUi.scroll(this); scroll.addView(body);
+                new AlertDialog.Builder(this).setTitle("Physical range information").setView(scroll).setNegativeButton("Close", null)
                     .setPositiveButton("Export JSON", (dialog, which) -> {
                         try { prepareText("die-range-report.json", ToolReport.range(inputName, analysis.range.fileSize == initialSize ? inputSha256 : null, analysis)); } catch (JSONException e) { status.setText(e.getMessage()); }
                     }).show();

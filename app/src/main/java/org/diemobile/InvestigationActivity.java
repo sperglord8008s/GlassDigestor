@@ -34,6 +34,7 @@ public final class InvestigationActivity extends Activity {
     private String retentionState, pendingInputRequest;
     private String inputNotice = "";
     private long byteSize;
+    private int stringMinimum;
     private volatile int generation;
     private boolean busy, binding, pickerOpen, expired, communityAttempted;
     private AtomicBoolean cancellation = new AtomicBoolean();
@@ -99,6 +100,12 @@ public final class InvestigationActivity extends Activity {
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         explanations = new ExpandableHelp(this);
+        stringMinimum = state != null && state.containsKey("stringMinimum")
+                ? state.getInt("stringMinimum")
+                : getIntent().getIntExtra(
+                        "stringMinimum", ScanPreferences.load(this).minimumStringLength);
+        if (stringMinimum < 3 || stringMinimum > 64)
+            stringMinimum = ScanPreferences.load(this).minimumStringLength;
         communityAttempted = state != null && state.getBoolean("communityAttempted");
         String path = getIntent().getStringExtra("path"); if (path == null) { finish(); return; }
         File root = new File(path);
@@ -220,7 +227,7 @@ public final class InvestigationActivity extends Activity {
                             root,
                             new File(getCacheDir(), "string-snapshots"),
                             inputName,
-                            ScanPreferences.load(this).minimumStringLength);
+                            stringMinimum);
         else
             backend =
                     new DexBackend(
@@ -230,7 +237,17 @@ public final class InvestigationActivity extends Activity {
                             getIntent().getStringExtra("sha256"),
                             getIntent().getLongExtra("sourceSize", root.length()));
         if (state != null) inputNotice = state.getString("inputNotice", "");
-        createViews(); location = new Location(null, "", "", 0, 50);
+        createViews();
+        String initialFilter = isStringProvider() ? getIntent().getStringExtra("stringFilter") : null;
+        if (initialFilter == null) initialFilter = "";
+        if (initialFilter.length() > 1024) {
+            inputNotice = "Initial string filter exceeds 1024 characters; enter a shorter filter.";
+            initialFilter = "";
+        }
+        String initialView = isStringProvider()
+                        && "all".equals(getIntent().getStringExtra("stringInitialView"))
+                ? "all" : null;
+        location = new Location(initialView, initialFilter, initialFilter, 0, 50);
         if (state != null) {
             try {
                 Bundle saved = state.getBundle("location");
@@ -279,7 +296,19 @@ public final class InvestigationActivity extends Activity {
                 view.setPadding(bars.left + dp(8), bars.top + dp(8), bars.right + dp(8), bars.bottom + dp(8)); return insets;
             });
         }
-        title = text(inputName, 17); title.setMaxLines(2); title.setEllipsize(TextUtils.TruncateAt.MIDDLE); root.addView(title);
+        LinearLayout heading = new LinearLayout(this);
+        title = text(inputName, 17); title.setMaxLines(2); title.setEllipsize(TextUtils.TruncateAt.MIDDLE);
+        heading.addView(title, new LinearLayout.LayoutParams(0, -2, 1));
+        if ("binwalk".equals(getIntent().getStringExtra("provider"))) {
+            Button limits = button("Time limit…", () -> AnalysisTimeLimitsUi.show(
+                    this, "binwalk", () -> status.setText("New Binwalk requests: "
+                            + AnalysisTimeLimits.summary(this, "binwalk")
+                            + ". Current captured results keep their original limits.")));
+            limits.setTag("binwalk-time-limit");
+            heading.addView(limits);
+        }
+        heading.addView(explanations.controls(this));
+        root.addView(heading);
         context = text("Loading investigation…", 12);
         context.setMaxLines(3); context.setEllipsize(TextUtils.TruncateAt.END);
         context.setOnClickListener(
@@ -294,7 +323,6 @@ public final class InvestigationActivity extends Activity {
                                         + "\n\n"
                                         + pretty(provenance)));
         root.addView(context);
-        root.addView(explanations.controls(this));
         mechanismToggle = button("Scope and interpretation", () -> {});
         root.addView(mechanismToggle);
         mechanism = text("", 12);
@@ -304,7 +332,7 @@ public final class InvestigationActivity extends Activity {
         LinearLayout navigation = new LinearLayout(this);
         back = button("Back", this::goBack);
         add(navigation, back);
-        views = button("Root views", this::rootViews);
+        views = button(isStringProvider() ? "Categories" : "Views", this::rootViews);
         add(navigation, views);
         reload = button("Reload view", () -> load(capture(), false)); add(navigation, reload);
         cancel =
@@ -318,7 +346,9 @@ public final class InvestigationActivity extends Activity {
                         });
         add(navigation, cancel); root.addView(navigation);
         LinearLayout filtering = new LinearLayout(this); filter = new EditText(this); filter.setSingleLine();
-        filter.setHint("Search current evidence (press Search)");
+        filter.setHint(isStringProvider() ? "Filter strings / classification details" : "Search current information");
+        filter.setContentDescription(isStringProvider() ? "Filter the complete current string category" : "Search current information");
+        filter.setImeOptions(android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH);
         filter.setFilters(new InputFilter[]{new InputFilter.LengthFilter(1024)}); filtering.addView(filter, new LinearLayout.LayoutParams(0, -2, 3));
         search =
                 button(
@@ -350,7 +380,7 @@ public final class InvestigationActivity extends Activity {
         export = button("Export all", this::exportTable); add(paging, export); root.addView(paging);
         status = text("Ready", 12);
         status.setMaxLines(3); status.setTextIsSelectable(true); root.addView(status);
-        records = new ListView(this); root.addView(records, new LinearLayout.LayoutParams(-1, 0, 1)); setContentView(root);
+        records = WorkbenchUi.scrolling(new ListView(this)); root.addView(records, new LinearLayout.LayoutParams(-1, 0, 1)); setContentView(root);
         WorkbenchUi.list(this, records);
         filter.setId(R.id.investigation_filter); records.setId(R.id.investigation_records); status.setId(R.id.investigation_status);
         filter.addTextChangedListener(
@@ -399,7 +429,7 @@ public final class InvestigationActivity extends Activity {
         if (pickerOpen && prepared == null) return;
         final EvidenceRows retained = reuse && produced != null && Objects.equals(produced.request, target.request) ? source : null;
         final EvidenceRows.Selection retainedSelection = retained != null && produced.filter.equals(target.filter) ? selection : null;
-        final int ticket = begin("Reading selected evidence scope…");
+        final int ticket = begin("Reading selected information…");
         final AtomicBoolean stop = cancellation;
         location = target; produced = null; source = null; selection = null; shown = null; records.setAdapter(null); bind(target);
         worker.execute(
@@ -467,7 +497,10 @@ public final class InvestigationActivity extends Activity {
     }
     private void failed(int ticket, String message) { runOnUiThread(() -> { if (!isDestroyed() && ticket == generation) { busy = false; controls(); status.setText(message); } }); }
     private void present() {
-        title.setText(source.title);
+        title.setText(stringTitle());
+        views.setText(isStringScope() ? "Categories" : "Views");
+        filter.setHint(isStringScope() ? "Filter strings / classification details" : "Search current information");
+        filter.setContentDescription(isStringScope() ? "Filter the complete current string category" : "Search current information");
         context.setText(
                 (backend.statusSummary().isEmpty() ? "" : backend.statusSummary() + "\n")
                         + inputName
@@ -475,7 +508,9 @@ public final class InvestigationActivity extends Activity {
                         + byteSize
                         + " bytes • "
                         + source.size()
-                        + " records in scope");
+                        + " records in scope"
+                        + (isStringProvider() ? " • captured minimum " + stringMinimum
+                                + " Unicode code points" : ""));
         mechanism.setText(backend.help(produced.request));
         explanations.bind(
                 "investigation." + getIntent().getStringExtra("provider") + "." + source.kind,
@@ -569,6 +604,21 @@ public final class InvestigationActivity extends Activity {
         }
         else if (!history.isEmpty() && !pickerOpen) goBack(); else super.onBackPressed();
     }
+    private boolean isStringProvider() {
+        return "strings".equals(getIntent().getStringExtra("provider"));
+    }
+    private String stringTitle() {
+        if (!isStringProvider() || !source.kind.startsWith("strings-")) return source.title;
+        String category = source.kind.substring("strings-".length());
+        if ("all".equals(category)) return "All decoded string candidates";
+        if ("interesting".equals(category)) return "Classified strings";
+        if ("unclassified".equals(category)) return "Unclassified strings";
+        try { return "Strings · " + StringClassifier.Group.valueOf(category).label; }
+        catch (IllegalArgumentException unknown) { return source.title; }
+    }
+    private boolean isStringScope() {
+        return isStringProvider() || source != null && source.kind.equals("dex-classified-strings");
+    }
     private void rootViews() {
         if (busy || pickerOpen) return;
         InputSnapshot owned = backend.ownedByteSource();
@@ -577,7 +627,7 @@ public final class InvestigationActivity extends Activity {
         if (owned != null)
             names[roots.size()] = "Gallerize this captured input / gallery and byte grids";
         new AlertDialog.Builder(this)
-                .setTitle("Root evidence views")
+                .setTitle(isStringScope() ? "String categories" : "Information views")
                 .setItems(
                         names,
                         (dialog, which) -> {
@@ -676,7 +726,7 @@ public final class InvestigationActivity extends Activity {
                         } else
                             failed(
                                     ticket,
-                                    "Supplemental input failed; prior captured evidence retained: "
+                                    "Supplemental input failed; prior captured information retained: "
                                             + error.getMessage());
                     }
                 });
@@ -701,7 +751,7 @@ public final class InvestigationActivity extends Activity {
     }
 
     private void showText(String caption, String value) {
-        ScrollView scroll = new ScrollView(this);
+        ScrollView scroll = WorkbenchUi.scroll(this);
         String displayed =
                 value.length() > 128 * 1024
                         ? value.substring(0, 128 * 1024)
@@ -732,7 +782,7 @@ public final class InvestigationActivity extends Activity {
     }
 
     private void details(EvidenceRows.Row row) {
-        ScrollView scroll = new ScrollView(this);
+        ScrollView scroll = WorkbenchUi.scroll(this);
         String value = pretty(row.encoded);
         LinearLayout body = new LinearLayout(this);
         body.setOrientation(LinearLayout.VERTICAL);
@@ -754,7 +804,7 @@ public final class InvestigationActivity extends Activity {
                             this,
                             "Classification explanation unavailable: "
                                     + error.getMessage()
-                                    + ". Original evidence is retained below."));
+                                    + ". Original information is retained below."));
         }
         if (classification == null) {
             TextView name = text(visible(row.name), 16);
@@ -805,7 +855,8 @@ public final class InvestigationActivity extends Activity {
                 true,
                 false);
         new AlertDialog.Builder(this)
-                .setTitle("Record " + row.index + " • " + source.kind)
+                .setTitle(classification == null ? "Record " + row.index + " • " + source.kind
+                        : "String details · record " + row.index)
                 .setView(scroll)
                 .setNegativeButton("Close", null)
                 .setPositiveButton("Actions", (dialog, which) -> rowActions(row))
@@ -1304,7 +1355,7 @@ public final class InvestigationActivity extends Activity {
                                     busy = false;
                                     controls();
                                     showText(
-                                            "Range evidence",
+                                            "Range information",
                                             "Physical offset: "
                                                     + NativeTable.hexOffset(range.offset)
                                                     + "\nBytes: "
@@ -1447,7 +1498,7 @@ public final class InvestigationActivity extends Activity {
             String pending=pendingInputRequest;pendingInputRequest=null;pickerOpen=false;
             if(pending==null||result!=RESULT_OK||intent==null||intent.getData()==null) {
                 controls();
-                status.setText("Supplemental input selection cancelled; prior evidence retained");
+                status.setText("Supplemental input selection cancelled; prior information retained");
                 if(source==null)load(location,false);return;
             }
             acceptAdditionalInput(pending,intent.getData());return;
@@ -1497,6 +1548,7 @@ public final class InvestigationActivity extends Activity {
     @Override protected void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
         state.putBoolean("communityAttempted", communityAttempted);
+        state.putInt("stringMinimum", stringMinimum);
         if (location == null) return;
         state.putBundle("location", capture().bundle());
         ArrayList<Bundle> trail = new ArrayList<>(); for (Location value : history) trail.add(value.bundle());

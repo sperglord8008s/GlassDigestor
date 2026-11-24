@@ -42,7 +42,7 @@ public final class RuleDatabaseActivity extends Activity {
             return "Custom-rule option updated. Rescan the input to apply.";
         })));
         status = text("Reading private snapshots…", 13); root.addView(status);
-        ScrollView scroll = new ScrollView(this);
+        ScrollView scroll = WorkbenchUi.scroll(this);
         snapshots = new LinearLayout(this); snapshots.setOrientation(LinearLayout.VERTICAL);
         scroll.addView(snapshots); root.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
         setContentView(root);

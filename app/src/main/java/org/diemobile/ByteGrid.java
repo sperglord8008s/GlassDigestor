@@ -48,6 +48,128 @@ final class ByteGrid {
             long start = (long) cell * size / used;
             return new FileRange(size, start, (long) (cell + 1) * size / used - start);
         }
+
+        /** Every populated cell between the anchor and endpoint, in original byte order. */
+        FileRange selection(int anchor, int end) {
+            if (anchor < 0 || end < 0 || anchor >= used || end >= used)
+                throw new IllegalArgumentException("Selection requires populated grid cells");
+            FileRange first = range(Math.min(anchor, end));
+            FileRange last = range(Math.max(anchor, end));
+            return new FileRange(size, first.offset, last.offset + last.length - first.offset);
+        }
+    }
+
+    /** Viewport coordinates only; zoom never changes byte partitions or raster allocation. */
+    static final class Viewport {
+        static final double MAX_ZOOM = 512;
+        final int columns, rows;
+        private int width, height;
+        double zoom = 1, centerX, centerY;
+
+        Viewport(int columns, int rows) {
+            if (columns < 1 || rows < 1) throw new IllegalArgumentException("Empty grid");
+            this.columns = columns;
+            this.rows = rows;
+            centerX = columns / 2.0;
+            centerY = rows / 2.0;
+        }
+
+        void resize(int width, int height) {
+            this.width = Math.max(0, width);
+            this.height = Math.max(0, height);
+            clamp();
+        }
+
+        double scale() {
+            return Math.min((double) width / columns, (double) height / rows) * zoom;
+        }
+
+        double left() {
+            return width / 2.0 - centerX * scale();
+        }
+
+        double top() {
+            return height / 2.0 - centerY * scale();
+        }
+
+        int cellAt(double x, double y) {
+            double scale = scale();
+            if (scale <= 0
+                    || !Double.isFinite(x)
+                    || !Double.isFinite(y)
+                    || x < 0
+                    || y < 0
+                    || x >= width
+                    || y >= height) return -1;
+            double column = (x - left()) / scale, row = (y - top()) / scale;
+            if (column < 0 || row < 0 || column >= columns || row >= rows) return -1;
+            return (int) row * columns + (int) column;
+        }
+
+        void zoomBy(double factor, double focusX, double focusY) {
+            if (!(factor > 0)
+                    || !Double.isFinite(factor)
+                    || !Double.isFinite(focusX)
+                    || !Double.isFinite(focusY)
+                    || scale() <= 0) return;
+            double column = (focusX - left()) / scale();
+            double row = (focusY - top()) / scale();
+            zoom = Math.max(1, Math.min(MAX_ZOOM, zoom * factor));
+            centerX = column - (focusX - width / 2.0) / scale();
+            centerY = row - (focusY - height / 2.0) / scale();
+            clamp();
+        }
+
+        void pan(double x, double y) {
+            if (scale() <= 0 || !Double.isFinite(x) || !Double.isFinite(y)) return;
+            centerX -= x / scale();
+            centerY -= y / scale();
+            clamp();
+        }
+
+        void centerOn(int cell) {
+            if (cell < 0 || cell >= (long) columns * rows) return;
+            centerX = cell % columns + 0.5;
+            centerY = cell / columns + 0.5;
+            clamp();
+        }
+
+        void fit() {
+            zoom = 1;
+            centerX = columns / 2.0;
+            centerY = rows / 2.0;
+        }
+
+        boolean restore(double zoom, double centerX, double centerY) {
+            if (!Double.isFinite(zoom)
+                    || zoom < 1
+                    || zoom > MAX_ZOOM
+                    || !Double.isFinite(centerX)
+                    || !Double.isFinite(centerY)
+                    || centerX < 0
+                    || centerX > columns
+                    || centerY < 0
+                    || centerY > rows) return false;
+            this.zoom = zoom;
+            this.centerX = centerX;
+            this.centerY = centerY;
+            clamp();
+            return true;
+        }
+
+        private void clamp() {
+            double scale = scale();
+            if (scale <= 0) return;
+            double halfWidth = width / (2 * scale), halfHeight = height / (2 * scale);
+            centerX =
+                    halfWidth >= columns / 2.0
+                            ? columns / 2.0
+                            : Math.max(halfWidth, Math.min(columns - halfWidth, centerX));
+            centerY =
+                    halfHeight >= rows / 2.0
+                            ? rows / 2.0
+                            : Math.max(halfHeight, Math.min(rows - halfHeight, centerY));
+        }
     }
 
     static Layout automatic(long size, Mode mode) {

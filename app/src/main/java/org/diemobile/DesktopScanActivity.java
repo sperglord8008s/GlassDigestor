@@ -107,7 +107,7 @@ public final class DesktopScanActivity extends Activity {
         status=text("Initializing bundled desktop database…",12);root.addView(status);
         filter=new EditText(this);filter.setSingleLine();filter.setHint("Filter results or signatures");
         root.addView(filter);
-        list=new ListView(this);root.addView(list,new LinearLayout.LayoutParams(-1,0,1));
+        list=WorkbenchUi.scrolling(new ListView(this));root.addView(list,new LinearLayout.LayoutParams(-1,0,1));
         setContentView(root);
         filter.addTextChangedListener(new android.text.TextWatcher() {
             public void beforeTextChanged(CharSequence s,int a,int c,int d){}
@@ -231,7 +231,7 @@ public final class DesktopScanActivity extends Activity {
     }
     private String pretty(String s){try{return new JSONObject(s).toString(2);}catch(Exception e){return s;}}
     private void dialog(String title,String value){
-        ScrollView sc=new ScrollView(this);TextView t=text(value,12);t.setTypeface(Typeface.MONOSPACE);
+        ScrollView sc=WorkbenchUi.scroll(this);TextView t=text(value,12);t.setTypeface(Typeface.MONOSPACE);
         t.setTextIsSelectable(true);sc.addView(t);new AlertDialog.Builder(this).setTitle(title)
             .setView(sc).setPositiveButton("Close",null).show();
     }

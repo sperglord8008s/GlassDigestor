@@ -165,7 +165,7 @@ public final class SystemExplorerActivity extends Activity {
         count = WorkbenchUi.text(this, "", 12);
         count.setTag("explore-count");
         root.addView(count);
-        list = new ListView(this);
+        list = WorkbenchUi.scrolling(new ListView(this));
         list.setTag("explore-records");
         WorkbenchUi.list(this, list);
         root.addView(list, new LinearLayout.LayoutParams(-1, 0, 1));
@@ -452,7 +452,7 @@ public final class SystemExplorerActivity extends Activity {
         return new Entry(
                 section,
                 component.name,
-                "Manifest declaration, not evidence that the component is running. Exported"
+                "Manifest declaration, not information that the component is running. Exported"
                         + " components may be addressable by other apps subject to permissions and"
                         + " platform rules.",
                 null,
@@ -599,7 +599,7 @@ public final class SystemExplorerActivity extends Activity {
                                         "APK files",
                                         "Investigate captured base + split APK set",
                                         "Compiled declarations, dependencies and independent"
-                                                + " signing evidence",
+                                                + " signing information",
                                         () -> {
                                             if (paths.isEmpty()) {
                                                 toast(

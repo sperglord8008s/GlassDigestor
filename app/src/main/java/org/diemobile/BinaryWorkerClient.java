@@ -12,10 +12,10 @@ import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 /** Pipe reports avoid Binder's transaction-size limit; cancellation targets one job token. */
 final class BinaryWorkerClient implements BinaryRunner, ArchiveRunner {
-    private static final long TIMEOUT_MS = 45000;
     private final Context context;
     private final String engine;
     private final Handler main = new Handler(Looper.getMainLooper());
@@ -79,7 +79,10 @@ final class BinaryWorkerClient implements BinaryRunner, ArchiveRunner {
             throw new IOException("Binary worker client must run off the UI thread");
         EvidenceRows.check(stop);
         if (closed.get()) throw new IOException("Binary worker client closed");
+        AnalysisTimeLimits.Request limits = AnalysisTimeLimits.capture(context, engine);
         String token = UUID.randomUUID().toString();
+        String requestDetail = limits.detail(engine, token);
+        DebugJournal.record(context, "worker_request_started", requestDetail);
         AtomicReference<Messenger> remote = new AtomicReference<>();
         AtomicReference<Exception> failure = new AtomicReference<>();
         CountDownLatch connected = new CountDownLatch(1);
@@ -97,7 +100,7 @@ final class BinaryWorkerClient implements BinaryRunner, ArchiveRunner {
                                 null,
                                 new IOException(
                                         "Isolated binary worker disconnected before completing its"
-                                            + " report"));
+                                                + " report"));
                         connected.countDown();
                     }
 
@@ -125,16 +128,18 @@ final class BinaryWorkerClient implements BinaryRunner, ArchiveRunner {
         watchdog.scheduleAtFixedRate(
                 () -> {
                     if (finished.get()) return;
-                    if (stop.getAsBoolean()
-                            || closed.get()
-                            || SystemClock.elapsedRealtime() - started > TIMEOUT_MS) {
-                        failure.compareAndSet(
-                                null,
-                                stop.getAsBoolean() || closed.get()
-                                        ? new InterruptedIOException("Binary analysis cancelled")
-                                        : new IOException(
-                                                "Binary worker exceeded the 45-second request"
-                                                    + " deadline"));
+                    IOException stopped =
+                            limits.termination(
+                                    SystemClock.elapsedRealtime() - started,
+                                    stop.getAsBoolean(),
+                                    closed.get());
+                    if (stopped != null && failure.compareAndSet(null, stopped)) {
+                        DebugJournal.record(
+                                context,
+                                stopped instanceof InterruptedIOException
+                                        ? "worker_request_cancelled"
+                                        : "worker_request_deadline",
+                                requestDetail);
                         Messenger service = remote.get();
                         if (service != null)
                             try {
@@ -189,6 +194,7 @@ final class BinaryWorkerClient implements BinaryRunner, ArchiveRunner {
                 Bundle arguments = request.getData();
                 arguments.putString("token", token);
                 arguments.putString("engine", engine);
+                limits.writeTo(arguments);
                 arguments.putParcelable("input", source);
                 arguments.putParcelable("output", pipe[1]);
                 arguments.putParcelable("payload", payload);
@@ -196,6 +202,7 @@ final class BinaryWorkerClient implements BinaryRunner, ArchiveRunner {
                 arguments.putLong("length", length);
                 arguments.putInt("member", member);
                 remote.get().send(request);
+                DebugJournal.record(context, "worker_request_dispatched", requestDetail);
             }
             pipe[1].close();
             pipe[1] = null;
@@ -226,9 +233,36 @@ final class BinaryWorkerClient implements BinaryRunner, ArchiveRunner {
             if (!engine.equals(envelope.getString("engine")))
                 throw new IOException("Worker response belongs to a different engine");
             JSONObject report = envelope.getJSONObject("report");
+            limits.validateEnvelope(envelope, report);
             envelope.remove("report");
-            report.put("worker", envelope.put("requestDeadlineMs", TIMEOUT_MS));
-            return report.toString();
+            report.put("worker", envelope);
+            return completeReport(
+                    report,
+                    () ->
+                            DebugJournal.record(
+                                    context,
+                                    "worker_request_completed",
+                                    requestDetail + " ok=" + report.optBoolean("ok")),
+                    () -> {
+                        Exception recorded = failure.get();
+                        return recorded != null
+                                ? recorded
+                                : limits.termination(
+                                        SystemClock.elapsedRealtime() - started,
+                                        stop.getAsBoolean(),
+                                        closed.get());
+                    });
+        } catch (Exception | LinkageError error) {
+            // Worker termination can close the report pipe before read() can observe failure.
+            // Keep the captured cancellation/deadline instead of replacing it with a pipe error.
+            Exception recorded = failure.get();
+            DebugJournal.recordFailure(
+                    context,
+                    "worker_request_failed",
+                    requestDetail,
+                    recorded == null ? error : recorded);
+            if (recorded != null) throw recorded;
+            throw error;
         } finally {
             finished.set(true);
             watchdog.shutdownNow();
@@ -241,6 +275,19 @@ final class BinaryWorkerClient implements BinaryRunner, ArchiveRunner {
                         }
             main.post(unbind);
         }
+    }
+
+    /**
+     * Serialization and best-effort journaling must settle before the terminal publication gate.
+     */
+    static String completeReport(
+            JSONObject report, Runnable journal, Supplier<Exception> terminalFailure)
+            throws Exception {
+        String encoded = report.toString();
+        journal.run();
+        Exception stopped = terminalFailure.get();
+        if (stopped != null) throw stopped;
+        return encoded;
     }
 
     @Override

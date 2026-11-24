@@ -11,6 +11,7 @@ source scripts/test-dependencies.sh
 load_json_test_dependency "$tmp"
 javac -cp "$json_test_jar" -d "$tmp/classes" \
   app/src/main/java/org/diemobile/{Inspector,EvidenceRows,EvidenceJson,InputSnapshot,InvestigationBackend,FileRange,RangeAnalysis,PreparedExport,BinwalkEngine,BinaryRunner,CarvingBackend,PhotoRecFileChecks,PhotoRecReport,BinwalkBackend}.java \
-  tests/fixtures/metadata/MetadataFixtureFactory.java tests/{BinwalkInvestigationTest,BinwalkInputTest}.java
+  tests/fixtures/metadata/MetadataFixtureFactory.java tests/{BinwalkInvestigationTest,BinwalkInputTest,BinwalkDeadlineTest}.java
 java --add-opens=java.base/java.io=ALL-UNNAMED -Djava.library.path="$PWD/app/build/host-binwalk" -cp "$tmp/classes:$json_test_jar" org.diemobile.BinwalkInvestigationTest "$tmp"
 java -Xmx128m --add-opens=java.base/java.io=ALL-UNNAMED -Djava.library.path="$PWD/app/build/host-binwalk" -cp "$tmp/classes:$json_test_jar" org.diemobile.BinwalkInputTest "$tmp"
+java -Xmx128m --add-opens=java.base/java.io=ALL-UNNAMED -Djava.library.path="$PWD/app/build/host-binwalk" -cp "$tmp/classes:$json_test_jar" org.diemobile.BinwalkDeadlineTest "$tmp"

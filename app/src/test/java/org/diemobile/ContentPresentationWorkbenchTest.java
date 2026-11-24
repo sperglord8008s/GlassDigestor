@@ -16,6 +16,7 @@ import org.robolectric.*;
 import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.*;
 import org.robolectric.shadows.ShadowAlertDialog;
+import org.robolectric.shadows.ShadowPopupMenu;
 import org.robolectric.util.ReflectionHelpers;
 
 import java.io.*;
@@ -146,10 +147,14 @@ public final class ContentPresentationWorkbenchTest {
         String sha = ReflectionHelpers.<Inspector.Result>getField(activity, "result").sha256;
         View why = tagged("explanation:main.1.Layout");
         assertEquals(View.GONE, why.getVisibility());
-        tagged("expand-explanations").performClick();
+        tagged("explanation-options").performClick();
+        ShadowPopupMenu.getLatestPopupMenu().getMenu()
+                .performIdentifierAction(ExpandableHelp.EXPAND_ALL, 0);
         assertEquals(View.VISIBLE, why.getVisibility());
         assertEquals(View.GONE, tagged("tool-group:executable").getVisibility());
-        tagged("collapse-explanations").performClick();
+        tagged("explanation-options").performClick();
+        ShadowPopupMenu.getLatestPopupMenu().getMenu()
+                .performIdentifierAction(ExpandableHelp.COLLAPSE_ALL, 0);
         assertEquals(View.GONE, why.getVisibility());
         // Individual overrides and the global setting survive an actual Main recreation.
         ExpandableHelp help = ReflectionHelpers.getField(activity, "explanations");

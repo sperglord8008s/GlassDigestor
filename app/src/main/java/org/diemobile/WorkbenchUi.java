@@ -13,6 +13,7 @@ import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -68,6 +69,26 @@ final class WorkbenchUi {
         list.setDivider(new ColorDrawable(context.getColor(R.color.workbench_divider)));
         list.setDividerHeight(Math.max(1, dp(context, 1)));
         list.setCacheColorHint(context.getColor(R.color.workbench_background));
+        fastScroll(list);
+    }
+
+    /** Native fast-scroll uses adapter positions, retaining paging and every supplied row. */
+    static void fastScroll(AbsListView list) {
+        list.setVerticalScrollBarEnabled(true);
+        list.setScrollbarFadingEnabled(false);
+        list.setFastScrollEnabled(true);
+        list.setFastScrollAlwaysVisible(true);
+        list.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+    }
+
+    static <T extends AbsListView> T scrolling(T list) {
+        fastScroll(list);
+        return list;
+    }
+
+    /** Generated columns and detail pages get a thumb which changes the actual scroll position. */
+    static DraggableScrollView scroll(Context context) {
+        return new DraggableScrollView(context);
     }
 
     static TextView row(Context context, View recycled, CharSequence value) {

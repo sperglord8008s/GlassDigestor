@@ -2,9 +2,11 @@
   <img src="app/src/main/res/drawable-nodpi/brand_mark.png" width="144" alt="GlassDigestor: a lens over file layers" />
 </p>
 <h1 align="center">GlassDigestor</h1>
-<p align="center"><strong>Open a file. Discover its contents. Follow the evidence.</strong><br/>An offline, free and open-source investigation workbench for Android.</p>
+<p align="center"><strong>Open a file. Explore its contents.</strong><br/>An offline, free and open-source investigation workbench for Android.</p>
 <p align="center">
   <a href="https://github.com/sperglord8008s/GlassDigestor/releases"><strong>Download a pre-alpha</strong></a> ·
+  <a href="docs/STATUS.md">Current status</a> ·
+  <a href="docs/PROJECT-MAP.md">Project map</a> ·
   <a href="#recover-and-view-files">File recovery walkthrough</a> ·
   <a href="docs/FEATURE-PARITY.md">Verified capabilities</a> ·
   <a href="docs/continuation.md">Build & contribute</a>
@@ -26,6 +28,7 @@ translation give selected text to your chosen browser only after an explicit
 action. Android's normal permissions determine accessible files and system data.
 
 ## Recover and view files
+
 
 1. **Select a file → Gallerize.** PhotoRec and Binwalk inspect the owned input;
    **Files** shows bounded recovered payloads, with images, audio/video,
@@ -91,19 +94,23 @@ the MPV source-build, dependency, release and signing work needed for submission
 
 ## Verification
 
-The published [pre-alpha.17 checkpoint](https://github.com/sperglord8008s/GlassDigestor/releases/tag/v0.6.0-pre-alpha.17)
-passed all five source CI jobs and **209 Android host tests**, using real native
+The published [pre-alpha.18 checkpoint](https://github.com/sperglord8008s/GlassDigestor/releases/tag/v0.6.0-pre-alpha.18)
+passed all five source CI jobs and **213 Android host tests**, using real native
 engines/parsers where documented. ARM64 compilation, lint, APK signatures,
 offline assets and static 16 KiB alignment are checked.
 
-**Ten actual Android contracts** passed on x86 API 26 and 35. Downloaded
+**Eleven actual Android contracts** passed on x86 API 26 and 35. Downloaded
 reports were independently checked against source, APK/library and report
 hashes. They include isolated worker transport/cancellation, archive extraction,
 bounded media observations, compiled declarations and exact recovery of a
 9,437,636-byte PDF, plus exact recovered two-page PDF rendering with independently
 known colors and geometry. A focused normal-UID window also checks exact raw
 UTF-16 copying, sensitive clipboard flags and seven engine URI encodings,
-without contacting an external service. [Exact verification evidence](docs/verification/android-worker-runtime-7c80322.json).
+without contacting an external service. The new large-archive contract checks
+20 MiB of exact decoded bytes through trusted cache aliases, retained origins
+and the actual isolated worker. [Download-verified runtime checks](docs/verification/android-worker-runtime-47bde0b.json).
+All 14 public release assets and the original CI files were independently audited;
+[release receipt](docs/verification/pre-alpha18-release.json).
 
 **Pre-alpha scope:** production ARM64 handset/SAF/UI acceptance, every media
 codec, arbitrary PDF/document support, fragmented recovery and full desktop Detect It Easy

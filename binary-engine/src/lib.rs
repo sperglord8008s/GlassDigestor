@@ -3,7 +3,7 @@ use aho_corasick::AhoCorasick;
 use binwalk::Binwalk;
 use jni::JNIEnv;
 use jni::objects::{JClass, JString};
-use jni::sys::{jint, jstring};
+use jni::sys::{jint, jlong, jstring};
 use serde_json::{Value, json};
 use std::collections::HashSet;
 use std::fs::File;
@@ -14,7 +14,9 @@ mod input;
 use std::panic::{AssertUnwindSafe, catch_unwind};
 
 const LIMIT: usize = input::MAX_BYTES;
-const DEADLINE_MS: u64 = 30000;
+const LEGACY_DEADLINE_MS: u64 = 30000;
+const MIN_DEADLINE_MS: u64 = 1000;
+const MAX_DEADLINE_MS: u64 = 1800000;
 
 struct Budget {
     started: Instant,
@@ -24,12 +26,27 @@ impl Budget {
     fn new() -> Self {
         Self {
             started: Instant::now(),
-            maximum: Duration::from_millis(DEADLINE_MS),
+            maximum: Duration::from_millis(LEGACY_DEADLINE_MS),
         }
+    }
+    fn requested(milliseconds: i64) -> Result<Self, String> {
+        if milliseconds < MIN_DEADLINE_MS as i64
+            || milliseconds > MAX_DEADLINE_MS as i64
+            || milliseconds % 1000 != 0
+        {
+            return Err("Binwalk analysis deadline requires whole seconds from 1 to 1800".into());
+        }
+        Ok(Self {
+            started: Instant::now(),
+            maximum: Duration::from_millis(milliseconds as u64),
+        })
     }
     fn check(&self) -> Result<(), String> {
         if self.started.elapsed() >= self.maximum {
-            Err("Binwalk exceeded its 30-second cooperative deadline; no complete result".into())
+            Err(format!(
+                "Binwalk exceeded its {}-millisecond cooperative deadline; no complete result",
+                self.maximum.as_millis()
+            ))
         } else {
             Ok(())
         }
@@ -124,13 +141,15 @@ fn scan(data: &[u8], budget: &Budget) -> Result<Value, String> {
     )
 }
 fn read(file: File) -> Result<Value, String> {
-    let budget = Budget::new();
+    read_with_budget(file, &Budget::new(), false)
+}
+fn read_with_budget(file: File, budget: &Budget, requested: bool) -> Result<Value, String> {
     let acquired = input::Input::acquire(file, || budget.check())?;
-    let mut result = scan(&acquired.bytes, &budget)?;
+    let mut result = scan(&acquired.bytes, budget)?;
     acquired.verify_identity()?;
     budget.check()?;
     let metadata = json!({
-        "adapter":"diemobile-binwalk-2",
+        "adapter":if requested {"diemobile-binwalk-3"} else {"diemobile-binwalk-2"},
         "inputReadMode":"owned-bounded-pread-copy",
         "inputSizedBufferAllocation":true,
         "maximumInputReadBufferBytes":LIMIT,
@@ -141,13 +160,19 @@ fn read(file: File) -> Result<Value, String> {
         "ownedDescriptorDuplicate":true,
         "callerDescriptorPositionPreserved":true,
         "sourceMetadataUnchanged":true,
-        "cooperativeDeadlineMs":DEADLINE_MS,
+        "cooperativeDeadlineMs":budget.maximum.as_millis() as u64,
         "parserCallbacksPreemptible":false
     });
     result
         .as_object_mut()
         .unwrap()
         .extend(metadata.as_object().unwrap().clone());
+    if requested {
+        let object = result.as_object_mut().unwrap();
+        object.insert("requestedDeadlineMs".into(), json!(budget.maximum.as_millis() as u64));
+        object.insert("minimumCooperativeDeadlineMs".into(), json!(MIN_DEADLINE_MS));
+        object.insert("maximumCooperativeDeadlineMs".into(), json!(MAX_DEADLINE_MS));
+    }
     Ok(result)
 }
 fn respond(mut env: JNIEnv, work: impl FnOnce(&mut JNIEnv) -> Result<Value, String>) -> jstring {
@@ -176,6 +201,18 @@ pub extern "system" fn Java_org_diemobile_BinwalkEngine_scanFd(
     fd: jint,
 ) -> jstring {
     respond(env, |_| read(input::duplicate(fd)?))
+}
+#[unsafe(no_mangle)]
+pub extern "system" fn Java_org_diemobile_BinwalkEngine_scanFdWithDeadline(
+    env: JNIEnv,
+    _class: JClass,
+    fd: jint,
+    milliseconds: jlong,
+) -> jstring {
+    respond(env, |_| {
+        let budget = Budget::requested(milliseconds)?;
+        read_with_budget(input::duplicate(fd)?, &budget, true)
+    })
 }
 #[unsafe(no_mangle)]
 pub extern "system" fn Java_org_diemobile_BinwalkEngine_scanPath(
@@ -207,5 +244,32 @@ mod tests {
         let result = scan(&[], &Budget::new()).unwrap();
         assert!(result["ok"].as_bool().unwrap());
         assert!(result["rows"].as_array().unwrap().is_empty());
+    }
+    #[test]
+    fn invalid_requested_limits_fail_before_analysis() {
+        for milliseconds in [-1, 0, 999, 1001, 1800001, i64::MAX] {
+            assert!(Budget::requested(milliseconds).is_err());
+        }
+        assert!(Budget::requested(1000).is_ok());
+        assert!(Budget::requested(1800000).is_ok());
+    }
+    #[test]
+    fn requested_budget_controls_acquisition_and_report() {
+        use std::io::Write;
+        let path = std::env::temp_dir().join(format!("die-binwalk-budget-{}", std::process::id()));
+        let mut source = File::create(&path).unwrap();
+        source.write_all(&[0; 17]).unwrap();
+        drop(source);
+        let mut budget = Budget::requested(240000).unwrap();
+        let result = read_with_budget(File::open(&path).unwrap(), &budget, true).unwrap();
+        assert_eq!(result["requestedDeadlineMs"], json!(240000));
+        assert_eq!(result["cooperativeDeadlineMs"], json!(240000));
+        assert_eq!(result["sourceReadBytes"], json!(17));
+        assert_eq!(result["adapter"], json!("diemobile-binwalk-3"));
+        // The same captured budget covers descriptor acquisition, not just scan callbacks.
+        budget.started = Instant::now() - Duration::from_secs(241);
+        let error = read_with_budget(File::open(&path).unwrap(), &budget, true).unwrap_err();
+        assert!(error.contains("240000-millisecond cooperative deadline"));
+        std::fs::remove_file(path).unwrap();
     }
 }

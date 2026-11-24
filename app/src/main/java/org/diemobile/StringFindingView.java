@@ -197,10 +197,14 @@ final class StringFindingView {
             displayed.setTag("string-match-value-" + ordinal);
             parent.addView(displayed);
         }
-        parent.addView(WorkbenchUi.section(activity, "Why this category"));
+        Button whyToggle = button(activity, "Why this classification?", () -> {});
+        whyToggle.setTag("string-why-toggle-" + ordinal);
+        parent.addView(whyToggle);
         TextView why = WorkbenchUi.prose(activity, match.getString("observation"));
         why.setTag("string-why-" + ordinal);
         parent.addView(why);
+        help.bind("string.why." + match.getString("ruleId") + "." + ordinal,
+                "Why this classification?", whyToggle, why, false, true);
         if (exact != null)
             actions(
                     activity,

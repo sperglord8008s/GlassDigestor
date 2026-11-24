@@ -1,4 +1,4 @@
-# DiE Android contributor instructions
+# GlassDigestor contributor instructions
 
 Read docs/DESIGN-GOALS.md, docs/FEATURE-PARITY.md and docs/analysis-workbench.md before changes.
 
@@ -25,3 +25,11 @@ Complete functional desktop DiE parity first, then extend Android investigation 
 7. Native worker isolation, bounded resources, cancellation, malformed-input regression tests, full per-field technical references, accessibility and release reproducibility.
 
 Review actual upstream desktop feature list and update the parity matrix, not just these broad milestones. See current Actions for the precise status of the newest changes.
+
+
+## Project navigation and active work
+- Canonical repository/product: `sperglord8008s/GlassDigestor` / GlassDigestor.
+- Start with `docs/STATUS.md`, `docs/PROJECT-MAP.md` and `docs/continuation.md`; the required design/parity documents remain authoritative.
+- `main` is the integrated codebase; use one clearly named working branch for the current pass. Remove merged branch heads only after verifying their commits are in main. Preserve unfinished experiments in named savepoint tags before removing their branch heads.
+- Keep `org.diemobile` application/JNI identity compatible with existing installs. Upstream Detect It Easy names and notices identify the engine and its original authors.
+- Product UI uses Information, Details and Source rather than framing every result as evidence. Raw inspected text, upstream returned fields and existing report schemas retain their exact meaning and bytes.

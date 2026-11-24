@@ -3,14 +3,19 @@ package org.diemobile;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.*;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
 
-/** Raw evidence stays visible; optional definitions expand individually or across the workbench. */
+/** Observed facts stay visible; optional definitions expand individually or across the workbench. */
 final class ExpandableHelp {
+    static final int EXPAND_ALL = 1, COLLAPSE_ALL = 2;
     private static final String DEFAULT = "definitions-expanded";
     private final SharedPreferences preferences;
     private final List<Binding> bindings = new ArrayList<>();
@@ -68,7 +73,7 @@ final class ExpandableHelp {
                                 || old.body.get() == null
                                 || old.body.get() == body);
         bindings.add(binding);
-        toggle.setAllCaps(false);
+        compact(toggle.getContext(), toggle);
         toggle.setOnClickListener(
                 view -> {
                     boolean expanded = body.getVisibility() == View.VISIBLE;
@@ -86,8 +91,14 @@ final class ExpandableHelp {
                 binding.definition ? preferences.getBoolean(DEFAULT, false) : binding.initial;
         boolean expanded = preferences.getBoolean(binding.key, fallback);
         body.setVisibility(expanded ? View.VISIBLE : View.GONE);
-        button.setText((expanded ? "▾ " : "▸ ") + binding.title);
+        boolean inline =
+                button.getParent() instanceof LinearLayout
+                        && ((LinearLayout) button.getParent()).getOrientation()
+                                == LinearLayout.HORIZONTAL;
+        button.setText((expanded ? "▾" : "▸") + (inline ? "" : " " + binding.title));
         button.setContentDescription((expanded ? "Collapse " : "Expand ") + binding.title);
+        if (Build.VERSION.SDK_INT >= 30)
+            button.setStateDescription(expanded ? "Expanded" : "Collapsed");
     }
 
     void refresh() {
@@ -107,16 +118,53 @@ final class ExpandableHelp {
 
     LinearLayout controls(Context context) {
         LinearLayout row = new LinearLayout(context);
-        for (boolean expanded : new boolean[] {false, true}) {
-            Button button = new Button(context);
-            button.setText(expanded ? "Expand explanations" : "Collapse explanations");
-            button.setTextSize(12);
-            button.setAllCaps(false);
-            button.setTag(expanded ? "expand-explanations" : "collapse-explanations");
-            button.setOnClickListener(view -> setAll(expanded));
-            row.addView(button, new LinearLayout.LayoutParams(0, -2, 1));
-        }
+        row.setGravity(Gravity.END | Gravity.CENTER_VERTICAL);
+        Button button = new Button(context);
+        compact(context, button);
+        button.setText("⋮");
+        button.setTextSize(22);
+        button.setGravity(Gravity.CENTER);
+        button.setTag("explanation-options");
+        button.setContentDescription("Explanation options");
+        button.setTooltipText("Expand or collapse explanations");
+        button.setOnClickListener(
+                view -> {
+                    PopupMenu menu = new PopupMenu(context, button);
+                    menu.getMenu().add(0, EXPAND_ALL, 0, "Expand explanations");
+                    menu.getMenu().add(0, COLLAPSE_ALL, 1, "Collapse explanations");
+                    menu.setOnMenuItemClickListener(
+                            item -> {
+                                setAll(item.getItemId() == EXPAND_ALL);
+                                return true;
+                            });
+                    menu.show();
+                });
+        int size = WorkbenchUi.dp(context, 40);
+        row.addView(button, new LinearLayout.LayoutParams(size, size));
+        row.setLayoutParams(new LinearLayout.LayoutParams(-2, -2));
         return row;
+    }
+
+    private static void compact(Context context, Button button) {
+        button.setAllCaps(false);
+        button.setTextSize(12);
+        button.setTextColor(context.getColor(R.color.workbench_secondary));
+        button.setMinWidth(0);
+        button.setMinimumWidth(0);
+        button.setMinHeight(WorkbenchUi.dp(context, 40));
+        button.setMinimumHeight(WorkbenchUi.dp(context, 40));
+        button.setPadding(WorkbenchUi.dp(context, 6), 0, WorkbenchUi.dp(context, 6), 0);
+        button.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
+        button.setElevation(0);
+        TypedValue background = new TypedValue();
+        if (context.getTheme()
+                .resolveAttribute(android.R.attr.selectableItemBackground, background, true))
+            button.setBackgroundResource(background.resourceId);
+        ViewGroup.LayoutParams layout = button.getLayoutParams();
+        if (layout != null && layout.width == ViewGroup.LayoutParams.MATCH_PARENT) {
+            layout.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+            button.setLayoutParams(layout);
+        }
     }
 
     void paragraph(
@@ -133,7 +181,7 @@ final class ExpandableHelp {
         int pad = Math.round(8 * context.getResources().getDisplayMetrics().density);
         body.setPadding(pad, pad, pad, pad);
         body.setTag("explanation:" + key);
-        parent.addView(toggle);
+        parent.addView(toggle, new LinearLayout.LayoutParams(-2, -2));
         parent.addView(body);
         bind(key, title, toggle, body, definition, initial);
     }

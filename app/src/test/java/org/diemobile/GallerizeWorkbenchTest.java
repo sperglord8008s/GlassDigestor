@@ -416,6 +416,8 @@ public final class GallerizeWorkbenchTest {
         view.onTouchEvent(touch);
         touch.recycle();
         raster.recycle();
+        // Selection stays on the grid so subsequent taps can extend it before opening actions.
+        tagged(activity, "grid-range-actions").performClick();
         ShadowAlertDialog.getLatestAlertDialog()
                 .getButton(AlertDialog.BUTTON_POSITIVE)
                 .performClick();
@@ -432,6 +434,9 @@ public final class GallerizeWorkbenchTest {
         assertEquals(7, grid.layout.width);
         assertEquals(5, grid.layout.height);
         assertEquals(sha, grid.sha256);
+        ByteGridView restored = (ByteGridView) tagged(activity, "gallerize-grid");
+        assertEquals(13, restored.anchor());
+        assertEquals(13, restored.end());
         assertEquals("Restoration should reuse the exact native capture", 1, nativeCalls.get());
         invoke("gridSizes");
         ShadowAlertDialog.getLatestAlertDialog().getListView().performItemClick(null, 6, 6);
@@ -439,6 +444,56 @@ public final class GallerizeWorkbenchTest {
         grid = ReflectionHelpers.getField(activity, "grid");
         assertEquals(640, grid.layout.width);
         assertEquals(640, grid.layout.height);
+    }
+
+    @Test
+    public void zoomedContiguousTailExportAndSourceIdentitySurvivePickerRecreation()
+            throws Exception {
+        ReflectionHelpers.setField(activity, "mode", "entropy");
+        ReflectionHelpers.<EditText>getField(activity, "width").setText("7");
+        ReflectionHelpers.<EditText>getField(activity, "height").setText("5");
+        ReflectionHelpers.callInstanceMethod(
+                activity, "showGrid", ReflectionHelpers.ClassParameter.from(boolean.class, false));
+        settle(activity);
+        ByteGridView view = (ByteGridView) tagged(activity, "gallerize-grid");
+        view.layout(0, 0, 320, 240);
+        view.setSelection(30, 34);
+        tagged(activity, "grid-zoom-in").performClick();
+        tagged(activity, "grid-zoom-in").performClick();
+        tagged(activity, "grid-zoom-in").performClick();
+        assertEquals(8, view.viewport.zoom, 0);
+        long expectedStart = 30L * blob.length / 35;
+        assertEquals(expectedStart, view.selection().offset);
+        assertEquals(blob.length, view.selection().offset + view.selection().length);
+        String sha = ReflectionHelpers.<ByteGrid.Result>getField(activity, "grid").sha256;
+        ContentMap.Card card = ReflectionHelpers.callInstanceMethod(activity, "gridRangeCard");
+        assertTrue(card.explicitInterval);
+        assertEquals(expectedStart, card.offset);
+        assertEquals(Long.valueOf(blob.length - expectedStart), card.length);
+        tagged(activity, "grid-range-actions").performClick();
+        ShadowAlertDialog.getLatestAlertDialog().getListView().performItemClick(null, 1, 1);
+        settle(activity);
+        PreparedExport staged = ReflectionHelpers.getField(activity, "prepared");
+        assertNotNull(status(activity), staged);
+        byte[] expected = Arrays.copyOfRange(blob, (int) expectedStart, blob.length);
+        assertArrayEquals(expected, Files.readAllBytes(staged.file.toPath()));
+        assertTrue(original.delete());
+        controller.recreate();
+        activity = controller.get();
+        settle(activity);
+        view = (ByteGridView) tagged(activity, "gallerize-grid");
+        assertEquals(30, view.anchor());
+        assertEquals(34, view.end());
+        assertEquals(8, view.viewport.zoom, 0);
+        assertEquals(sha, ReflectionHelpers.<ByteGrid.Result>getField(activity, "grid").sha256);
+        assertEquals("Recreation must reuse the original native capture", 1, nativeCalls.get());
+        Uri destination = Uri.parse("content://org.diemobile.test/selected-grid-tail");
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        Shadows.shadowOf(activity.getContentResolver()).registerOutputStream(destination, output);
+        activity.onActivityResult(1, Activity.RESULT_OK, new Intent().setData(destination));
+        settle(activity);
+        assertArrayEquals(expected, output.toByteArray());
+        assertFalse(staged.file.exists());
     }
 
     @Test

@@ -37,7 +37,7 @@ final class StringBackend extends InvestigationBackend {
     @Override File byteSource() { return document == null ? input : document.input; }
     @Override String sourceName() { return name; }
     @Override String help(String request) {
-        return "Offline string classification • Root views group URLs/endpoints, commands/APIs, secret candidates, vulnerability/exploit and other indicators. Match spans, physical offsets, rules and context stay visible in each record. A match does not prove execution, a valid credential or a vulnerability. Counts overlap; tap here for decoding coverage and limits.";
+        return "Offline string classification • Categories group URLs/endpoints, commands/APIs, secret candidates, vulnerability/exploit and other indicators. Search filters every record in the current category, across all pages; open a string for Why this classification?, exact matched text, offsets and rule details. A match does not prove execution, a valid credential or a vulnerability. Category counts overlap. Captured minimum: " + minimum + " Unicode code points. Decoding coverage and limits remain in the source information and exports.";
     }
     @Override public void close() throws Exception { if (document != null) document.close(); }
 }

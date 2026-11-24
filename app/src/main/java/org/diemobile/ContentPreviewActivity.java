@@ -166,7 +166,7 @@ public final class ContentPreviewActivity extends Activity {
                                 .setPositiveButton("Close", null)
                                 .show());
         root.addView(identity);
-        originButton = button("Origin / captured evidence", this::showOrigin);
+        originButton = button("Source / captured information", this::showOrigin);
         originButton.setTag("content-origin");
         originButton.setEnabled(false);
         originButton.setVisibility(
@@ -222,11 +222,11 @@ public final class ContentPreviewActivity extends Activity {
                                                 + origin.relationship
                                                 + " · "
                                                 + origin.size
-                                                + " evidence bytes · SHA-256 "
+                                                + " information bytes · SHA-256 "
                                                 + origin.sha256;
                             } catch (Exception unavailable) {
                                 originNotice =
-                                        "Origin evidence unavailable: " + unavailable.getMessage();
+                                        "Origin information unavailable: " + unavailable.getMessage();
                             }
                         }
                         runOnUiThread(
@@ -432,7 +432,7 @@ public final class ContentPreviewActivity extends Activity {
                                     originBusy = false;
                                     originButton.setEnabled(true);
                                     exportMessage(
-                                            "Origin evidence unavailable: " + error.getMessage());
+                                            "Origin information unavailable: " + error.getMessage());
                                 });
                     }
                 });
@@ -444,7 +444,7 @@ public final class ContentPreviewActivity extends Activity {
         int operation = ++exportGeneration;
         exportBusy = true;
         exportBytes.setEnabled(false);
-        exportMessage("Checking and staging complete origin evidence…");
+        exportMessage("Checking and staging complete origin information…");
         worker.execute(
                 () -> {
                     PreparedExport staged = null;
@@ -695,7 +695,7 @@ public final class ContentPreviewActivity extends Activity {
         view.setTag("content-text");
         view.setTextIsSelectable(true);
         if (mono) view.setTypeface(Typeface.MONOSPACE);
-        ScrollView scroll = new ScrollView(this);
+        ScrollView scroll = WorkbenchUi.scroll(this);
         scroll.addView(view);
         content.addView(scroll, new LinearLayout.LayoutParams(-1, -1));
     }
@@ -855,7 +855,7 @@ public final class ContentPreviewActivity extends Activity {
                     image,
                     new android.widget.FrameLayout.LayoutParams(
                             observation.bitmap.getWidth(), observation.bitmap.getHeight()));
-            ScrollView vertical = new ScrollView(this);
+            ScrollView vertical = WorkbenchUi.scroll(this);
             vertical.setTag("content-pdf-scroll");
             vertical.addView(
                     horizontal,
@@ -1048,7 +1048,7 @@ public final class ContentPreviewActivity extends Activity {
             status.setText(
                     "Local media unavailable: "
                             + error
-                            + ". Use MPV / metadata tools for codec evidence.");
+                            + ". Use MPV / metadata tools for codec information.");
         }
     }
 
