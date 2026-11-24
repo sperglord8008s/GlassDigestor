@@ -65,7 +65,7 @@ if args.bundle:
         with ZipFile(temporary_path, 'w', compression=ZIP_DEFLATED, compresslevel=1) as bundle:
             for item in lock['sources']:
                 bundle.write(cache / item['file'], 'sources/' + item['file'])
-            for name in ('source-lock.json', 'runtime-lock.json', 'README.md', 'probe.c'):
+            for name in ('source-lock.json', 'runtime-lock.json', 'README.md', 'probe.c', 'frame.c', 'mpv_support.h'):
                 bundle.write(root / 'media-engine' / name, 'integration/' + name)
             for source_path in sorted((root / 'media-engine/include').rglob('*')):
                 if source_path.is_file():
