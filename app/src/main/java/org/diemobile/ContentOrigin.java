@@ -274,7 +274,9 @@ final class ContentOrigin implements AutoCloseable {
     private static File leaf(File directory, String name) throws IOException {
         if (!name.matches("content-origin-[A-Za-z0-9._-]+\\.ndjson"))
             throw new IOException("Invalid private origin filename");
-        File expected = new File(directory, name).getAbsoluteFile();
+        // Canonicalize the trusted Context root, not an untrusted leaf. Android can
+        // expose an app directory through an ancestor alias such as /data/user/0.
+        File expected = new File(directory.getCanonicalFile(), name);
         File file = expected.getCanonicalFile();
         if (!file.equals(expected) || !file.getParentFile().equals(directory.getCanonicalFile()))
             throw new IOException("Origin evidence is outside its private directory");

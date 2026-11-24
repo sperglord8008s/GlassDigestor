@@ -41,7 +41,10 @@ public final class ContentOriginTest {
                 "prefix\u0000 exact selected 世界 😀 bytes and suffix"
                         .getBytes(StandardCharsets.UTF_8);
         Files.write(source.toPath(), bytes);
-        File origins = root.resolve("origins").toFile(), exports = root.resolve("exports").toFile();
+        Path physicalCache = Files.createDirectories(root.resolve("physical-cache"));
+        Path contextCache = root.resolve("context-cache-alias");
+        Files.createSymbolicLink(contextCache, physicalCache);
+        File origins = contextCache.resolve("origins").toFile(), exports = root.resolve("exports").toFile();
         StringBuilder units = new StringBuilder();
         for (int i = 0; i < 65536; i++) units.append((char) i);
         String text = "Unclipped original witness 世界\n".repeat(10000) + units;
