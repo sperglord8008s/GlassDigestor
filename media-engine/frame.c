@@ -152,6 +152,19 @@ static bool write_pixels(int fd, const unsigned char *bytes, size_t count,
     return true;
 }
 
+static const char *rollback_pixels(int fd, const char *principal_error,
+                                   char *cleanup_failure, size_t capacity) {
+    int result;
+    do {
+        result = ftruncate(fd, 0);
+    } while (result < 0 && errno == EINTR);
+    if (result == 0) return principal_error;
+    // The caller discards every failed raster, even when truncation also fails.
+    // Use a separate buffer: principal_error may already refer to failure[].
+    snprintf(cleanup_failure, capacity, "%s; pixel output cleanup failed", principal_error);
+    return cleanup_failure;
+}
+
 static bool same_input(const struct stat *before, const struct stat *after) {
     return before->st_dev == after->st_dev && before->st_ino == after->st_ino
         && before->st_size == after->st_size
@@ -176,7 +189,7 @@ JNIEXPORT jbyteArray JNICALL Java_org_diemobile_MpvEngine_frameFd(
     unsigned char *rgba = NULL;
     bool output_owned = false, captured = false;
     const char *error = NULL;
-    char failure[256] = {0}, filter[512] = {0};
+    char failure[256] = {0}, cleanup_failure[512] = {0}, filter[512] = {0};
     int64_t width = 0, height = 0, stride = 0;
     int64_t display_width = 0, display_height = 0;
     size_t packed = 0;
@@ -353,7 +366,9 @@ done:
                ",\"maxNativeRasterBytes\":%u,\"maxPixelBytes\":%u,\"maxOutputBytes\":%u,\"maxNodes\":%u,\"nodeCount\":%u}",
                atomic_load(&input.bytes), atomic_load(&input.seeks), atomic_load(&input.opens), atomic_load(&input.denied),
                INPUT_LIMIT, READ_LIMIT, DEADLINE_MS, FRAME_MAX_NATIVE_BYTES, FRAME_MAX_PIXEL_BYTES, OUTPUT_LIMIT, NODE_LIMIT, json.nodes);
-    if ((error || json.error) && output_owned) (void)ftruncate(output, 0);
+    if ((error || json.error) && output_owned)
+        error = rollback_pixels(output, error ? error : json.error,
+                                cleanup_failure, sizeof(cleanup_failure));
     if (input.fd >= 0) close(input.fd);
     if (output >= 0) close(output);
     free(rgba);

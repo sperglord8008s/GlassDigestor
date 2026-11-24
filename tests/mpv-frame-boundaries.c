@@ -144,8 +144,41 @@ static void events_and_io(void) {
     fclose(file);
 }
 
+static void failed_raster_rollback(void) {
+    char name[] = "/tmp/diempv-rollback-XXXXXX";
+    int output = mkstemp(name); assert(output >= 0);
+    int read_only = open(name, O_RDONLY | O_CLOEXEC); assert(read_only >= 0);
+    assert(!unlink(name));
+    const unsigned char partial[] = {30,20,10,255};
+    assert(pwrite(output, partial, sizeof(partial), 0) == (ssize_t)sizeof(partial));
+    assert(lseek(output, 11, SEEK_SET) == 11);
+    char principal[] = "MPV pixel output exceeded its deadline", cleanup_failure[512];
+    const char *reason = rollback_pixels(output, principal, cleanup_failure, sizeof(cleanup_failure));
+    struct stat status;
+    assert(reason == principal && !fstat(output, &status) && status.st_size == 0);
+    assert(lseek(output, 0, SEEK_CUR) == 11);
+
+    // A real read-only descriptor cannot clear a failed raster. Keep its original
+    // reason and bytes; the parent must discard the private file after any error.
+    assert(pwrite(output, partial, sizeof(partial), 0) == (ssize_t)sizeof(partial));
+    assert(lseek(read_only, 7, SEEK_SET) == 7);
+    reason = rollback_pixels(read_only, principal, cleanup_failure, sizeof(cleanup_failure));
+    assert(reason == cleanup_failure);
+    assert(!strcmp(reason, "MPV pixel output exceeded its deadline; pixel output cleanup failed"));
+    assert(!strcmp(principal, "MPV pixel output exceeded its deadline"));
+    assert(!fstat(output, &status) && status.st_size == (off_t)sizeof(partial));
+    assert(lseek(output, 0, SEEK_CUR) == 11 && lseek(read_only, 0, SEEK_CUR) == 7);
+    unsigned char actual[sizeof(partial)];
+    assert(pread(read_only, actual, sizeof(actual), 0) == (ssize_t)sizeof(actual));
+    assert(!memcmp(actual, partial, sizeof(partial)));
+    reason = rollback_pixels(-1, principal, cleanup_failure, sizeof(cleanup_failure));
+    assert(reason == cleanup_failure && strstr(reason, principal) == reason);
+    assert(!close(read_only) && !close(output));
+}
+
 int main(void) {
     metadata_bounds(); before_screenshot_allocation(); raw_pixel_contract(); events_and_io();
-    puts("MPV frame C contracts passed: bounded/empty/malformed maps and tracks, display/SAR preflight, raw raster dimensions/stride/alpha, immediate failure events, positional output, deadlines and source-change gates.");
+    failed_raster_rollback();
+    puts("MPV frame C contracts passed: bounded/empty/malformed maps and tracks, display/SAR preflight, raw raster dimensions/stride/alpha, immediate failure events, positional output, deadlines, source-change gates and checked failed-raster rollback.");
     return 0;
 }

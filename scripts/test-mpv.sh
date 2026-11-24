@@ -9,11 +9,14 @@ source scripts/test-dependencies.sh
 load_json_test_dependency "$tmp"
 source scripts/host-mpv.sh
 library=$(die_host_mpv_library)
+fortify_level=$(die_host_mpv_fortify_level)
 "${CC:-cc}" -std=c11 -O2 -Wall -Wextra -Werror -pthread \
+  -U_FORTIFY_SOURCE "-D_FORTIFY_SOURCE=$fortify_level" \
   -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -Imedia-engine/include \
   tests/mpv-boundaries.c "$library" -Wl,-rpath,"$(dirname "$library")" -lm -o "$tmp/mpv-boundaries"
 "$tmp/mpv-boundaries"
 "${CC:-cc}" -std=c11 -O2 -Wall -Wextra -Werror -pthread \
+  -U_FORTIFY_SOURCE "-D_FORTIFY_SOURCE=$fortify_level" \
   -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -Imedia-engine/include \
   tests/mpv-frame-boundaries.c "$library" -Wl,-rpath,"$(dirname "$library")" -lm -o "$tmp/mpv-frame-boundaries"
 "$tmp/mpv-frame-boundaries"
