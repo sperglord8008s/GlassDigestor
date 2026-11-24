@@ -1,7 +1,7 @@
 # Project map
 
 The repository and Android product are **GlassDigestor**. `main` holds integrated
-work; `codex/workbench-improvements` is the current working branch. Named
+work; `codex/mpv-image-fallback` is the current working branch. Named
 `savepoint/…` tags preserve unfinished experiments. Released APK/source tags are
 immutable numbered checkpoints. [Current status](STATUS.md) is the entry point.
 

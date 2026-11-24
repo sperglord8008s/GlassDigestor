@@ -100,5 +100,6 @@ bounded native/Java reports and the resulting ZIP. Run native builds/tests
 serially: never replace a library while a test JVM has it loaded. This checks
 host engines/models/file bytes; Android UI and SAF acceptance stay separate.
 
-The pre-alpha.20 actual host native/export run passes 6/6; full build/CI and
-actual Android regression gates are still pending. [Receipt](../../../docs/verification/nist-L0-video-native-export.json).
+The published pre-alpha.20 actual host native/export run passes 6/6. All source
+build/CI gates and 13 selected actual x86 API 26/35 contracts pass; these Android
+contracts use generated fixtures rather than this external corpus. [Receipt](../../../docs/verification/nist-L0-video-native-export.json).
