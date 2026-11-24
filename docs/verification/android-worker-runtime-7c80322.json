@@ -1,0 +1,102 @@
+[
+  {
+    "sdk": 26,
+    "abi": "x86_64",
+    "sourceRevision": "7c803225ff7048f917a84a3b7ee98a04ba72beb8",
+    "artifactSha256": "4b8bbb31a9ead883bca0de5a7602ba8354c32b9e973616e62701e83f673f7daa",
+    "reportSha256": "ef93c3fbc419c57d47cd469f49353ca664ce8b8fc7de8e47a0f96590494315e3",
+    "reportSizeBytes": 1014901,
+    "checksPassed": 10,
+    "workflowPassed": true,
+    "completionPassed": true,
+    "normalUid": 10077,
+    "pdfWorkerUid": 99005,
+    "pdfPayloadSizeBytes": 440,
+    "pdfPayloadSha256": "1a664f099b15369794cb9e32e27dcd7ca13f84527fb1e7947eecda0ee4a8c261",
+    "largePdfWorkerUid": 99007,
+    "largePdfPayloadSizeBytes": 9437636,
+    "largePdfPayloadSha256": "0c37bd4faef8269249dfd6dba12d3aa6cfd4bb1f71dfa5a36b0e947a8b01de9c",
+    "optionalMetadataReadLimited": true,
+    "nativePdfRecoveryPassed": true,
+    "pdfRendererExecuted": true,
+    "pdfPagePayloadSha256": "f3961ece0dc19dfc3cbe2250a819f677721ae3184799cbc1237f576f799756f1",
+    "pdfPagePayloadSizeBytes": 692,
+    "pdfPageCount": 2,
+    "pdfPagePointDimensions": [
+      144,
+      96
+    ],
+    "pdfThumbnailPixels": [
+      24,
+      16
+    ],
+    "pdfFullViewPixels": [
+      1536,
+      1024
+    ],
+    "firstPageCenterArgb": "ffff0000",
+    "secondPageCenterArgb": "ff00ff00",
+    "pdfRecoveryWorkerUid": 99008,
+    "fullGalleryUiExecuted": false,
+    "productionArm64RuntimeVerified": false,
+    "exactPlatformClipboardUtf16": true,
+    "sensitiveClipFlagApplicable": false,
+    "sensitiveClipFlag": false,
+    "textEngineUriRoundTrips": 7,
+    "externalBrowserLaunched": false,
+    "externalServiceContacted": false,
+    "workflowRunId": 45387599711,
+    "artifactId": 14917421273,
+    "artifactSizeBytes": 2403923
+  },
+  {
+    "sdk": 35,
+    "abi": "x86_64",
+    "sourceRevision": "7c803225ff7048f917a84a3b7ee98a04ba72beb8",
+    "artifactSha256": "814098b5d1c55713d3e0cf73cc75e0352080df4525765d5860b610aea7449b57",
+    "reportSha256": "4a07c9ad7156865f015f92188c84dbeebec8efa24fe4db29e0e63a0bdaed8a6d",
+    "reportSizeBytes": 1014946,
+    "checksPassed": 10,
+    "workflowPassed": true,
+    "completionPassed": true,
+    "normalUid": 10209,
+    "pdfWorkerUid": 99005,
+    "pdfPayloadSizeBytes": 440,
+    "pdfPayloadSha256": "1a664f099b15369794cb9e32e27dcd7ca13f84527fb1e7947eecda0ee4a8c261",
+    "largePdfWorkerUid": 99007,
+    "largePdfPayloadSizeBytes": 9437636,
+    "largePdfPayloadSha256": "0c37bd4faef8269249dfd6dba12d3aa6cfd4bb1f71dfa5a36b0e947a8b01de9c",
+    "optionalMetadataReadLimited": true,
+    "nativePdfRecoveryPassed": true,
+    "pdfRendererExecuted": true,
+    "pdfPagePayloadSha256": "f3961ece0dc19dfc3cbe2250a819f677721ae3184799cbc1237f576f799756f1",
+    "pdfPagePayloadSizeBytes": 692,
+    "pdfPageCount": 2,
+    "pdfPagePointDimensions": [
+      144,
+      96
+    ],
+    "pdfThumbnailPixels": [
+      24,
+      16
+    ],
+    "pdfFullViewPixels": [
+      1536,
+      1024
+    ],
+    "firstPageCenterArgb": "ffff0000",
+    "secondPageCenterArgb": "ff00ff00",
+    "pdfRecoveryWorkerUid": 99008,
+    "fullGalleryUiExecuted": false,
+    "productionArm64RuntimeVerified": false,
+    "exactPlatformClipboardUtf16": true,
+    "sensitiveClipFlagApplicable": true,
+    "sensitiveClipFlag": true,
+    "textEngineUriRoundTrips": 7,
+    "externalBrowserLaunched": false,
+    "externalServiceContacted": false,
+    "workflowRunId": 45387599711,
+    "artifactId": 14917797226,
+    "artifactSizeBytes": 2409011
+  }
+]

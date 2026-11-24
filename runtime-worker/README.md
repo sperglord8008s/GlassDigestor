@@ -28,7 +28,8 @@ in run [`44733208678`](https://github.com/sperglord8008s/DiE-Android-/actions/ru
 All nine contracts passed at `04e93c0` on actual API 26/35 in run
 44967525584, including >9 MiB native PDF recovery and exact recovered two-page
 rendering. [Download-verified summary](../docs/verification/android-worker-runtime-04e93c0.json).
-Pre-alpha.17 adds a tenth clipboard/URI contract; its new execution is pending.
+Pre-alpha.17 source `7c80322` passes all ten contracts in run `45387599711`.
+[Download-verified clipboard/URI and native evidence](../docs/verification/android-worker-runtime-7c80322.json).
 
 ## Reproduce
 

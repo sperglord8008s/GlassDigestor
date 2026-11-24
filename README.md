@@ -20,9 +20,10 @@ Android packages on your device. Technical facts, original evidence and
 expandable explanations are available together. Dense views, search, paging
 and complete exports support investigations beyond the first screen of results.
 
-**No account, ads, telemetry, cloud upload or INTERNET permission.** Selected
-applications are inspected as data and never executed. Android's normal
-permissions determine which files and system information are accessible.
+**Offline analysis, no account, ads, telemetry or INTERNET permission.** Selected
+applications are inspected as data and never executed. Optional search and
+translation give selected text to your chosen browser only after an explicit
+action. Android's normal permissions determine accessible files and system data.
 
 ## Recover and view files
 
@@ -90,17 +91,19 @@ the MPV source-build, dependency, release and signing work needed for submission
 
 ## Verification
 
-The published [pre-alpha.16 checkpoint](https://github.com/sperglord8008s/GlassDigestor/releases/tag/v0.6.0-pre-alpha.16)
-passed all five source CI jobs and **195 Android host tests**, using real native
+The published [pre-alpha.17 checkpoint](https://github.com/sperglord8008s/GlassDigestor/releases/tag/v0.6.0-pre-alpha.17)
+passed all five source CI jobs and **209 Android host tests**, using real native
 engines/parsers where documented. ARM64 compilation, lint, APK signatures,
 offline assets and static 16 KiB alignment are checked.
 
-**Nine actual Android contracts** passed on x86 API 26 and 35. Downloaded
+**Ten actual Android contracts** passed on x86 API 26 and 35. Downloaded
 reports were independently checked against source, APK/library and report
 hashes. They include isolated worker transport/cancellation, archive extraction,
 bounded media observations, compiled declarations and exact recovery of a
 9,437,636-byte PDF, plus exact recovered two-page PDF rendering with independently
-known colors and geometry. [Exact verification evidence](docs/verification/android-worker-runtime-04e93c0.json).
+known colors and geometry. A focused normal-UID window also checks exact raw
+UTF-16 copying, sensitive clipboard flags and seven engine URI encodings,
+without contacting an external service. [Exact verification evidence](docs/verification/android-worker-runtime-7c80322.json).
 
 **Pre-alpha scope:** production ARM64 handset/SAF/UI acceptance, every media
 codec, arbitrary PDF/document support, fragmented recovery and full desktop Detect It Easy

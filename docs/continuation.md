@@ -1,6 +1,6 @@
 # Development continuation point
 
-The workbench is on main through PR #20 (`1b0a44b`) in **sperglord8008s/GlassDigestor** (the owner's rename of DiE-Android-, repository ID 1460636999). **0.6.0-pre-alpha.16 / code 22**, source `04e93c0`, is published. The pinned offline host-test-image follow-up is accepted at `95e46b3`; final source/runtime gates are recorded below. User priority is the actual recovered files: PhotoRec/Binwalk/archive galleries, usable in-app previews and exact file exports. Preserve production `org.diemobile`, existing signing and immutable checkpoint APKs. Full desktop parity and production handset verification remain incomplete. Read AGENTS.md and the three design/parity documents before changes. The latest continuation entry is at the end; older entries retain historical verification scope.
+The workbench is on main through **PR #21**, merge `d81154c`, in **sperglord8008s/GlassDigestor** (repository ID 1460636999). **0.6.0-pre-alpha.17 / code 23**, exact source `7c80322`, is published after both five-job source and API 26/35 ten-contract runs passed. The latest iteration explains classified strings, adds exact copy/explicit browser search/English translation, and shares readable Explore/evidence formatting. Preserve production `org.diemobile`, signing configuration and every immutable fallback APK. Full desktop parity and production handset acceptance remain incomplete. Read AGENTS.md and the three design/parity documents before changes. The latest continuation entry is at the end; older entries preserve historical verification scope.
 
 ## Implemented and fixture-verified in this work
 
@@ -1528,3 +1528,66 @@ fail without network or replacement. Authored interrupted/corrupt/fallback/
 cache fixtures, original SDK acquisition regressions, standalone strings,
 publication contracts and a fresh real pinned mirror download pass. New clean
 source/runtime CI must pass on this follow-up before release.
+
+
+## Published pre-alpha.17: accepted source and continuation
+
+PR #21 merges as `d81154cd2d39c9e363117e3a287cb52a9cd4ac30`. Exact release
+source is `7c803225ff7048f917a84a3b7ee98a04ba72beb8`, code 23. Both source
+five-job runs `45387599763` / `45387608955` and actual x86 API 26/35 ten-contract
+runs `45387599711` / `45387609013` pass. All 209 host Android cases, standalone
+string/DEX, generic/native, acquisition/publication regressions and clean CI
+ARM64/lint/static packaging gates pass. Publisher `45390385211` succeeds.
+
+The original CI APK is 52,869,925 bytes, SHA-256
+`7acdc615e6ea4d0c81733f5e99481d56388cebe3f0d24c0e069b4d784263744a`.
+Immutable original files are in `/workspace/work/releases/0.6.0-pre-alpha.17/ci`;
+independent static verification uses a hard link in `source-audit`, without
+modifying CI sidecars. `/workspace/release-source` is clean/detached at 7c80322.
+All prior frozen APKs and the separate 95d9afa local .17 checkpoint remain intact.
+
+Downloaded runtime proof and independent verifier are in
+`/workspace/work/runtime-evidence/7c80322`; the [public summary](verification/android-worker-runtime-7c80322.json)
+binds source/resources/test activity/APKs, actual normal/isolated UIDs,
+completion/report identities and all prior native/PDF cases. The new clipboard
+case preserves all 14 unusual UTF-16 units, retains API 35 sensitive flags and
+round-trips all seven URI engines without browser launch or service contact.
+Host-only readability images use authored fixtures and unchanged production UI;
+they do not establish handset, selection-toolbar or font-scale acceptance.
+
+Next work:
+1. Inspect main's newest CI first. Preserve verified .17 and increment to
+   pre-alpha.18 / code24 before the next application feature checkpoint.
+2. Validate actual ARM64 gallery/SAF saves, selection toolbar, browser handoff,
+   font scaling and screen-reader use when hardware is available. External
+   translation provider behavior is separate from offline encoding/helper tests.
+3. Continue actual recovered-file coverage. The retained
+   `/workspace/work/mpv-software-render-probe` demonstrates exact 64×48 TIFF/PPM
+   software rendering on the pinned host; production JNI/Android integration,
+   ownership/cancellation and UI remain unimplemented. Keep its experimental
+   cleanup/color-oracle shortcuts out of production. Source/renderer API pins
+   and remaining media/PhotoRec/fragment/desktop gaps are in the parity docs.
+4. F-Droid remains unlisted. The official MPV/FFmpeg prebuilt runtime still needs
+   the full corresponding-source NDK r30 rebuild/integration and signing work
+   documented in `docs/fdroid.md`; no new dependency or INTERNET permission was
+   introduced by text actions.
+
+Local source/dependency/toolchain caches remain available for offline builds.
+Disk is constrained: reclaim only audited regenerable object/packaging copies,
+never pinned inputs, loaded JNI libraries or frozen APKs. Do not run the full
+Rust rebuilding wrapper casually; direct Gradle tests can use retained real
+host libraries. Current build-reuse receipts and exact commands are above.
+
+
+Final public audit independently downloads/hashes all 14 assets and compares all
+six original CI files. Source ZIPs contain 87 exact repository files and 29
+hash-pinned upstream archives; every member CRC and safe path is checked.
+[Public release receipt](verification/pre-alpha17-release.json) retains every
+source-member identity. Local verifier/receipt are
+`/workspace/work/releases/0.6.0-pre-alpha.17/{verify-public.py,download-verification.json}`.
+To repeat, first download the immutable release into `public-downloads-temp`.
+Duplicate temporary downloads (142,909,434 bytes) were reclaimed after auditing;
+original CI APKs/sidecars, public metadata, runtime ZIPs and all existing pinned
+build inputs remain. About 183 MiB is free. The following commit changes only
+public documentation/images/receipts; it records source 7c80322's acceptance,
+not a new application feature. Inspect main's newest workflows before continuing.

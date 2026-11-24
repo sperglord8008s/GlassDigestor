@@ -78,3 +78,25 @@ Native-graphics host captures at 360 × 640 check the Explore pane and that the
 first primary match explanation is visible. These captures are not handset
 screenshots or screen-reader validation. Actual platform test scope and source
 identities are recorded separately in the parity checklist and release evidence.
+
+
+The exact-source Android run [45387599711](https://github.com/sperglord8008s/GlassDigestor/actions/runs/45387599711)
+passes all ten contracts at `7c80322` on actual x86 API 26/35. Independently
+downloaded reports bind every staged source/resource, test activity, APK,
+completion count/size/SHA-256 and prior native/PDF contract. The new case preserves
+all 14 fixture UTF-16 units (NUL, bidi, supplementary and isolated surrogate),
+checks refusal without replacing the prior clip, sensitive flags on API 35 and
+seven exact URI round trips. It launches no external browser and contacts no
+provider. [Retained evidence](verification/android-worker-runtime-7c80322.json).
+Production ARM64 UI, selection-toolbar behavior, real browsers/providers,
+font-scale and screen-reader acceptance remain unverified.
+
+## Host-rendered examples
+
+These unedited native-graphics captures come from `ReadabilityPreviewTest` and
+authored package/string fixtures, using the same production UI source as
+`7c80322`. They are host examples, not handset screenshots. Reproduce them with
+`scripts/test-workbench-ui.sh`; outputs are in `app/build/reports/workbench-ui`.
+
+<img src="images/pre-alpha17-explore.png" width="270" alt="Explore with grouped apps, bold names and labelled package IDs" />
+<img src="images/pre-alpha17-string-reason.png" width="240" alt="CVE match highlighted above a visible category mechanism explanation" />
