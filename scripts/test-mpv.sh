@@ -16,6 +16,8 @@ library=$(die_host_mpv_library)
 command -v ffmpeg >/dev/null || { echo 'Install ffmpeg to generate the real media fixtures.' >&2; exit 1; }
 javac -cp "$json_test_jar" -d "$tmp/classes" \
   app/src/main/java/org/diemobile/{Inspector,EvidenceRows,EvidenceJson,InputSnapshot,InvestigationBackend,FileRange,RangeAnalysis,PreparedExport,BinaryRunner,MpvEngine,MpvReference,MpvDocument,MpvTables,MpvBackend}.java \
-  tests/fixtures/metadata/MetadataFixtureFactory.java tests/MpvInvestigationTest.java
+  tests/fixtures/metadata/MetadataFixtureFactory.java tests/{MpvInvestigationTest,MpvFrameTest}.java
 java --add-opens=java.base/java.io=ALL-UNNAMED -Djava.library.path="$PWD/app/build/host-mpv" \
   -cp "$tmp/classes:$json_test_jar:$PWD/app/src/main/resources" org.diemobile.MpvInvestigationTest "$tmp"
+timeout 90s java --add-opens=java.base/java.io=ALL-UNNAMED -Djava.library.path="$PWD/app/build/host-mpv" \
+  -cp "$tmp/classes:$json_test_jar" org.diemobile.MpvFrameTest "$tmp"

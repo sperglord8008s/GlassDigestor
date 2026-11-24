@@ -395,3 +395,12 @@ The public six-file checkpoint inventory and all corresponding public asset
 digests match, and exact-source APK static verification passes. This verifies
 the shared PDF helper on those Android fixtures; production ARM64/SAF/full
 gallery UI, arbitrary documents and full desktop parity remain separate.
+
+
+Unreleased `codex/mpv-decoded-frame-previews` foundation: a fixed-command,
+null-output/paused libmpv screenshot path produces bounded packed RGBA through
+a separate checked descriptor. Actual host TIFF/PPM/black/1-pixel/resizing and
+source/output/alias/refusal tests pass, alongside the existing metadata/C-boundary
+suite. This bridge is not wired into production worker/UI and has no Android
+runtime verification. Keep it separate from published feature claims. Archive
+handset failure repair now takes priority; resume/rebase this branch afterward.
